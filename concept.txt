@@ -1,26 +1,32 @@
 #World
--Terrain
+-Terrain - generated OR static
 -Character
 -Enemies
--Loot
--Traps
--Activated elements
+-Loot - visible or hidden
+-Traps - visible or hidden
+-Activated elements - switches, levers, atctivated doors or chests, etc.
 
 #Entity
 -Position
--Representation
+-Representation - appearance and animations
 -Alive
 
-#Main Character
+#Main Character : Entity
 -HP
 -Attack power
 -Armor
--Inventory
--Modifiers
+-Inventory - equipped items, money, etc.
+-Modifiers - item effects, buffs, status effects
 
-#Enemies
+#Enemies : Entity
 -HP
 -Attack power
 -Armor
--Behaviour
--Loot table
+-Modifiers - status effects
+-Behaviour - basic AI
+-Loot table - possible item, money and experience drops
+
+#Loot : Entity
+-Effect type - permanent (when equiped), one time (consumable), timed (buff)
+-Effect - alter character stats, alter world (for keys)
+-Narrative elements - text, decoration
