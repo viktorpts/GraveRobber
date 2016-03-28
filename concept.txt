@@ -1,0 +1,26 @@
+#World
+-Terrain
+-Character
+-Enemies
+-Loot
+-Traps
+-Activated elements
+
+#Entity
+-Position
+-Representation
+-Alive
+
+#Main Character
+-HP
+-Attack power
+-Armor
+-Inventory
+-Modifiers
+
+#Enemies
+-HP
+-Attack power
+-Armor
+-Behaviour
+-Loot table
