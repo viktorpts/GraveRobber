@@ -11,17 +11,16 @@
 -Representation - appearance and animations
 -Alive
 
-#Main Character : Entity
+#Creature : Entity
 -HP
 -Attack power
 -Armor
+
+#Main Character : Creature , Movable
 -Inventory - equipped items, money, etc.
 -Modifiers - item effects, buffs, status effects
 
-#Enemies : Entity
--HP
--Attack power
--Armor
+#Enemies : Creature, Movable?(if yes we need AI)
 -Modifiers - status effects
 -Behaviour - basic AI
 -Loot table - possible item, money and experience drops
