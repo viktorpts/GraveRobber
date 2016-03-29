@@ -26,6 +26,21 @@
 -Loot table - possible item, money and experience drops
 
 #Loot : Entity
--Effect type - permanent (when equiped), one time (consumable), timed (buff)
--Effect - alter character stats, alter world (for keys)
+-Slot ID (if equipped or in bag)
+-Inventory management data and methods
 -Narrative elements - text, decoration
+-Cost (for shop use)
+
+#Item : Loot
+*Items are permanent
+-Stat changes
+-Flags - special effetcs, alter world (for keys) - HARDCODED OPTIONS
+-List of status effects applied to others or self
+
+#Consumable : Loot
+*Consumables disappear after use and are inventory stackable
+-Stat changes
+-Flags - special effetcs, alter world (for keys) - HARDCODED OPTIONS
+-List of status effects applied to others or self
+-Count/Ammo
+-Duration (-1 for isntant, 0+ for timed)
