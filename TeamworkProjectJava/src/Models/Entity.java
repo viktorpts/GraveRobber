@@ -1,3 +1,5 @@
+package Models;
+
 public class Entity {
     private Boolean isAlive;
     private double x = 0;

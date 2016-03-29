@@ -1,3 +1,7 @@
+package Models;
+
+import Enumerations.CurrentStatus;
+
 public class Loot extends Entity {
         private CurrentStatus currentStatus;
         private int Cost;

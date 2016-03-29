@@ -1,3 +1,5 @@
+package Models;
+
 public class Creature extends Entity{
     private int healthPoints;
     private int attackPower;

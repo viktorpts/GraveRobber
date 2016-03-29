@@ -1,3 +1,7 @@
+package Models;
+
+import Enumerations.CurrentStatus;
+
 public class Consumable extends Loot {
     private int ammo;
     private int duration;
