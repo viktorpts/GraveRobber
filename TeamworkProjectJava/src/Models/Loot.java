@@ -2,7 +2,7 @@ package Models;
 
 import Enumerations.InventoryStatus;
 
-public class Loot extends Entity {
+abstract public class Loot extends Entity {
         private InventoryStatus inventoryStatus;
         private int Cost;
 
