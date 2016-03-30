@@ -1,7 +1,7 @@
 package World;
 import java.util.Random;
 
-public class Dungeon extends Hall{
+public class Dungeon{
 
 	public Dungeon() {
 	}
@@ -105,8 +105,8 @@ public class Dungeon extends Hall{
 		} else { // if leaf node, create a dungeon within the minimum size constraints
 			int dungeonTop = (height - MIN_SIZE <= 0) ? 0 : rnd.nextInt( height - MIN_SIZE);
 			int dungeonLeft =  (width - MIN_SIZE <= 0) ? 0 : rnd.nextInt( width - MIN_SIZE);
-			int dungeonHeight = Math.max(rnd.nextInt( height - dungeonTop ), MIN_SIZE );;
-			int dungeonWidth = Math.max(rnd.nextInt( width - dungeonLeft ), MIN_SIZE );;
+			int dungeonHeight = Math.max(rnd.nextInt( height - dungeonTop ), MIN_SIZE );
+			int dungeonWidth = Math.max(rnd.nextInt( width - dungeonLeft ), MIN_SIZE );
 			dungeon = new Dungeon( x + dungeonTop, y +dungeonLeft, dungeonHeight, dungeonWidth);
 		}
 	}
