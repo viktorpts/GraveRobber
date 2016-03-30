@@ -1,9 +1,9 @@
 package Models;
 
-import Enumerations.CurrentStatus;
+import Enumerations.InventoryStatus;
 
 public class Item extends Loot {
-    public Item(double x, double y, CurrentStatus currentStatus, int cost) {
-        super(x, y, currentStatus, cost);
+    public Item(double x, double y, InventoryStatus inventoryStatus, int cost) {
+        super(x, y, inventoryStatus, cost);
     }
 }

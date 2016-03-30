@@ -1,14 +1,14 @@
 package Models;
 
-import Enumerations.CurrentStatus;
+import Enumerations.InventoryStatus;
 
 public class Loot extends Entity {
-        private CurrentStatus currentStatus;
+        private InventoryStatus inventoryStatus;
         private int Cost;
 
-    public Loot(double x, double y, CurrentStatus currentStatus, int cost) {
+    public Loot(double x, double y, InventoryStatus inventoryStatus, int cost) {
         super(x, y, false);//items not alive
-        this.currentStatus = currentStatus;
+        this.inventoryStatus = inventoryStatus;
         Cost = cost;
         super.setX(x);
         super.setY(y);

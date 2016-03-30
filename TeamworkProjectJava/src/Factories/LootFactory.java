@@ -1,6 +1,6 @@
 package Factories;
 
-import Interfaces.ILootProducable;
+import Interfaces.ILootProducible;
 
-public class LootFactory implements ILootProducable {
+public class LootFactory implements ILootProducible {
 }

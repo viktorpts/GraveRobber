@@ -1,38 +1,44 @@
 package Models;
 
-public class Entity {
+import World.Position;
+
+abstract public class Entity {
     private Boolean isAlive;
-    private double x = 0;
-    private double y = 0;
+    private Position position;
 
-    public Entity(double x, double y,boolean isAlive) {
-        this.x = x;
-        this.y = y;
+    public Entity(double x, double y, boolean isAlive) {
+        position = new Position(x, y);
     }
 
+    // Position modifiers
+    public Position getPos() {
+        return position;
+    }
+    public void setPos(double x, double y) {
+        position.setPos(x, y);
+    }
+
+    public double getX() {
+        return position.getX();
+    }
+    public void setX(double x) {
+        position.setX(x);
+    }
+
+    public double getY() {
+        return position.getY();
+    }
     public void setY(double y) {
-        this.y = y;
+        position.setY(y);
     }
 
+    // Alive modifiers
     public void setAlive(Boolean alive) {
         isAlive = alive;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
     public Boolean getAlive() {
-
         return isAlive;
     }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-  }
+}
 

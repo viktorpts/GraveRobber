@@ -1,8 +1,8 @@
 package Enumerations;
 
-public enum CurrentStatus {
+public enum InventoryStatus {
     hand,
     armor,
     backpack,
-    onGround;
+    onGround
 }

@@ -1,7 +1,7 @@
 package Factories;
 
-import Interfaces.IEnemyProducable;
-import Interfaces.IPlayerProducable;
+import Interfaces.IEnemyProducible;
+import Interfaces.IPlayerProducible;
 
-public class CreatureFactory implements IEnemyProducable, IPlayerProducable {
+public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
 }
