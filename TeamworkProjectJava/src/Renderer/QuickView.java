@@ -1,14 +1,17 @@
 package Renderer;
 
+import World.Dungeon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 
 /**
  * For testing only
  */
 public class QuickView {
     // Grid size
-    static final int gridSize = 20;
+    static final int gridSize = 4;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
@@ -16,11 +19,11 @@ public class QuickView {
         gc.setLineWidth(0.5);
 
         // Vertical lines
-        for (int i = 0; i < 80; i++) {
+        for (int i = 0; i < 800 / gridSize; i++) {
             gc.strokeLine(i * gridSize, 0, i * gridSize, 600);
         }
         // Horizontal lines
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 600 / gridSize; i++) {
             gc.strokeLine(0, i * gridSize, 800, i * gridSize);
         }
     }
@@ -44,5 +47,22 @@ public class QuickView {
                 break;
         }
         gc.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+    }
+
+    static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list) {
+        for (Dungeon dungeon : list) {
+            int x1 = dungeon.getX();
+            int y1 = dungeon.getY();
+            int x2 = dungeon.getWidth() + x1;
+            int y2 = dungeon.getHeight() + y1;
+            for (int i = x1; i < x2; i++) {
+                setBlock(gc, i, y1, 2);
+                setBlock(gc, i, y2-1, 2);
+            }
+            for (int j = y1; j < y2; j++) {
+                setBlock(gc, x1, j, 2);
+                setBlock(gc, x2-1, j, 2);
+            }
+        }
     }
 }

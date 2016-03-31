@@ -1,6 +1,7 @@
 package World;
+import Renderer.QuickView;
+import javafx.scene.canvas.GraphicsContext;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,9 +11,7 @@ public class GenerateDungeon {
 	private static Random rnd = new Random();
 
 
-	public  static ArrayList<Rectangle> rooms;
-
-	public static void main(String[] args) {
+	public static void makeSample() {
 		ArrayList<Dungeon> rectangles = new ArrayList<>(); // flat rectangle store to help pick a random one
 		Dungeon root = new Dungeon(0, 0, 60, 120); //
 		rectangles.add(root); //populate rectangle store with root area
@@ -27,28 +26,45 @@ public class GenerateDungeon {
 		}
 		root.generateDungeon(); //generate dungeons
 
-		rooms = getRoomParams(rectangles);// get rooms
-
-		rectangles.removeAll(rectangles); //flush content
-
-		printRooms(rooms); //this is just to test the output
+		//printDungeons(rectangles); //this is just to test the output
 	}
 
-	private static ArrayList<Rectangle> getRoomParams(ArrayList<Dungeon> room) {
-		ArrayList<Rectangle> rooms = new ArrayList<>();
-		for (Dungeon r : room) {
-			if (r.dungeon == null) {
-				continue;
+    /**
+     * This method creates dungeons iteratively and outputs them to the grid
+     */
+	public static ArrayList<Dungeon> sampleStep() {
+		ArrayList<Dungeon> rectangles = new ArrayList<>(); // flat rectangle store to help pick a random one
+		Dungeon root = new Dungeon(0, 0, 60, 120); //
+		rectangles.add(root); //populate rectangle store with root area
+		while (rectangles.size() < 19) { // this will give us 10 leaf areas
+			int splitIdx = rnd.nextInt(rectangles.size()); // choose a random element
+			Dungeon toSplit = rectangles.get(splitIdx);
+			if (toSplit.split()) { //attempt to split
+				rectangles.add(toSplit.getLeftChild());
+				rectangles.add(toSplit.getRightChild());
 			}
-			//get room x,y,width,height
-			Dungeon d = r.dungeon;
-			rooms.add(new Rectangle(d.getX(), d.getY(), d.getWidth(), d.getHeight()));
+
 		}
-		return rooms;
+		root.generateDungeon(); //generate dungeons
+
+        return rectangles;
 	}
 
+    /**
+     *
+     * @param list ArrayList of Dungeon to be trimmed to leaves only
+     * @return The trimmed list
+     */
+    public static ArrayList<Dungeon> filterTree(ArrayList<Dungeon> list) {
+        ArrayList<Dungeon> result = new ArrayList<Dungeon>();
+        for (Dungeon dungeon : list) {
+            if (dungeon.dungeon == null) continue;
+            result.add(dungeon);
+        }
+        return  result;
+    }
 
-	private static void printRooms(ArrayList<Rectangle> rectangles) {
+	private static void printDungeons(ArrayList<Dungeon> rectangles) {
 		byte[][] lines = new byte[60][];
 		for (int i = 0; i < 60; i++) {
 			lines[i] = new byte[120];
@@ -56,15 +72,15 @@ public class GenerateDungeon {
 				lines[i][j] = -1;
 		}
 		byte dungeonCount = -1;
-		for (Rectangle r : rectangles) {
-			if (r == null)
+		for (Dungeon r : rectangles) {
+			if (r.dungeon == null)
 				continue;
-			Rectangle d = r;
+			Dungeon d = r.dungeon;
 			dungeonCount++;
 			for (int i = 0; i < d.getHeight(); i++) {
-				for (int j = 0; j < d.getWidth(); j++) {
-					lines[(int) d.getX() + i][(int) d.getY() + j] = dungeonCount;
-				}
+				for (int j = 0; j < d.getWidth(); j++)
+
+					lines[d.getX() + i][d.getY() + j] = dungeonCount;
 			}
 		}
 		for (int i = 0; i < 60; i++) {
@@ -76,9 +92,5 @@ public class GenerateDungeon {
 			}
 			System.out.println();
 		}
-	}
-
-	public static ArrayList<Rectangle> getRooms() {
-		return rooms;
 	}
 }

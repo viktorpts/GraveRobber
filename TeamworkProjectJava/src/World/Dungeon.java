@@ -13,6 +13,9 @@ public class Dungeon{
 	private Dungeon leftChild;
 	private Dungeon rightChild;
 
+	/**
+	 * Properties
+     */
 	public Dungeon getDungeon() {
 		return dungeon;
 	}
@@ -71,6 +74,9 @@ public class Dungeon{
 
 	public Dungeon dungeon;
 
+	/**
+	 * Constructor
+     */
 	public Dungeon(int x, int y, int height, int width) {
 		this.x = x;
 		this.y = y;
@@ -78,6 +84,9 @@ public class Dungeon{
 		this.height = height;
 	}
 
+	/**
+	 * Attempts to split the room in two, if not already split and if MIN_SIZE has not been reached
+     */
 	public boolean split() {
 		if( leftChild != null ) //if already split, bail out
 			return false;
@@ -98,6 +107,9 @@ public class Dungeon{
 		return true; //split successful
 	}
 
+	/**
+	 * Recursively generate all leafs
+	 */
 	public void generateDungeon() {
 		if( leftChild != null ) { //if current are has child areas, propagate the call
 			leftChild.generateDungeon();
@@ -110,5 +122,4 @@ public class Dungeon{
 			dungeon = new Dungeon( x + dungeonTop, y +dungeonLeft, dungeonHeight, dungeonWidth);
 		}
 	}
-
 }
