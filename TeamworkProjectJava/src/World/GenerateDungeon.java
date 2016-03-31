@@ -34,7 +34,7 @@ public class GenerateDungeon {
      */
 	public static ArrayList<Dungeon> sampleStep() {
 		ArrayList<Dungeon> rectangles = new ArrayList<>(); // flat rectangle store to help pick a random one
-		Dungeon root = new Dungeon(0, 0, 60, 120); //
+		Dungeon root = new Dungeon(0, 0, 120, 120); //
 		rectangles.add(root); //populate rectangle store with root area
 		while (rectangles.size() < 19) { // this will give us 10 leaf areas
 			int splitIdx = rnd.nextInt(rectangles.size()); // choose a random element
@@ -56,7 +56,7 @@ public class GenerateDungeon {
      * @return The trimmed list
      */
     public static ArrayList<Dungeon> filterTree(ArrayList<Dungeon> list) {
-        ArrayList<Dungeon> result = new ArrayList<Dungeon>();
+        ArrayList<Dungeon> result = new ArrayList<>();
         for (Dungeon dungeon : list) {
             if (dungeon.dungeon == null) continue;
             result.add(dungeon);
