@@ -94,14 +94,24 @@ public class Dungeon {
 
         /**
          * direction of split - true for horizontal (top and bottom nodes), false for vertical (left and right nodes)
+         * Direction favours the shorter side if the ratio is more than 2:1, to prevent very long rooms
          */
-        boolean direction = rnd.nextBoolean();
+        boolean direction;
+        if (width > height * 1.5) direction = false;
+        else if (height > width * 1.5) direction = true;
+        else direction = rnd.nextBoolean();
         int max = (direction ? height : width) - MIN_SIZE; //maximum height/width we can split off
         if (max <= MIN_SIZE) // area too small to split, bail out
             return false;
         int newSize = rnd.nextInt(max); // generate split point
-        if (newSize < MIN_SIZE)  // adjust split point so there's at least MIN_SIZE in both partitions
-            newSize = MIN_SIZE;
+        /**
+         * Adjust split point so there's at least MIN_SIZE in both partitions and not more than 2/3rds
+         */
+        int fullSize = direction ? height : width;
+        if (newSize < MIN_SIZE) newSize = MIN_SIZE;
+        else if (newSize > fullSize * 0.66) newSize = (int) (fullSize * 0.66);
+        else if (newSize < fullSize * 0.33) newSize = (int) (fullSize * 0.33);
+
         if (direction) { //populate child areas
             leftChild = new Dungeon(x, y, width, newSize);
             rightChild = new Dungeon(x, y + newSize, width, height - newSize);
@@ -120,10 +130,16 @@ public class Dungeon {
             leftChild.generateDungeon();
             rightChild.generateDungeon();
         } else { // if leaf node, create a dungeon within the minimum size constraints
+            /**
+             * Size of the room is constrained to be at least half of the boundary, to prevent
+             * large empty spaces between rooms
+             */
             int dungeonTop = (height - MIN_SIZE <= 0) ? 0 : rnd.nextInt(height - MIN_SIZE);
+            if (dungeonTop > height * 0.33) dungeonTop = (int)(height * 0.33);
             int dungeonLeft = (width - MIN_SIZE <= 0) ? 0 : rnd.nextInt(width - MIN_SIZE);
-            int dungeonHeight = Math.max(rnd.nextInt(height - dungeonTop), MIN_SIZE);
-            int dungeonWidth = Math.max(rnd.nextInt(width - dungeonLeft), MIN_SIZE);
+            if (dungeonLeft > width * 0.33) dungeonLeft = (int)(width * 0.33);
+            int dungeonHeight = Math.max(rnd.nextInt(height - dungeonTop), Math.max(MIN_SIZE, (int)((height - dungeonTop) * 0.66)));
+            int dungeonWidth = Math.max(rnd.nextInt(width - dungeonLeft), Math.max(MIN_SIZE, (int)((width - dungeonLeft) * 0.66)));
             dungeon = new Dungeon(x + dungeonLeft, y + dungeonTop, dungeonWidth, dungeonHeight);
         }
     }
