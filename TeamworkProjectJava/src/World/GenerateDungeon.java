@@ -1,4 +1,6 @@
 package World;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -7,6 +9,8 @@ public class GenerateDungeon {
 
 	private static Random rnd = new Random();
 
+
+	public  static ArrayList<Rectangle> rooms;
 
 	public static void main(String[] args) {
 		ArrayList<Dungeon> rectangles = new ArrayList<>(); // flat rectangle store to help pick a random one
@@ -23,12 +27,28 @@ public class GenerateDungeon {
 		}
 		root.generateDungeon(); //generate dungeons
 
-		printDungeons(rectangles); //this is just to test the output
+		rooms = getRoomParams(rectangles);// get rooms
 
+		rectangles.removeAll(rectangles); //flush content
+
+		printRooms(rooms); //this is just to test the output
+	}
+
+	private static ArrayList<Rectangle> getRoomParams(ArrayList<Dungeon> room) {
+		ArrayList<Rectangle> rooms = new ArrayList<>();
+		for (Dungeon r : room) {
+			if (r.dungeon == null) {
+				continue;
+			}
+			//get room x,y,width,height
+			Dungeon d = r.dungeon;
+			rooms.add(new Rectangle(d.getX(), d.getY(), d.getWidth(), d.getHeight()));
+		}
+		return rooms;
 	}
 
 
-	private static void printDungeons(ArrayList<Dungeon> rectangles) {
+	private static void printRooms(ArrayList<Rectangle> rectangles) {
 		byte[][] lines = new byte[60][];
 		for (int i = 0; i < 60; i++) {
 			lines[i] = new byte[120];
@@ -36,15 +56,15 @@ public class GenerateDungeon {
 				lines[i][j] = -1;
 		}
 		byte dungeonCount = -1;
-		for (Dungeon r : rectangles) {
-			if (r.dungeon == null)
+		for (Rectangle r : rectangles) {
+			if (r == null)
 				continue;
-			Dungeon d = r.dungeon;
+			Rectangle d = r;
 			dungeonCount++;
 			for (int i = 0; i < d.getHeight(); i++) {
-				for (int j = 0; j < d.getWidth(); j++)
-
-					lines[d.getX() + i][d.getY() + j] = dungeonCount;
+				for (int j = 0; j < d.getWidth(); j++) {
+					lines[(int) d.getX() + i][(int) d.getY() + j] = dungeonCount;
+				}
 			}
 		}
 		for (int i = 0; i < 60; i++) {
@@ -56,5 +76,9 @@ public class GenerateDungeon {
 			}
 			System.out.println();
 		}
+	}
+
+	public static ArrayList<Rectangle> getRooms() {
+		return rooms;
 	}
 }

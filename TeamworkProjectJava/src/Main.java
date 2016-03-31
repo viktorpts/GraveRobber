@@ -26,7 +26,6 @@ public class Main extends Application {
 
         //Draw some stuff
         QuickView.drawGrid(gc);
-        QuickView.setBlock(gc, 2, 1, 2);
         QuickView.setBlock(gc, 2, 2, 2);
 
         root.getChildren().add(canvas);
