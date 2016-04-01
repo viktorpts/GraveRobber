@@ -5,6 +5,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -16,6 +17,9 @@ import World.GenerateDungeon;
 import java.util.ArrayList;
 
 public class Main extends Application {
+
+    static ArrayList<Dungeon> dungeonList;
+
     public static void main(String[] args) {
         // Add functionality to display generated map, like a foreach. Use the output of the following method:
         Generator.Generate();
@@ -35,15 +39,24 @@ public class Main extends Application {
         // Draw grid
         QuickView.drawGrid(gc);
 
-        // Register event handler for keypresses
+        // First pass
+        dungeonList = GenerateDungeon.sampleMake();
+        // Register event handler for key presses
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {
                 // Advance generation
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, 800, 600);
                 QuickView.drawGrid(gc);
-                ArrayList<Dungeon> dungeonList = GenerateDungeon.sampleStep();
-                QuickView.renderDungeon(gc, GenerateDungeon.filterTree(dungeonList));
+                if (ke.getCode() == KeyCode.ENTER) {
+                    // Finalize generation, make rooms within boundaries
+                    dungeonList.get(0).generateDungeon();
+                    QuickView.renderDungeon(gc, GenerateDungeon.filterTree(dungeonList));
+                } else {
+                    // Iterate dungeon
+                    GenerateDungeon.sampleStep(dungeonList);
+                    QuickView.renderDungeon(gc, dungeonList);
+                }
             }
         });
 
