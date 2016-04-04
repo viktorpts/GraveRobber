@@ -1,18 +1,19 @@
 package Models;
 
-public class Creature extends Entity{
+import Interfaces.IMovable;
+import World.Coord;
+
+public class Creature extends Entity implements IMovable{
     private int healthPoints;
     private int attackPower;
     private int armorValue;
+    Coord velocity;
 
-    public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, double x, double y, boolean isAlive) {
-        super(x, y, isAlive);
+    public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position, boolean isAlive) {
+        super(position, isAlive);
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
-        super.setX(x);
-        super.setY(y);
-        super.setAlive(isAlive);
     }
     public int getHealthPoints() {
         return healthPoints;
@@ -33,4 +34,41 @@ public class Creature extends Entity{
         this.armorValue = value;
     }
 
+    @Override
+    public void accelerate(Coord vector) {
+
+    }
+
+    @Override
+    public void stop() {
+        velocity = new Coord(0, 0);
+    }
+
+    @Override
+    public void place(Coord newPosition) {
+        super.setPos(newPosition);
+    }
+
+    @Override
+    public void place(double newX, double newY) {
+        super.setPos(newX, newY);
+    }
+
+    @Override
+    public boolean hitscan(Entity target) {
+        // TODO: Implement collision detection
+        return false;
+    }
+
+    @Override
+    public Coord getVelocity() {
+        return velocity;
+    }
+
+    @Override
+    public void setVelocity(Coord newVelocity) {
+        velocity = newVelocity;
+    }
+
+    // TODO: Methods for taking damage and damage calculation
 }

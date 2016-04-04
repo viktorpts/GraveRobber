@@ -1,5 +1,6 @@
 package Renderer;
 
+import Models.Sprite;
 import World.Dungeon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  */
 public class QuickView {
     // Grid size
-    static final int gridSize = 4;
+    static final int gridSize = 25;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
@@ -78,5 +79,38 @@ public class QuickView {
             //    setBlock(gc, x2 - 1, j, 1);
             //}
         }
+    }
+
+    static public void renderSprite(GraphicsContext gc, double x, double y, double dir) {
+        // temp constants
+        double size = 30;
+        // Translate direction indicator
+        // /!\ Inverted coordinate system!
+        double dirX = x - size * 1.2 * Math.cos(dir);
+        double dirY = y - size * 1.2 * Math.sin(dir);
+
+        gc.setStroke(Color.WHITE);
+        gc.setFill(Color.GREY);
+        gc.fillOval(x - size / 2, y - size / 2, size, size);
+        gc.strokeOval(x - size / 2, y - size / 2, size, size);
+        gc.strokeLine(x, y, dirX, dirY);
+    }
+
+    static public void renderDot(GraphicsContext gc, double x, double y) {
+        // temp constants
+        double size = 30;
+
+        gc.setStroke(Color.WHITE);
+        gc.setFill(Color.GREY);
+        gc.fillOval(x - size / 2, y - size / 2, size, size);
+        gc.strokeOval(x - size / 2, y - size / 2, size, size);
+    }
+
+    static public void renderScene(GraphicsContext gc, double dir) {
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, 800, 600);
+        drawGrid(gc);
+        renderSprite(gc, 400, 300, dir);
+        // Draw other stuff
     }
 }

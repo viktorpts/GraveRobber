@@ -1,21 +1,35 @@
 package Models;
 
-import World.Position;
+import World.Coord;
 
 abstract public class Entity {
-    private Boolean isAlive;
-    private Position position;
+    private Boolean alive;
+    private Coord position;
+    private double direction;
+    private Sprite sprite;
+    // TODO: Add methods to initialize a sprite and output it to a display interface /!\ depends on direction
 
+    public Entity() {
+        alive = true;
+    }
     public Entity(double x, double y, boolean isAlive) {
-        position = new Position(x, y);
+        this.alive = isAlive;
+        position = new Coord(x, y);
+    }
+    public Entity(Coord position, boolean isAlive) {
+        this.alive = isAlive;
+        this.position = position;
     }
 
-    // Position modifiers
-    public Position getPos() {
+    // Coord modifiers
+    public Coord getPos() {
         return position;
     }
     public void setPos(double x, double y) {
         position.setPos(x, y);
+    }
+    public void setPos(Coord position) {
+        this.position = position;
     }
 
     public double getX() {
@@ -34,11 +48,17 @@ abstract public class Entity {
 
     // Alive modifiers
     public void setAlive(Boolean alive) {
-        isAlive = alive;
+        this.alive = alive;
     }
 
-    public Boolean getAlive() {
-        return isAlive;
+    public Boolean isAlive() {
+        return alive;
+    }
+
+    // TODO: Output sprite to display interface /!\ depends on direction
+    public void render()
+    {
+        if (sprite == null) return;
     }
 }
 
