@@ -1,5 +1,6 @@
 package Renderer;
 
+import Game.Main;
 import Models.Sprite;
 import World.Dungeon;
 import javafx.scene.canvas.GraphicsContext;
@@ -81,7 +82,8 @@ public class QuickView {
         }
     }
 
-    static public void renderSprite(GraphicsContext gc, double x, double y, double dir) {
+    static public void renderSprite(double x, double y, double dir) {
+        GraphicsContext gc = Main.game.getGc();
         // temp constants
         double size = 30;
         // Translate direction indicator
@@ -96,7 +98,8 @@ public class QuickView {
         gc.strokeLine(x, y, dirX, dirY);
     }
 
-    static public void renderDot(GraphicsContext gc, double x, double y) {
+    static public void renderDot(double x, double y) {
+        GraphicsContext gc = Main.game.getGc();
         // temp constants
         double size = 30;
 
@@ -106,11 +109,12 @@ public class QuickView {
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
     }
 
-    static public void renderScene(GraphicsContext gc, double dir) {
+    static public void renderScene(double dir) {
+        GraphicsContext gc = Main.game.getGc();
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, 800, 600);
         drawGrid(gc);
-        renderSprite(gc, 400, 300, dir);
+        renderSprite(400, 300, dir);
         // Draw other stuff
     }
 }

@@ -22,14 +22,12 @@ import java.util.ArrayList;
 
 public class Main extends Application {
 
-    static ArrayList<Dungeon> dungeonList;
+    public static Game game; // Container for all of the things
     final static double horizontalRes = 800;
     final static double verticalRes = 600;
-    public final static Level level = new Level(new Player(0, 0, 0, new Coord(horizontalRes / 2, verticalRes / 2), true));
 
     public static void main(String[] args) {
-        // Add functionality to display generated map, like a foreach. Use the output of the following method:
-        Generator.Generate();
+        // Redirect
         launch(args);
     }
 
@@ -43,22 +41,24 @@ public class Main extends Application {
         gc.setFill(Color.BLACK);
         root.getChildren().add(canvas);
 
+        // Initialize Game
+        game = new Game(gc);
+
         final double[] mousePos = {0.0, 0.0};
-        final double[] direction = {0.0};
         // Register event handler for key presses
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {
                 if (ke.getCode() == KeyCode.W) {
-                    level.getPlayer().moveUp();
+                    game.getLevel().getPlayer().moveUp();
                 }
                 else if (ke.getCode() == KeyCode.S) {
-                    level.getPlayer().moveDown();
+                    game.getLevel().getPlayer().moveDown();
                 }
                 else if (ke.getCode() == KeyCode.A) {
-                    level.getPlayer().moveLeft();
+                    game.getLevel().getPlayer().moveLeft();
                 }
                 else if (ke.getCode() == KeyCode.D) {
-                    level.getPlayer().moveRight();
+                    game.getLevel().getPlayer().moveRight();
                 }
             }
         });
@@ -76,10 +76,10 @@ public class Main extends Application {
             public void handle(long currentNanoTime)
             {
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0;
-                double offsetX = mousePos[0] - level.getPlayer().getX();
-                double offsetY = mousePos[1] - level.getPlayer().getY();
-                direction[0] = Math.atan(offsetY / offsetX);
-                if (offsetX >= 0) direction[0] = direction[0] + Math.PI;
+                double offsetX = mousePos[0] - game.getLevel().getPlayer().getX();
+                double offsetY = mousePos[1] - game.getLevel().getPlayer().getY();
+                double dir = Math.atan(offsetY / offsetX);
+                if (offsetX >= 0) dir = dir + Math.PI;
 
                 String text = mousePos[0] + " -> " + offsetX + "\n" + mousePos[1] + " -> " + offsetY;
 
@@ -87,8 +87,8 @@ public class Main extends Application {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, 800, 600);
                 QuickView.drawGrid(gc);
-                QuickView.renderSprite(gc, level.getPlayer().getX(), level.getPlayer().getY(), direction[0]);
-                QuickView.renderDot(gc, mousePos[0], mousePos[1]);
+                QuickView.renderSprite(game.getLevel().getPlayer().getX(), game.getLevel().getPlayer().getY(), dir);
+                QuickView.renderDot(mousePos[0], mousePos[1]);
 
                 // Debug text
                 gc.setFill(Color.WHITE);
