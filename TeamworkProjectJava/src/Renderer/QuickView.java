@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class QuickView {
     // Grid size
-    static final int gridSize = 25;
+    static public final int gridSize = 25;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
@@ -85,9 +85,12 @@ public class QuickView {
     static public void renderSprite(double x, double y, double dir) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
-        double size = 30;
+        double size = gridSize / 2;
         // Translate direction indicator
         // /!\ Inverted coordinate system!
+        // Convert position to pixels
+        x *= gridSize;
+        y *= gridSize;
         double dirX = x - size * 1.2 * Math.cos(dir);
         double dirY = y - size * 1.2 * Math.sin(dir);
 
@@ -101,7 +104,7 @@ public class QuickView {
     static public void renderDot(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
-        double size = 30;
+        double size = 10;
 
         gc.setStroke(Color.WHITE);
         gc.setFill(Color.GREY);
@@ -109,6 +112,9 @@ public class QuickView {
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
     }
 
+    /**
+     * Obsolete
+     */
     static public void renderScene(double dir) {
         GraphicsContext gc = Main.game.getGc();
         gc.setFill(Color.BLACK);
@@ -117,4 +123,6 @@ public class QuickView {
         renderSprite(400, 300, dir);
         // Draw other stuff
     }
+
+    // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
 }

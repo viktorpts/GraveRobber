@@ -2,6 +2,7 @@ package Models;
 
 import Interfaces.IMovable;
 import World.Coord;
+import World.Physics;
 
 public class Creature extends Entity implements IMovable{
     private int healthPoints;
@@ -14,6 +15,7 @@ public class Creature extends Entity implements IMovable{
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
+        velocity = new Coord(0.0, 0.0);
     }
     public int getHealthPoints() {
         return healthPoints;
@@ -35,8 +37,12 @@ public class Creature extends Entity implements IMovable{
     }
 
     @Override
-    public void accelerate(Coord vector) {
-
+    public void accelerate(Coord vector, double time) {
+        vector.scale(time);
+        velocity.add(vector);
+        if (velocity.getMagnitude() > Physics.maxVelocity) {
+            velocity.setMagnitude(Physics.maxVelocity);
+        }
     }
 
     @Override
@@ -70,5 +76,12 @@ public class Creature extends Entity implements IMovable{
         velocity = newVelocity;
     }
 
+    public void update(double time) {
+        if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);
+        double newX = super.getX() + velocity.getX() * time;
+        double newY = super.getY() + velocity.getY() * time;
+        super.setX(newX);
+        super.setY(newY);
+    }
     // TODO: Methods for taking damage and damage calculation
 }

@@ -25,18 +25,18 @@ public class Player extends Creature {
 
     // TODO: Movement
     // This is temporary, to test rendering and mouse acquisition; /!\ Inverted coordinate system!
-    public void moveUp() {
-        setY(getY() - 10);
-    }
-    public void moveDown() {
-        setY(getY() + 10);
-    }
-    public void moveLeft() {
-        setX(getX() - 10);
-    }
-    public void moveRight() {
-        setX(getX() + 10);
-    }
+    //public void moveUp() {
+    //    setY(getY() - 10);
+    //}
+    //public void moveDown() {
+    //    setY(getY() + 10);
+    //}
+    //public void moveLeft() {
+    //    setX(getX() - 10);
+    //}
+    //public void moveRight() {
+    //    setX(getX() + 10);
+    //}
 
     // TODO: Inventory management
 }

@@ -1,12 +1,13 @@
 package Models;
 
+import Renderer.QuickView;
 import World.Coord;
 
 abstract public class Entity {
     private Boolean alive;
     private Coord position;
     private double direction;
-    private Sprite sprite;
+    private Sprite sprite = new Sprite();   // TODO: don't forget to initialize this in a constructor instead
     // TODO: Add methods to initialize a sprite and output it to a display interface /!\ depends on direction
 
     public Entity() {
@@ -29,7 +30,8 @@ abstract public class Entity {
         position.setPos(x, y);
     }
     public void setPos(Coord position) {
-        this.position = position;
+        this.position.setX(position.getX());
+        this.position.setY(position.getY());
     }
 
     public double getX() {
@@ -58,7 +60,10 @@ abstract public class Entity {
     // TODO: Output sprite to display interface /!\ depends on direction
     public void render()
     {
-        if (sprite == null) return;
+        if (sprite == null || !alive) return;
+
+        // A rather hasty implementation for debugging purposes
+        QuickView.renderSprite(position.getX(), position.getY(), direction);
     }
 }
 

@@ -32,6 +32,35 @@ public class Coord {
         y = inY;
     }
 
+    public double getMagnitude() {
+        return Math.sqrt(x * x + y * y);
+    }
+    public void setMagnitude(double magnitude) {
+        double scalar = magnitude / getMagnitude();
+        x *= scalar;
+        y *= scalar;
+    }
+
+    public void scale(double scalar) {
+        x *= scalar;
+        y *= scalar;
+    }
+
+    public double getDirection() {
+        double dir = Math.atan2(y, x);
+        return dir;
+    }
+
+    public void subtract(Coord vector) {
+        x -= vector.getX();
+        y -= vector.getY();
+    }
+
+    public void add(Coord vector) {
+        x += vector.getX();
+        y += vector.getY();
+    }
+
     // As parameters: coordinates, map to check against
     public boolean verifyBounds (/* Overloads for x, y; Coord */) {
         // Implement map boundary check
