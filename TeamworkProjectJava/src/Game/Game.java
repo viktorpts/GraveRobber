@@ -1,8 +1,10 @@
 package Game;
 
+import Abilities.Attack;
 import Models.Creature;
 import Models.Entity;
 import Models.Player;
+import Renderer.QuickView;
 import World.Coord;
 import World.Level;
 import World.Physics;
@@ -94,6 +96,13 @@ public class Game {
         // This has the positive side effect of disabling player controls during knockback
         if (getPlayer().getVelocity().getMagnitude() > Physics.maxMoveSpeed) return;
 
+        // Mouse
+        if (controlState.mouseLeft) {
+            // Attack
+            //getPlayer().useAbility(Attack);
+        }
+
+        // Keyboard
         // Sloppy dodge roll; this is dependent on framerate, find a better implementation!
         double modifier = Physics.playerAcceleration;
         if (controlState.pressed(KeyCode.SPACE)) {

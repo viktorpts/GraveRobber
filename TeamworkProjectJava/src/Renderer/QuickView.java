@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class QuickView {
     // Grid size
-    static public final int gridSize = 25;
+    static public final int gridSize = 5;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
@@ -51,7 +51,7 @@ public class QuickView {
         gc.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
     }
 
-    static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list) {
+    static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list, boolean finalize) {
         for (Dungeon dungeon : list) {
             // Boundary
             int bx1 = dungeon.getX();
@@ -66,19 +66,21 @@ public class QuickView {
                 setBlock(gc, bx1, j, 2);
                 setBlock(gc, bx2 - 1, j, 2);
             }
-            //// Room
-            //int x1 = dungeon.dungeon.getX();
-            //int y1 = dungeon.dungeon.getY();
-            //int x2 = dungeon.dungeon.getWidth() + x1;
-            //int y2 = dungeon.dungeon.getHeight() + y1;
-            //for (int i = x1; i < x2; i++) {
-            //    setBlock(gc, i, y1, 1);
-            //    setBlock(gc, i, y2 - 1, 1);
-            //}
-            //for (int j = y1; j < y2; j++) {
-            //    setBlock(gc, x1, j, 1);
-            //    setBlock(gc, x2 - 1, j, 1);
-            //}
+            if (finalize) {
+                // Room
+                int x1 = dungeon.dungeon.getX();
+                int y1 = dungeon.dungeon.getY();
+                int x2 = dungeon.dungeon.getWidth() + x1;
+                int y2 = dungeon.dungeon.getHeight() + y1;
+                for (int i = x1; i < x2; i++) {
+                    setBlock(gc, i, y1, 1);
+                    setBlock(gc, i, y2 - 1, 1);
+                }
+                for (int j = y1; j < y2; j++) {
+                    setBlock(gc, x1, j, 1);
+                    setBlock(gc, x2 - 1, j, 1);
+                }
+            }
         }
     }
 
@@ -91,25 +93,79 @@ public class QuickView {
         // Convert position to pixels
         x *= gridSize;
         y *= gridSize;
-        double dirX = x - size * 1.2 * Math.cos(dir);
-        double dirY = y - size * 1.2 * Math.sin(dir);
+        double dirX = x + size * 1.2 * Math.cos(dir);
+        double dirY = y + size * 1.2 * Math.sin(dir);
 
         gc.setStroke(Color.WHITE);
         gc.setFill(Color.GREY);
         gc.fillOval(x - size / 2, y - size / 2, size, size);
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
         gc.strokeLine(x, y, dirX, dirY);
+
+        /**
+         * Debug info
+         */
+        String debug = String.format("%.2f, %.2f", x, y);
+        debug += String.format("%n%.2f", dir);
+        gc.setFill(Color.WHITE);
+        gc.fillText(debug, x + gridSize, y);
     }
 
     static public void renderDot(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
-        double size = 10;
-
-        gc.setStroke(Color.WHITE);
+        double size = 15;
         gc.setFill(Color.GREY);
+        if (Main.game.getControlState().isMouseLeft())
+        {
+            gc.setFill(Color.RED);
+            size = 25;
+        }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
-        gc.strokeOval(x - size / 2, y - size / 2, size, size);
+    }
+
+    static public void renderArrow(double x, double y, double dir) {
+        GraphicsContext gc = Main.game.getGc();
+        double size = 5;
+        gc.setFill(Color.WHITE);
+        if (Main.game.getControlState().isMouseLeft())
+        {
+            gc.setFill(Color.RED);
+            size = 6;
+        }
+        double[] aX = {
+                size * 1 * Math.cos(dir),
+                size * 2 * Math.cos(dir + Math.PI/2),
+                size * 2.82 * Math.cos(dir + Math.PI*3/4),
+                size * 1 * Math.cos(dir + Math.PI),
+                size * 2.82 * Math.cos(dir + Math.PI*5/4),
+                size * 2 * Math.cos(dir + Math.PI*3/2)
+        };
+        double[] aY = {
+                size * 1 * Math.sin(dir),
+                size * 2 * Math.sin(dir + Math.PI/2),
+                size * 2.82 * Math.sin(dir + Math.PI*3/4),
+                size * 1 * Math.sin(dir + Math.PI),
+                size * 2.82 * Math.sin(dir + Math.PI*5/4),
+                size * 2 * Math.sin(dir + Math.PI*3/2)
+        };
+        for (int i = 0; i < 6; i++) {
+            aX[i] += x;
+            aY[i] += y;
+        }
+        gc.fillPolygon(aX, aY, 6);
+    }
+
+    static public void renderSwipe(double x, double y) {
+        GraphicsContext gc = Main.game.getGc();
+        // temp constants
+        double size = 10;
+        // Convert position to pixels
+        x *= gridSize;
+        y *= gridSize;
+
+        gc.setFill(Color.RED);
+        gc.fillOval(x - size / 2, y - size / 2, size, size);
     }
 
     /**

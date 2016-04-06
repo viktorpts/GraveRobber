@@ -1,11 +1,13 @@
 package Game;
 
+import Models.Enemy;
 import Models.Player;
 import Models.Sprite;
 import World.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -22,6 +24,7 @@ import Renderer.QuickView;
 import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 public class Main extends Application {
 
@@ -43,6 +46,7 @@ public class Main extends Application {
         Scene scene = new Scene(root, horizontalRes, verticalRes, Color.BLACK);
         Canvas canvas = new Canvas(horizontalRes, verticalRes);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        canvas.setCursor(Cursor.NONE);
         gc.setFill(Color.BLACK);
         root.getChildren().add(canvas);
 
@@ -55,6 +59,12 @@ public class Main extends Application {
 
         // Event handler for mouse position
         scene.setOnMouseMoved(event -> { game.getControlState().update(event.getX(), event.getY()); });
+        scene.setOnMousePressed(event -> {
+            game.getControlState().mouseLeft = true;
+            if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
+                    .add(new Enemy(100, 10, 0, event.getX() / QuickView.gridSize, event.getY() / QuickView.gridSize, true));
+        } );
+        scene.setOnMouseReleased(event -> { game.getControlState().mouseLeft = false; } );
 
         final long startNanoTime = System.nanoTime();
 
@@ -62,35 +72,37 @@ public class Main extends Application {
         {
             public void handle(long currentNanoTime)
             {
-                game.update(currentNanoTime);
-                game.handleInput();
-
                 double[] mousePos = game.getControlState().getMouse();
                 double offsetX = mousePos[0] - game.getLevel().getPlayer().getX() * QuickView.gridSize;
                 double offsetY = mousePos[1] - game.getLevel().getPlayer().getY() * QuickView.gridSize;
-                double dir = Math.atan(offsetY / offsetX);
-                if (offsetX >= 0) dir = dir + Math.PI;
+                double dir = Math.atan2(offsetY, offsetX);
+                game.getPlayer().setDirection(dir);
 
+                // Update state
+                game.update(currentNanoTime);
+                game.handleInput();
                 // Output
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, 800, 600);
                 QuickView.drawGrid(gc);
                 game.render();
-                QuickView.renderDot(mousePos[0], mousePos[1]);
+                QuickView.renderArrow(mousePos[0], mousePos[1], dir);
 
                 /**
                  * Debug info
                  */
                 // Mouse position relative to player
                 gc.setFill(Color.WHITE);
-                String mouseData = mousePos[0] + " -> " + offsetX + "\n" + mousePos[1] + " -> " + offsetY;
-                gc.fillText(mouseData, mousePos[0] + 20, mousePos[1]);
+                String mouseData = String.format("%.2f -> %.2f", mousePos[0], offsetX);
+                mouseData += String.format("%n%.2f -> %.2f", mousePos[1], offsetY);
+                //gc.fillText(mouseData, mousePos[0] + 20, mousePos[1]);
                 // Player position and movement
                 String playerData = String.format("Position %.2f, %.2f", game.getLevel().getPlayer().getX(), game.getLevel().getPlayer().getY());
                 playerData += String.format("%nVelocity %.2f", game.getLevel().getPlayer().getVelocity().getMagnitude());
                 playerData += String.format("%n%.2f %.2f", game.getLevel().getPlayer().getVelocity().getX(), game.getLevel().getPlayer().getVelocity().getY());
                 // Control state
                 playerData += String.format("%n");
+                playerData += String.format("%n%s", game.getControlState().mouseLeft);
                 for (KeyCode key : game.getControlState().getCombo()) {
                     playerData += String.format("%n%s", key.toString());
                 }

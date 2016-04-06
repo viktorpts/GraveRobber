@@ -63,6 +63,12 @@ public class Coord {
         return dir;
     }
 
+    public void setDirection(double dir) {
+        double magnitude = getMagnitude();
+        x = magnitude * Math.cos(dir);
+        y = magnitude * Math.sin(dir);
+    }
+
     public void subtract(Coord vector) {
         x -= vector.getX();
         y -= vector.getY();

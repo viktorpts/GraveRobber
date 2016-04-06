@@ -32,6 +32,14 @@ public class ControlState {
         return keyState;
     }
 
+    public boolean isMouseLeft() {
+        return mouseLeft;
+    }
+
+    public boolean isMouseRight() {
+        return mouseRight;
+    }
+
     //Shorthand for getting just pressed keys
     public boolean pressed(KeyCode kc) {
         if (keyState.contains(kc)) return true;
