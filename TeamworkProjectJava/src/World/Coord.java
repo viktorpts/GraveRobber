@@ -12,6 +12,10 @@ public class Coord {
         x = inX;
         y = inY;
     }
+    public Coord(double[] pos) {
+        x = pos[0];
+        y = pos[1];
+    }
 
     public double getX() {
         return x;
@@ -30,6 +34,14 @@ public class Coord {
     public void setPos(double inX, double inY) {
         x = inX;
         y = inY;
+    }
+    public void setPos(double[] pos) {
+        x = pos[0];
+        y = pos[1];
+    }
+    public double[] getPos() {
+        double[] result = {x, y};
+        return result;
     }
 
     public double getMagnitude() {
