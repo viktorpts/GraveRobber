@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class QuickView {
     // Grid size
-    static final int gridSize = 25;
+    static final int gridSize = 5;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
@@ -66,19 +66,19 @@ public class QuickView {
                 setBlock(gc, bx1, j, 2);
                 setBlock(gc, bx2 - 1, j, 2);
             }
-            //// Room
-            //int x1 = dungeon.dungeon.getX();
-            //int y1 = dungeon.dungeon.getY();
-            //int x2 = dungeon.dungeon.getWidth() + x1;
-            //int y2 = dungeon.dungeon.getHeight() + y1;
-            //for (int i = x1; i < x2; i++) {
-            //    setBlock(gc, i, y1, 1);
-            //    setBlock(gc, i, y2 - 1, 1);
-            //}
-            //for (int j = y1; j < y2; j++) {
-            //    setBlock(gc, x1, j, 1);
-            //    setBlock(gc, x2 - 1, j, 1);
-            //}
+            // Room
+            int x1 = dungeon.dungeon.getX();
+            int y1 = dungeon.dungeon.getY();
+            int x2 = dungeon.dungeon.getWidth() + x1;
+            int y2 = dungeon.dungeon.getHeight() + y1;
+            for (int i = x1; i < x2; i++) {
+                setBlock(gc, i, y1, 1);
+                setBlock(gc, i, y2 - 1, 1);
+            }
+            for (int j = y1; j < y2; j++) {
+                setBlock(gc, x1, j, 1);
+                setBlock(gc, x2 - 1, j, 1);
+            }
         }
     }
 

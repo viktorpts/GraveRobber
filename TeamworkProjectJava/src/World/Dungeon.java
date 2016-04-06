@@ -6,8 +6,8 @@ public class Dungeon {
 
     public Dungeon() {
     }
-
-    private static int MIN_SIZE = 5;
+    //Update from MIN_SIZE = 5
+    private static int MIN_SIZE = 20;
     private static Random rnd = new Random();
 
     private int x, y, width, height;
