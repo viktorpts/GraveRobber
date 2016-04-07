@@ -1,30 +1,33 @@
 package Models;
 
+import Enumerations.EntityState;
 import Renderer.QuickView;
 import World.Coord;
 
+import java.util.EnumSet;
+
 abstract public class Entity {
-    private Boolean alive;
+    private EnumSet<EntityState> state;
     private Coord position;
     private double direction;
     private Sprite sprite;   // TODO: don't forget to initialize this in a constructor instead
     // TODO: Add methods to initialize a sprite and output it to a display interface /!\ depends on direction
 
     public Entity() {
-        alive = true;
+        state = EnumSet.of(EntityState.IDLE);
     }
-    public Entity(double x, double y, boolean isAlive) {
-        this.alive = isAlive;
+    public Entity(double x, double y) {
+        state = EnumSet.of(EntityState.IDLE);
         position = new Coord(x, y);
         sprite = new Sprite(10);
     }
-    public Entity(Coord position, boolean isAlive) {
-        this.alive = isAlive;
+    public Entity(Coord position) {
+        state = EnumSet.of(EntityState.IDLE);
         this.position = position;
         sprite = new Sprite(10);
     }
 
-    // Coord modifiers
+    // Position and orientation modifiers
     public Coord getPos() {
         return position;
     }
@@ -50,15 +53,6 @@ abstract public class Entity {
         position.setY(y);
     }
 
-    // Alive modifiers
-    public void setAlive(Boolean alive) {
-        this.alive = alive;
-    }
-
-    public Boolean isAlive() {
-        return alive;
-    }
-
     public double getDirection() {
         return direction;
     }
@@ -66,12 +60,33 @@ abstract public class Entity {
         this.direction = direction;
     }
 
+    // State sets
+    public void setState(EnumSet state) {
+        this.state = state;
+    }
+    public EnumSet<EntityState> getState() {
+        return state;
+    }
+
+    public boolean hasState(EntityState state) {
+        return this.state.contains(state);
+    }
+    // Shorthands
+    public boolean isAlive() {
+        return (!state.contains(EntityState.DESTROYED));
+    }
+
+    public boolean isReady() {
+        // Check against a list of all unchangeable states
+        return state.contains(EntityState.READY);
+    }
+
     // TODO: Output sprite to display interface /!\ depends on direction
     public void render()
-
     {
-        if (sprite == null || !alive) return;
+        if (sprite == null || !isAlive()) return;
 
+        // TODO: replace the following code with sprite-based implementation
         // A rather hasty implementation for debugging purposes
         QuickView.renderSprite(position.getX(), position.getY(), direction);
     }
@@ -79,5 +94,10 @@ abstract public class Entity {
     public void animate(double time) {
         sprite.advance(time);
     }
+
+    public void changeAnimation() {
+
+    }
+
 }
 

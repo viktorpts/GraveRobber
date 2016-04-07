@@ -23,8 +23,8 @@ public class Creature extends Entity implements IMovable{
     private int behaviour;
     private double behaviourState;
 
-    public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position, boolean isAlive) {
-        super(position, isAlive);
+    public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
+        super(position);
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
@@ -131,6 +131,7 @@ public class Creature extends Entity implements IMovable{
     }
 
     public void useAbility(Abilities ability) {
+        if (!isReady()) return;
         if (abilities.containsKey(ability)) {
             abilities.get(ability).use();
         }

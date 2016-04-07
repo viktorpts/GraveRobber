@@ -7,11 +7,10 @@ abstract public class Loot extends Entity {
         private int Cost;
 
     public Loot(double x, double y, InventoryStatus inventoryStatus, int cost) {
-        super(x, y, false);//items not alive
+        super(x, y);
         this.inventoryStatus = inventoryStatus;
         Cost = cost;
         super.setX(x);
         super.setY(y);
-        super.setAlive(false);
     }
 }

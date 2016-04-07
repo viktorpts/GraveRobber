@@ -10,8 +10,7 @@ public class Player extends Creature {
         super(oldPlayer.getHealthPoints(),
                 oldPlayer.getAttackPower(),
                 oldPlayer.getArmorValue(),
-                oldPlayer.getPos(),
-                oldPlayer.isAlive());
+                oldPlayer.getPos());
     }
     // Create new player
     public Player(int startHealthPoints,
@@ -19,7 +18,7 @@ public class Player extends Creature {
                   int startArmorValue,
                   Coord position,
                   boolean isAlive) {
-        super(startHealthPoints, startAttackPower, startArmorValue, position, isAlive);
+        super(startHealthPoints, startAttackPower, startArmorValue, position);
     }
 
     // TODO: Inventory management
