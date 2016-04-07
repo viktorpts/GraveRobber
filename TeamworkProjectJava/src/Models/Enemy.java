@@ -8,6 +8,7 @@ public class Enemy extends Creature{
 
     public Enemy(int startHealthPoints, int startAttackPower, int startArmorValue, double x, double y, boolean isAlive) {
         super(startHealthPoints, startAttackPower, startArmorValue, new Coord(x, y), isAlive);
+        setBehaviour(1);
     }
 
     // TODO: add methods to initialize loot table

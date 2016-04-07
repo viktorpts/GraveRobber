@@ -44,21 +44,23 @@ public class TestLevel  extends Application {
         // First pass
         dungeonList = GenerateDungeon.sampleMake();
         // Register event handler for key presses
-        scene.setOnKeyPressed(ke -> {
-			// Advance generation
-			gc.setFill(Color.BLACK);
-			gc.fillRect(0, 0, 800, 600);
-			QuickView.drawGrid(gc);
-			if (ke.getCode() == KeyCode.ENTER) {
-				// Finalize generation, make rooms within boundaries
-				dungeonList.get(0).generateDungeon();
-				QuickView.renderDungeon(gc, GenerateDungeon.filterTree(dungeonList));
-			} else {
-				// Iterate dungeon
-				GenerateDungeon.sampleStep(dungeonList);
-				QuickView.renderDungeon(gc, dungeonList);
-			}
-		});
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent ke) {
+                // Advance generation
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, 800, 600);
+                QuickView.drawGrid(gc);
+                if (ke.getCode() == KeyCode.ENTER) {
+                    // Finalize generation, make rooms within boundaries
+                    dungeonList.get(0).generateDungeon();
+                    QuickView.renderDungeon(gc, GenerateDungeon.filterTree(dungeonList), true);
+                } else {
+                    // Iterate dungeon
+                    GenerateDungeon.sampleStep(dungeonList);
+                    QuickView.renderDungeon(gc, dungeonList, false);
+                }
+            }
+        });
 
         // Render stage
         primaryStage.setResizable(false);
