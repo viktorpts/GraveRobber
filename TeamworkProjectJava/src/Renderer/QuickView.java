@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class QuickView {
     // Grid size
-    static final int gridSize = 5;
+    static public int gridSize = 5;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
