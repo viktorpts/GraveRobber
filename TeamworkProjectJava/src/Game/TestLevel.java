@@ -39,6 +39,7 @@ public class TestLevel  extends Application {
         root.getChildren().add(canvas);
 
         // Draw grid
+        QuickView.gridSize = 60;
         QuickView.drawGrid(gc);
 
         // First pass

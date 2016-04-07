@@ -59,6 +59,7 @@ public class Main extends Application {
 
         // Initialize Game
         game = new Game(gc, System.nanoTime());
+        QuickView.gridSize = 60;
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
