@@ -1,6 +1,7 @@
 package Game;
 
 import Abilities.Attack;
+import Enumerations.Abilities;
 import Models.Creature;
 import Models.Entity;
 import Models.Player;
@@ -99,7 +100,7 @@ public class Game {
         // Mouse
         if (controlState.mouseLeft) {
             // Attack
-            //getPlayer().useAbility(Attack);
+            getPlayer().useAbility(Abilities.ATTACKPRIMARY);
         }
 
         // Keyboard

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class QuickView {
     // Grid size
-    static public final int gridSize = 5;
+    static public final int gridSize = 60;
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
@@ -108,7 +108,7 @@ public class QuickView {
         String debug = String.format("%.2f, %.2f", x, y);
         debug += String.format("%n%.2f", dir);
         gc.setFill(Color.WHITE);
-        gc.fillText(debug, x + gridSize, y);
+        gc.fillText(debug, x + gridSize / 2, y);
     }
 
     static public void renderDot(double x, double y) {

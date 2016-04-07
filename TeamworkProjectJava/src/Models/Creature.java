@@ -1,10 +1,14 @@
 package Models;
 
+import Abilities.Ability;
+import Abilities.Attack;
+import Enumerations.Abilities;
 import Interfaces.IAbility;
 import Interfaces.IMovable;
 import World.Coord;
 import World.Physics;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +17,9 @@ public class Creature extends Entity implements IMovable{
     private int attackPower;
     private int armorValue;
     Coord velocity;
-    List<IAbility> abilities;
+    HashMap<Abilities, Ability> abilities;
+
+    // TODO: Make this it's own object with more actions
     private int behaviour;
     private double behaviourState;
 
@@ -23,6 +29,9 @@ public class Creature extends Entity implements IMovable{
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
         velocity = new Coord(0.0, 0.0);
+
+        abilities = new HashMap<>();
+        abilities.put(Abilities.ATTACKPRIMARY, new Attack(this, 10.0, 0.5));
 
         behaviour = 0;
         behaviourState = 0;
@@ -91,7 +100,7 @@ public class Creature extends Entity implements IMovable{
     }
 
     public void update(double time) {
-        // Process behaviour
+        // Process behaviour, temp
         if (behaviour > 0) {
             behaviourState += time;
             if (behaviourState > 3) {
@@ -110,11 +119,21 @@ public class Creature extends Entity implements IMovable{
         double newY = super.getY() + velocity.getY() * time;
         super.setX(newX);
         super.setY(newY);
+
+        // Cool down used abilities
+        abilities.entrySet().stream()
+                .filter(entry -> !entry.getValue().isReady()) // Filter used abilities
+                .forEach(entry -> entry.getValue().cool(time));
     }
 
-    public void useAbility(IAbility ability) {
-        // This is sketchy, but the compiler likes it
-        if (abilities.contains(ability)) ability.use();
+    public void addAbility(Ability ability) {
+
+    }
+
+    public void useAbility(Abilities ability) {
+        if (abilities.containsKey(ability)) {
+            abilities.get(ability).use();
+        }
     }
     // TODO: Methods for taking damage and damage calculation
 }

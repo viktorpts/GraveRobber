@@ -32,6 +32,8 @@ public class Main extends Application {
     public static Game game; // Container for all of the things
     final static double horizontalRes = 800;
     final static double verticalRes = 600;
+    // Debug view
+    public static GraphicsContext debugc;
 
     public static void main(String[] args) {
         // Redirect
@@ -43,12 +45,17 @@ public class Main extends Application {
         // Setup scene and nodes
         Pane root = new Pane();
         root.setPrefSize(horizontalRes,verticalRes);
-        Scene scene = new Scene(root, horizontalRes, verticalRes, Color.BLACK);
-        Canvas canvas = new Canvas(horizontalRes, verticalRes);
+        Scene scene = new Scene(root, horizontalRes + 300, verticalRes, Color.BLACK);
+        Canvas canvas = new Canvas(horizontalRes, verticalRes); // Main canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
         canvas.setCursor(Cursor.NONE);
         gc.setFill(Color.BLACK);
-        root.getChildren().add(canvas);
+        Canvas debugCanvas = new Canvas(300, verticalRes); // Main view
+        debugCanvas.setLayoutX(horizontalRes);
+        GraphicsContext debugc = debugCanvas.getGraphicsContext2D();
+        debugc.setFill(Color.WHITE);
+        debugc.fillRect(0, 0, 300, verticalRes);
+        root.getChildren().addAll(canvas, debugCanvas);
 
         // Initialize Game
         game = new Game(gc, System.nanoTime());
@@ -83,7 +90,7 @@ public class Main extends Application {
                 game.handleInput();
                 // Output
                 gc.setFill(Color.BLACK);
-                gc.fillRect(0, 0, 800, 600);
+                gc.fillRect(0, 0, horizontalRes, verticalRes);
                 QuickView.drawGrid(gc);
                 game.render();
                 QuickView.renderArrow(mousePos[0], mousePos[1], dir);
@@ -91,8 +98,12 @@ public class Main extends Application {
                 /**
                  * Debug info
                  */
+                debugc.setFill(Color.BLACK);
+                debugc.setStroke(Color.GREENYELLOW);
+                debugc.fillRect(0, 0, 300, verticalRes);
+                debugc.strokeRect(1, 1, 298, verticalRes - 2);
+                debugc.setFill(Color.GREENYELLOW);
                 // Mouse position relative to player
-                gc.setFill(Color.WHITE);
                 String mouseData = String.format("%.2f -> %.2f", mousePos[0], offsetX);
                 mouseData += String.format("%n%.2f -> %.2f", mousePos[1], offsetY);
                 //gc.fillText(mouseData, mousePos[0] + 20, mousePos[1]);
@@ -106,7 +117,7 @@ public class Main extends Application {
                 for (KeyCode key : game.getControlState().getCombo()) {
                     playerData += String.format("%n%s", key.toString());
                 }
-                gc.fillText(playerData, 5, 15);
+                debugc.fillText(playerData, 5, 15);
                 /**
                  * End of Debug info
                  */

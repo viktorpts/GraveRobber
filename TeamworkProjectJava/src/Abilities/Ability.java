@@ -1,12 +1,23 @@
 package Abilities;
 
 import Interfaces.IAbility;
+import Models.Creature;
 
 abstract public class Ability implements IAbility {
 
     double remaining; // time to next use, seconds
     double cooldown; // time between uses, seconds
     boolean ready; // readiness
+    Creature owner;
+
+    public Ability (Creature owner, double cooldown) {
+        this.owner = owner; // passed by reference, we don't want a copy
+        this.cooldown = cooldown;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
 
     @Override
     public void spend() {
