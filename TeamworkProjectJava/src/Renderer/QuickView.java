@@ -107,10 +107,12 @@ public class QuickView {
         /**
          * Debug info
          */
-        String debug = String.format("%.2f, %.2f", x, y);
-        debug += String.format("%n%.2f", dir);
-        gc.setFill(Color.WHITE);
-        gc.fillText(debug, x + gridSize / 2, y);
+        if (false) {
+            String debug = String.format("%.2f, %.2f", x, y);
+            debug += String.format("%n%.2f", dir);
+            gc.setFill(Color.WHITE);
+            gc.fillText(debug, x + gridSize / 2, y);
+        }
     }
 
     static public void renderDot(double x, double y) {
