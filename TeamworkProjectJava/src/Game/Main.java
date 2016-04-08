@@ -3,6 +3,7 @@ package Game;
 import Models.Enemy;
 import Models.Player;
 import Models.Sprite;
+import Renderer.DebugView;
 import World.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -30,8 +31,8 @@ public class Main extends Application {
 
     // Application parameters
     public static Game game; // Container for all of the things
-    final static double horizontalRes = 800;
-    final static double verticalRes = 600;
+    final static public double horizontalRes = 800;
+    final static public double verticalRes = 600;
     // Debug view
     public static GraphicsContext debugc;
     public static String debugInfo = "";
@@ -51,22 +52,20 @@ public class Main extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         canvas.setCursor(Cursor.NONE);
         gc.setFill(Color.BLACK);
-        Canvas debugCanvas = new Canvas(300, verticalRes); // Main view
+        Canvas debugCanvas = new Canvas(300, verticalRes); // Debug info panel
         debugCanvas.setLayoutX(horizontalRes);
-        GraphicsContext debugc = debugCanvas.getGraphicsContext2D();
-        debugc.setFill(Color.WHITE);
-        debugc.fillRect(0, 0, 300, verticalRes);
+        debugc = debugCanvas.getGraphicsContext2D();
         root.getChildren().addAll(canvas, debugCanvas);
 
         // Initialize Game
         game = new Game(gc, System.nanoTime());
-        QuickView.gridSize = 60;
+        QuickView.gridSize = 60; // set zoom level
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
         scene.setOnKeyReleased(ke -> { game.getControlState().removeKey(ke.getCode()); });
 
-        // Event handler for mouse position
+        // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> { game.getControlState().update(event.getX(), event.getY()); });
         scene.setOnMousePressed(event -> {
             game.getControlState().mouseLeft = true;
@@ -100,29 +99,11 @@ public class Main extends Application {
                 /**
                  * Debug info
                  */
-                debugc.setFill(Color.BLACK);
-                debugc.setStroke(Color.GREENYELLOW);
-                debugc.fillRect(0, 0, 300, verticalRes);
-                debugc.strokeRect(1, 1, 298, verticalRes - 2);
-                debugc.setFill(Color.GREENYELLOW);
-                // Mouse position relative to player
-                String mouseData = String.format("%.2f -> %.2f", mousePos[0], offsetX);
-                mouseData += String.format("%n%.2f -> %.2f", mousePos[1], offsetY);
-                //gc.fillText(mouseData, mousePos[0] + 20, mousePos[1]);
-                // Player position and movement
-                String playerData = String.format("Position %.2f, %.2f", game.getLevel().getPlayer().getX(), game.getLevel().getPlayer().getY());
-                playerData += String.format("%nVelocity %.2f", game.getLevel().getPlayer().getVelocity().getMagnitude());
-                playerData += String.format("%n%.2f %.2f", game.getLevel().getPlayer().getVelocity().getX(), game.getLevel().getPlayer().getVelocity().getY());
-                // Control state
-                playerData += String.format("%n");
-                playerData += String.format("%n%s", game.getControlState().mouseLeft);
-                for (KeyCode key : game.getControlState().getCombo()) {
-                    playerData += String.format("%n%s", key.toString());
-                }
-                debugc.fillText(playerData, 5, 15);
-                // Debug text from external methods
-                debugc.fillText(debugInfo, 5, 200);
-                debugInfo= "";
+                DebugView.clear();
+                DebugView.showPlayerInfo(); // Player position and movement
+                DebugView.showControlInfo(); // Input state
+                DebugView.showEntityData();
+                DebugView.showInfo(); // Custom data from other objects
                 /**
                  * End of Debug info
                  */
