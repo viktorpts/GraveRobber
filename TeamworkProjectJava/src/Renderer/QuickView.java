@@ -86,7 +86,7 @@ public class QuickView {
         }
     }
 
-    static public void renderSprite(double x, double y, double dir) {
+    static public void renderSprite(int selector, double x, double y, double dir) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
         double size = gridSize / 2;
@@ -98,8 +98,15 @@ public class QuickView {
         double dirX = x + size * 0.6 * Math.cos(dir);
         double dirY = y + size * 0.6 * Math.sin(dir);
 
-        gc.setStroke(Color.WHITE);
-        gc.setFill(Color.GREY);
+        gc.setStroke(Color.WHITE); // pick color based on type
+        switch (selector) {
+            case 0:
+                gc.setFill(Color.GREY);
+                break;
+            case 1:
+                gc.setFill(Color.GREEN);
+                break;
+        }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
         gc.strokeLine(x, y, dirX, dirY);
@@ -170,18 +177,6 @@ public class QuickView {
 
         gc.setFill(Color.RED);
         gc.fillOval(x - size / 2, y - size / 2, size, size);
-    }
-
-    /**
-     * Obsolete
-     */
-    static public void renderScene(double dir) {
-        GraphicsContext gc = Main.game.getGc();
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, 800, 600);
-        drawGrid(gc);
-        renderSprite(400, 300, dir);
-        // Draw other stuff
     }
 
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
