@@ -52,6 +52,7 @@ public class Main extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         canvas.setCursor(Cursor.NONE);
         gc.setFill(Color.BLACK);
+        gc.setLineWidth(2.0);
         Canvas debugCanvas = new Canvas(300, verticalRes); // Debug info panel
         debugCanvas.setLayoutX(horizontalRes);
         debugc = debugCanvas.getGraphicsContext2D();
@@ -59,7 +60,7 @@ public class Main extends Application {
 
         // Initialize Game
         game = new Game(gc, System.nanoTime());
-        QuickView.gridSize = 60; // set zoom level
+        QuickView.gridSize = 50; // set zoom level
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
@@ -70,7 +71,7 @@ public class Main extends Application {
         scene.setOnMousePressed(event -> {
             game.getControlState().mouseLeft = true;
             if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add(new Enemy(100, 10, 0, event.getX() / QuickView.gridSize, event.getY() / QuickView.gridSize, true));
+                    .add(new Enemy(100, 10, 0, event.getX() / QuickView.gridSize, event.getY() / QuickView.gridSize));
         } );
         scene.setOnMouseReleased(event -> { game.getControlState().mouseLeft = false; } );
 
