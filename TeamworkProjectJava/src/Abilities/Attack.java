@@ -23,7 +23,7 @@ public class Attack extends Ability {
     public void use() {
         if (!ready) return;
         spend();
-        // change owner animation to attack
+        // TODO: change owner animation to attack
         owner.stop();
 
         // TODO: cycle all entities in affected area and propagate damage resolution
