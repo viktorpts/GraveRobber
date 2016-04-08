@@ -17,6 +17,7 @@ public class QuickView {
 
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
+        gc.save();
         gc.setStroke(Color.DARKGRAY);
         gc.setLineWidth(0.5);
 
@@ -28,6 +29,7 @@ public class QuickView {
         for (int i = 0; i < 600 / gridSize; i++) {
             gc.strokeLine(0, i * gridSize, 800, i * gridSize);
         }
+        gc.restore();
     }
 
     static public void setBlock(GraphicsContext gc, int x, int y, int type) {
@@ -93,8 +95,8 @@ public class QuickView {
         // Convert position to pixels
         x *= gridSize;
         y *= gridSize;
-        double dirX = x + size * 1.2 * Math.cos(dir);
-        double dirY = y + size * 1.2 * Math.sin(dir);
+        double dirX = x + size * 0.6 * Math.cos(dir);
+        double dirY = y + size * 0.6 * Math.sin(dir);
 
         gc.setStroke(Color.WHITE);
         gc.setFill(Color.GREY);
