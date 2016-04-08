@@ -25,7 +25,7 @@ public class Creature extends Entity implements IMovable{
     private double behaviourState;
 
     public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
-        super(position);
+        super(new Sprite(0.0), position.getX(), position.getY(), 0.0);
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);

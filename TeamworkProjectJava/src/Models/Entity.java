@@ -7,24 +7,26 @@ import World.Coord;
 import java.util.EnumSet;
 
 abstract public class Entity {
+
+    private static int lastID = 0; // all entities know the last assigned ID
+    private int ID; // ID
     private EnumSet<EntityState> state;
     private Coord position;
     private double direction;
     private Sprite sprite;   // TODO: don't forget to initialize this in a constructor instead
     // TODO: Add methods to initialize a sprite and output it to a display interface /!\ depends on direction
 
-    public Entity() {
-        state = EnumSet.of(EntityState.IDLE);
-    }
-    public Entity(double x, double y) {
-        state = EnumSet.of(EntityState.IDLE);
+    public Entity(Sprite sprite, double x, double y, double direction) {
+        ID = ++lastID; // increment then assign
+
+        this.sprite = sprite;
         position = new Coord(x, y);
-        sprite = new Sprite(10);
+        this.direction =  direction;
+        state = EnumSet.of(EntityState.IDLE); // all entities idle at creation, modify using set method
     }
-    public Entity(Coord position) {
-        state = EnumSet.of(EntityState.IDLE);
-        this.position = position;
-        sprite = new Sprite(10);
+
+    public int getID() {
+        return ID;
     }
 
     // Position and orientation modifiers
