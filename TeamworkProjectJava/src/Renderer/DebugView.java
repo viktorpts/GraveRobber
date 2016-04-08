@@ -27,7 +27,7 @@ public class DebugView {
     public static void showEntityData() {
         final String[] entityData = { String.format("Entity Data:%n") };
         Main.game.getLevel().getEntities().stream().forEach(entity -> {
-            entityData[0] += String.format("%s: %s - %s%n",
+            entityData[0] += String.format("%3s: %s - %s%n",
                     entity.getID(),
                     entity.getClass().toString().replaceFirst("class Models.", ""),
                     entity.getState().toString());
