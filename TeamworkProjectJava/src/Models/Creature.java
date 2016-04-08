@@ -3,6 +3,7 @@ package Models;
 import Abilities.Ability;
 import Abilities.Attack;
 import Enumerations.Abilities;
+import Game.Main;
 import Interfaces.IAbility;
 import Interfaces.IMovable;
 import World.Coord;
@@ -82,6 +83,19 @@ public class Creature extends Entity implements IMovable{
     @Override
     public boolean hitscan(Entity target) {
         // TODO: Implement collision detection
+        Coord dist = new Coord(getX(), getY());
+        dist.subtract(target.getPos());
+        double penetration = dist.getMagnitude() - 0.5; // TODO: Replace this with entity size
+        if (penetration < 0.0) {
+            // collision; resolve via projection (entities placed apart, no vector modification)
+            Main.debugInfo += String.format("%ncollision");
+            dist.setMagnitude(penetration / 2); // separation vector
+            getPos().subtract(dist);
+            dist.scale(-1); // push target entity in opposite direction
+            target.getPos().subtract(dist);
+            // TODO: modify each entity's velocity vector, so they aren't moving towards each other
+            return true;
+        }
         return false;
     }
 
@@ -112,6 +126,15 @@ public class Creature extends Entity implements IMovable{
                 accelerate(moveSome, 0.5);
             }
         }
+        // Detect collisions
+        // TODO: this will check each pair twice, make a separate list and deplete it
+        Main.game.getLevel().getEntities().stream()
+                .filter(entity -> entity instanceof Creature) // get just the creatures
+                .filter(entity -> !entity.equals(this))
+                .forEach(entity -> {
+            Creature current = (Creature)entity;
+            current.hitscan(this);
+        });
 
         // If the object is moving, apply friction
         if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);
