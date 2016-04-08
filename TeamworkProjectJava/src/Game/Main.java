@@ -34,6 +34,7 @@ public class Main extends Application {
     final static double verticalRes = 600;
     // Debug view
     public static GraphicsContext debugc;
+    public static String debugInfo = "";
 
     public static void main(String[] args) {
         // Redirect
@@ -119,6 +120,9 @@ public class Main extends Application {
                     playerData += String.format("%n%s", key.toString());
                 }
                 debugc.fillText(playerData, 5, 15);
+                // Debug text from external methods
+                debugc.fillText(debugInfo, 5, 200);
+                debugInfo= "";
                 /**
                  * End of Debug info
                  */
