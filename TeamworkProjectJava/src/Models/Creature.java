@@ -4,14 +4,11 @@ import Abilities.Ability;
 import Abilities.Attack;
 import Enumerations.Abilities;
 import Game.Main;
-import Interfaces.IAbility;
 import Interfaces.IMovable;
 import World.Coord;
 import World.Physics;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
 public class Creature extends Entity implements IMovable{
     private int healthPoints;
@@ -19,10 +16,6 @@ public class Creature extends Entity implements IMovable{
     private int armorValue;
     Coord velocity;
     HashMap<Abilities, Ability> abilities;
-
-    // TODO: Make this it's own object with more actions
-    private int behaviour;
-    private double behaviourState;
 
     public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
         super(new Sprite(0.0), position.getX(), position.getY(), 0.0);
@@ -33,9 +26,6 @@ public class Creature extends Entity implements IMovable{
 
         abilities = new HashMap<>();
         abilities.put(Abilities.ATTACKPRIMARY, new Attack(this, 10.0, 0.5));
-
-        behaviour = 0;
-        behaviourState = 0;
     }
     public int getHealthPoints() {
         return healthPoints;
@@ -109,32 +99,18 @@ public class Creature extends Entity implements IMovable{
         velocity = newVelocity;
     }
 
-    public void setBehaviour(int behaviour) {
-        this.behaviour = behaviour;
-    }
-
     public void update(double time) {
-        // Process behaviour, temp
-        if (behaviour > 0) {
-            behaviourState += time;
-            if (behaviourState > 3) {
-                behaviourState = 0;
-                behaviour++;
-                setDirection(Math.PI * 2 * (new Random().nextFloat()));
-                Coord moveSome = new Coord(10.0, 0.0);
-                moveSome.setDirection(getDirection());
-                accelerate(moveSome, 0.5);
-            }
+        // Process behaviour
+        if (this instanceof Enemy) {
+            ((Enemy)this).processBehaviour(time);
         }
+
         // Detect collisions
         // TODO: this will check each pair twice, make a separate list and deplete it
         Main.game.getLevel().getEntities().stream()
                 .filter(entity -> entity instanceof Creature) // get just the creatures
-                .filter(entity -> !entity.equals(this))
-                .forEach(entity -> {
-            Creature current = (Creature)entity;
-            current.hitscan(this);
-        });
+                .filter(entity -> !entity.equals(this)) // can't collide with self
+                .forEach(entity -> ((Creature)entity).hitscan(this)); // resolution currently included in detection, can be filtered further
 
         // If the object is moving, apply friction
         if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);

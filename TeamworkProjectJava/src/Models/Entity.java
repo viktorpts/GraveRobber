@@ -90,7 +90,9 @@ abstract public class Entity {
 
         // TODO: replace the following code with sprite-based implementation
         // A rather hasty implementation for debugging purposes
-        QuickView.renderSprite(position.getX(), position.getY(), direction);
+        int selector = 0;
+        if (this instanceof Player) selector = 1; // change color
+        QuickView.renderSprite(selector, position.getX(), position.getY(), direction);
     }
 
     public void animate(double time) {
