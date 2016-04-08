@@ -1,6 +1,7 @@
 package Renderer;
 
 import Game.Main;
+import Models.Enemy;
 import javafx.geometry.VPos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -27,10 +28,11 @@ public class DebugView {
     public static void showEntityData() {
         final String[] entityData = { String.format("Entity Data:%n") };
         Main.game.getLevel().getEntities().stream().forEach(entity -> {
-            entityData[0] += String.format("%3s: %s - %s%n",
+            entityData[0] += String.format("%3s: %s - %s %s%n",
                     entity.getID(),
                     entity.getClass().toString().replaceFirst("class Models.", ""),
-                    entity.getState().toString());
+                    entity.getState().toString(),
+                    entity instanceof Enemy ? ((Enemy)entity).getThought(0).toString() : "");
                 });
         Main.debugc.fillText(entityData[0], 5, 70);
     }
