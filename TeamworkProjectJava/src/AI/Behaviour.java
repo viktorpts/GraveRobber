@@ -45,6 +45,7 @@ abstract public class Behaviour implements IBehaviour {
     @Override
     public void update(double time) {
         elapsedTime += time;
+        think(time);
     }
 
     public AIState getState() {

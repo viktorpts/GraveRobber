@@ -26,8 +26,7 @@ public class Roam extends Behaviour {
     }
 
     @Override
-    public void update(double time) {
-        elapsedTime += time;
+    public void think(double time) {
         if (state == AIState.PROCESSING) {
             progress -= time;
             if (progress <= 0) { // if action is complete, go back to idle
