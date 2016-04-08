@@ -2,7 +2,7 @@ package Game;
 
 public class Loop implements Runnable{
 	// TODO: place loop here, add to it all update and display calls
-
+	// This file is likely redundant
 
 	private boolean isRunning;
 	private Thread thread;
