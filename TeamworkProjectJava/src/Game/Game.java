@@ -2,6 +2,7 @@ package Game;
 
 import Abilities.Attack;
 import Enumerations.Abilities;
+import Enumerations.EntityState;
 import Models.Creature;
 import Models.Entity;
 import Models.Player;
@@ -13,6 +14,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 /**
  * This object will contain all instances required for a complete game to be initialized, updated and displayed:
@@ -93,14 +95,24 @@ public class Game {
     }
 
     public void handleInput() {
+        // Player states need to go somewhere else, but are here for now
+        if (controlState.getCombo().isEmpty()) {
+            getPlayer().setState(EnumSet.of(EntityState.IDLE));
+        } else {
+            getPlayer().setState(EnumSet.of(EntityState.MOVING));
+        }
+
         // User can't control the character if it's velocity is greater than Physics.maxMoveSpeed
         // This has the positive side effect of disabling player controls during knockback
         if (getPlayer().getVelocity().getMagnitude() > Physics.maxMoveSpeed) return;
 
         // Mouse
-        if (controlState.mouseLeft) {
+        if (controlState.isMouseLeft()) {
             // Attack
+            getPlayer().getState().add(EntityState.CASTINGINIT);
             getPlayer().useAbility(Abilities.ATTACKPRIMARY);
+        } else {
+            getPlayer().getState().remove(EntityState.CASTINGINIT);
         }
 
         // Keyboard
