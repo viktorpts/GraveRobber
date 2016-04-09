@@ -1,7 +1,5 @@
 package Enumerations;
 
-import Models.Entity;
-
 import java.util.EnumSet;
 
 public enum EntityState {
@@ -9,9 +7,9 @@ public enum EntityState {
     MOVING,
     DEAD,
     STAGGERED, // controls disabled
-    CASTINGINIT, // controls disabled, can be interrupted
-    CASTING,
-    DAMAGED, // immune, don't forget to toggle off!
+    CASTINGINIT, // controls disabled, can be interrupted (by staggering effects)
+    CASTING, // movement disabled, can use abilities
+    DAMAGED, // immune to further damage, don't forget to toggle off!
     DESTROYED; // release instance
 
     // This state prevents the entity from changing it's state voluntarily
@@ -19,6 +17,7 @@ public enum EntityState {
             DEAD,
             STAGGERED,
             CASTINGINIT,
+            CASTING,
             DESTROYED);
 
     // This state is the inverse of BUSY, it means the entity can change it's state at will
