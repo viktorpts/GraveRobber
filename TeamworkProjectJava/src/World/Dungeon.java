@@ -13,6 +13,7 @@ public class Dungeon {
     private int x, y, width, height;
     private Dungeon leftChild;
     private Dungeon rightChild;
+    private Dungeon hallway;
 
     /**
      * Properties
@@ -73,6 +74,21 @@ public class Dungeon {
         this.x = x;
     }
 
+    public int getCenterX() {
+        return x + width / 2;
+    }
+
+    public int getCenterY() {
+        return y + height / 2;
+    }
+
+    public Dungeon getHallway() {
+        return hallway;
+    }
+
+    /**
+     * Room to display
+     */
     public Dungeon dungeon;
 
     /**
@@ -115,9 +131,13 @@ public class Dungeon {
         if (direction) { //populate child areas
             leftChild = new Dungeon(x, y, width, newSize);
             rightChild = new Dungeon(x, y + newSize, width, height - newSize);
+            // make a hallway connecting children
+            hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), 2, rightChild.getCenterY() - leftChild.getCenterY());
         } else {
             leftChild = new Dungeon(x, y, newSize, height);
             rightChild = new Dungeon(x + newSize, y, width - newSize, height);
+            // make a hallway connecting children
+            hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), rightChild.getCenterX() - leftChild.getCenterX(), 2);
         }
         return true; //split successful
     }

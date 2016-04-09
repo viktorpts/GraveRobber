@@ -55,32 +55,58 @@ public class QuickView {
 
     static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list, boolean finalize) {
         for (Dungeon dungeon : list) {
-            // Boundary
-            int bx1 = dungeon.getX();
-            int by1 = dungeon.getY();
-            int bx2 = dungeon.getWidth() + bx1;
-            int by2 = dungeon.getHeight() + by1;
-            for (int i = bx1; i < bx2; i++) {
-                setBlock(gc, i, by1, 2);
-                setBlock(gc, i, by2 - 1, 2);
-            }
-            for (int j = by1; j < by2; j++) {
-                setBlock(gc, bx1, j, 2);
-                setBlock(gc, bx2 - 1, j, 2);
-            }
             if (finalize) {
-                // Room
-                int x1 = dungeon.dungeon.getX();
-                int y1 = dungeon.dungeon.getY();
-                int x2 = dungeon.dungeon.getWidth() + x1;
-                int y2 = dungeon.dungeon.getHeight() + y1;
-                for (int i = x1; i < x2; i++) {
-                    setBlock(gc, i, y1, 1);
-                    setBlock(gc, i, y2 - 1, 1);
+                if (dungeon.getDungeon() != null) {
+                    // Room
+                    int x1 = dungeon.dungeon.getX();
+                    int y1 = dungeon.dungeon.getY();
+                    int x2 = dungeon.dungeon.getWidth() + x1;
+                    int y2 = dungeon.dungeon.getHeight() + y1;
+                    for (int i = x1; i < x2; i++) {
+                        for (int j = y1; j < y2; j++) {
+                            setBlock(gc, i, j, 1);
+                        }
+                    }
+                    /*
+                    for (int i = x1; i < x2; i++) {
+                        setBlock(gc, i, y1, 1);
+                        setBlock(gc, i, y2 - 1, 1);
+                    }
+                    for (int j = y1; j < y2; j++) {
+                        setBlock(gc, x1, j, 1);
+                        setBlock(gc, x2 - 1, j, 1);
+                    }
+                    */
+                } else {
+                    // Hallway
+                    if (dungeon.getHallway() != null) {
+                        int hx1 = dungeon.getHallway().getX();
+                        int hy1 = dungeon.getHallway().getY();
+                        int hx2 = dungeon.getHallway().getWidth() + hx1;
+                        int hy2 = dungeon.getHallway().getHeight() + hy1;
+                        for (int i = hx1; i < hx2; i++) {
+                            setBlock(gc, i, hy1, 1);
+                            setBlock(gc, i, hy2 - 1, 1);
+                        }
+                        for (int j = hy1; j < hy2; j++) {
+                            setBlock(gc, hx1, j, 1);
+                            setBlock(gc, hx2 - 1, j, 1);
+                        }
+                    }
                 }
-                for (int j = y1; j < y2; j++) {
-                    setBlock(gc, x1, j, 1);
-                    setBlock(gc, x2 - 1, j, 1);
+            } else {
+                // Boundary
+                int bx1 = dungeon.getX();
+                int by1 = dungeon.getY();
+                int bx2 = dungeon.getWidth() + bx1;
+                int by2 = dungeon.getHeight() + by1;
+                for (int i = bx1; i < bx2; i++) {
+                    setBlock(gc, i, by1, 2);
+                    setBlock(gc, i, by2 - 1, 2);
+                }
+                for (int j = by1; j < by2; j++) {
+                    setBlock(gc, bx1, j, 2);
+                    setBlock(gc, bx2 - 1, j, 2);
                 }
             }
         }

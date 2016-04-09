@@ -88,19 +88,17 @@ abstract public class Entity {
     {
         if (sprite == null || !isAlive()) return;
 
-        // TODO: replace the following code with sprite-based implementation
-        // A rather hasty implementation for debugging purposes
-        int selector = 0;
-        if (this instanceof Player) selector = 1; // change color
-        QuickView.renderSprite(selector, position.getX(), position.getY(), direction);
+        int selector = 0; // class type based color
+        if (this instanceof Player) selector = 1; // change color of player
+        sprite.output(selector, position.getX(), position.getY(), direction);
     }
 
     public void animate(double time) {
         sprite.advance(time);
     }
 
-    public void changeAnimation() {
-
+    public void changeAnimation(String animation) {
+        // TODO: information should be passed between ability and animation
     }
 
 }

@@ -42,7 +42,7 @@ public class GenerateDungeon {
     public static ArrayList<Dungeon> filterTree(ArrayList<Dungeon> list) {
         ArrayList<Dungeon> result = new ArrayList<>();
         for (Dungeon dungeon : list) {
-            if (dungeon.dungeon == null) continue;
+            if (dungeon.dungeon == null && dungeon.getHallway() == null) continue;
             result.add(dungeon);
         }
         return result;

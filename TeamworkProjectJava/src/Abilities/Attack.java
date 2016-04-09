@@ -1,13 +1,18 @@
 package Abilities;
 
+import Enumerations.Abilities;
+import Enumerations.EntityState;
 import Models.Creature;
 import World.Coord;
+
+import java.util.EnumSet;
 
 public class Attack extends Ability {
 
     double damage;
     double radius;
     Coord target;
+    // TODO: add timing
 
     public Attack(Creature owner, double damage, double radius) {
         super(owner, 1.0);
@@ -25,6 +30,8 @@ public class Attack extends Ability {
         spend();
         // TODO: change owner animation to attack
         owner.stop();
+        owner.changeAnimation(Abilities.ATTACKPRIMARY.getName());
+        owner.getState().add(EntityState.CASTINGINIT);
 
         // TODO: cycle all entities in affected area and propagate damage resolution
     }
