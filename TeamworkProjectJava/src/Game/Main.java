@@ -1,31 +1,19 @@
 package Game;
 
 import Models.Enemy;
-import Models.Player;
-import Models.Sprite;
 import Renderer.DebugView;
-import World.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import Renderer.QuickView;
 import javafx.stage.StageStyle;
-
-import java.util.ArrayList;
-import java.util.StringJoiner;
 
 public class Main extends Application {
 
@@ -110,7 +98,7 @@ public class Main extends Application {
                  */
             }
         }.start();
-        
+
         // Render stage
         primaryStage.setResizable(false);
         primaryStage.initStyle(StageStyle.UNDECORATED);

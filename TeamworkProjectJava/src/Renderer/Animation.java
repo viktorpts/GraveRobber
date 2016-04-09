@@ -1,14 +1,14 @@
-package Models;
+package Renderer;
 
 import Renderer.QuickView;
 
-public class Sprite {
+public class Animation {
     // TODO: Add a container and methods to load image frames from disk into memory and output them to a display interface
     int state;
     double progress;
     double framerate; // frames per second
 
-    public Sprite (double framerate) {
+    public Animation(double framerate) {
         state = 0;
         progress = 0.0;
         this.framerate = framerate;
