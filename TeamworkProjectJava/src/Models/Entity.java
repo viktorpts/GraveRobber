@@ -1,7 +1,7 @@
 package Models;
 
 import Enumerations.EntityState;
-import Renderer.QuickView;
+import Renderer.Animation;
 import World.Coord;
 
 import java.util.EnumSet;
@@ -13,23 +13,27 @@ abstract public class Entity {
     private EnumSet<EntityState> state;
     private Coord position;
     private double direction;
-    private Sprite sprite;   // TODO: don't forget to initialize this in a constructor instead
+    private double radius; // used for collision detection
+    private Animation animation;   // TODO: don't forget to initialize this in a constructor instead
     // TODO: Add methods to initialize a sprite and output it to a display interface /!\ depends on direction
 
-    public Entity(Sprite sprite, double x, double y, double direction) {
+    public Entity(Animation animation, double x, double y, double direction) {
         ID = ++lastID; // increment then assign
 
-        this.sprite = sprite;
+        this.animation = animation;
         position = new Coord(x, y);
         this.direction =  direction;
         state = EnumSet.of(EntityState.IDLE); // all entities idle at creation, modify using set method
+
+        // TODO: add a way for this to be initialized to a different value
+        radius = 0.25;
     }
 
     public int getID() {
         return ID;
     }
 
-    // Position and orientation modifiers
+    // Position and orientation properties
     public Coord getPos() {
         return position;
     }
@@ -62,6 +66,10 @@ abstract public class Entity {
         this.direction = direction;
     }
 
+    public double getRadius() {
+        return radius;
+    }
+
     // State sets
     public void setState(EnumSet state) {
         this.state = state;
@@ -86,15 +94,15 @@ abstract public class Entity {
     // TODO: Output sprite to display interface /!\ depends on direction
     public void render()
     {
-        if (sprite == null || !isAlive()) return;
+        if (animation == null || !isAlive()) return;
 
         int selector = 0; // class type based color
         if (this instanceof Player) selector = 1; // change color of player
-        sprite.output(selector, position.getX(), position.getY(), direction);
+        animation.output(selector, position.getX(), position.getY(), direction);
     }
 
     public void animate(double time) {
-        sprite.advance(time);
+        animation.advance(time);
     }
 
     public void changeAnimation(String animation) {
