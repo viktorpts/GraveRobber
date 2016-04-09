@@ -5,28 +5,46 @@ import Abilities.Attack;
 import Enumerations.Abilities;
 import Game.Main;
 import Interfaces.IMovable;
+import Renderer.Animation;
 import World.Coord;
 import World.Physics;
 
 import java.util.HashMap;
 
 public class Creature extends Entity implements IMovable{
+    // Stats
     private int healthPoints;
     private int attackPower;
     private int armorValue;
-    Coord velocity;
     HashMap<Abilities, Ability> abilities;
 
+    // Physical characteristics
+    private double radius; // used for collision detection
+    private double maxSpeed;
+    private double maxAcceleration;
+    private Coord velocity; // current velocity vector
+
+
+    // Constructor
     public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
-        super(new Sprite(0.0), position.getX(), position.getY(), 0.0);
+        // Init parent
+        super(new Animation(0.0), position.getX(), position.getY(), 0.0);
+        // Init stats
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
-        velocity = new Coord(0.0, 0.0);
-
         abilities = new HashMap<>();
         abilities.put(Abilities.ATTACKPRIMARY, new Attack(this, 10.0, 0.5));
+
+        // Init physical characteristics
+        velocity = new Coord(0.0, 0.0);
+        // TODO: add a way for these to be set at production time; not a good idea to change them directly though
+        radius = 0.25;
+        maxSpeed = Physics.maxMoveSpeed; // we use the properties of the player for now
+        maxAcceleration = Physics.playerAcceleration;
     }
+
+    // Properties
     public int getHealthPoints() {
         return healthPoints;
     }
@@ -46,6 +64,7 @@ public class Creature extends Entity implements IMovable{
         this.armorValue = value;
     }
 
+    // Implementation of IMovable, everything to do with motion
     @Override
     public void accelerate(Coord vector, double time) {
         vector.scale(time);
@@ -75,7 +94,7 @@ public class Creature extends Entity implements IMovable{
         // TODO: Implement collision detection
         Coord dist = new Coord(getX(), getY());
         dist.subtract(target.getPos());
-        double penetration = dist.getMagnitude() - 0.5; // TODO: Replace this with entity size
+        double penetration = dist.getMagnitude() - (radius + target.getRadius()); // TODO: Replace this with entity size
         if (penetration < 0.0) {
             // collision; resolve via projection (entities placed apart, no vector modification)
             Main.debugInfo += String.format("%ncollision");
@@ -99,6 +118,11 @@ public class Creature extends Entity implements IMovable{
         velocity = newVelocity;
     }
 
+    /**
+     * Update the creature, depending on time elapsed since last update. Process behaviour, if entity has an AI
+     * attached, look for collisions with other objects, move physically, cool down all used abilites, etc.
+     * @param time Seconds since last update
+     */
     public void update(double time) {
         // Process behaviour
         if (this instanceof Enemy) {
@@ -125,13 +149,22 @@ public class Creature extends Entity implements IMovable{
                 .forEach(entry -> entry.getValue().cool(time));
     }
 
-    public void addAbility(Ability ability) {
+    // Abilities
 
+    /**
+     * Add an ability to the list
+     * @param name A name from the dedicated enumeration
+     * @param ability An instance of the ability. Do not attach the same reference to two different creatures, since
+     *                cooldown and effects are linked back to the creature
+     */
+    public void addAbility(Abilities name, Ability ability) {
+        abilities.put(name, ability);
     }
 
     public void useAbility(Abilities ability) {
         if (!isReady()) return;
         if (abilities.containsKey(ability)) {
+            if (!abilities.get(ability).isReady()) return;
             abilities.get(ability).use();
         }
     }
