@@ -32,7 +32,7 @@ public class DebugView {
                     entity.getID(),
                     entity.getClass().toString().replaceFirst("class Models.", ""),
                     entity.getState().toString(),
-                    entity instanceof Enemy ? ((Enemy)entity).getThought(0).toString() : "");
+                    entity instanceof Enemy ? ((Enemy)entity).getThought(0).toString() : entity.getAnimationState().toString());
                 });
         Main.debugc.fillText(entityData[0], 5, 70);
     }

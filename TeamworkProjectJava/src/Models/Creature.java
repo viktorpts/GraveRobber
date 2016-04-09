@@ -28,7 +28,8 @@ public class Creature extends Entity implements IMovable{
     // Constructor
     public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
         // Init parent
-        super(new Animation(0.0), position.getX(), position.getY(), 0.0);
+        // TODO: finish proper Animation implementation
+        super(new Animation(10.0), position.getX(), position.getY(), 0.0);
         // Init stats
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
@@ -143,10 +144,10 @@ public class Creature extends Entity implements IMovable{
         super.setX(newX);
         super.setY(newY);
 
-        // Cool down used abilities
+        // Update used abilities (they cool themselves down)
         abilities.entrySet().stream()
                 .filter(entry -> !entry.getValue().isReady()) // Filter used abilities
-                .forEach(entry -> entry.getValue().cool(time));
+                .forEach(entry -> entry.getValue().update(time));
     }
 
     // Abilities

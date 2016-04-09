@@ -4,6 +4,7 @@ import Game.Main;
 import World.Dungeon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.StrokeLineCap;
 
 import java.util.ArrayList;
 
@@ -131,6 +132,12 @@ public class QuickView {
             case 1:
                 gc.setFill(Color.GREEN);
                 break;
+            case 2:
+                gc.setFill(Color.LIGHTPINK);
+                break;
+            case 3:
+                gc.setFill(Color.RED);
+                break;
         }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
@@ -192,16 +199,25 @@ public class QuickView {
         gc.fillPolygon(aX, aY, 6);
     }
 
-    static public void renderSwipe(double x, double y) {
+    static public void renderSwipe(double x, double y, double dir, double progress) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
         double size = 10;
         // Convert position to pixels
+        dir -= progress;
         x *= gridSize;
         y *= gridSize;
+        double dirX = x + size * 3.0 * Math.cos(dir);
+        double dirY = y + size * 3.0 * Math.sin(dir);
 
-        gc.setFill(Color.RED);
-        gc.fillOval(x - size / 2, y - size / 2, size, size);
+        gc.save();
+        gc.setStroke(Color.GREY);
+        gc.setLineWidth(4.0);
+        gc.setLineCap(StrokeLineCap.ROUND);
+        gc.strokeLine(x, y, dirX, dirY);
+        gc.restore();
+        //gc.setFill(Color.RED);
+        //gc.fillOval(dirX - size / 2, dirY - size / 2, size, size);
     }
 
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter

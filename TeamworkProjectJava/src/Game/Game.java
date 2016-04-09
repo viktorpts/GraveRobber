@@ -97,11 +97,9 @@ public class Game {
 
     public void handleInput() {
         // Player states need to go somewhere else, but are here for now
-        if (controlState.getCombo().isEmpty()) {
-            getPlayer().setState(EnumSet.of(EntityState.IDLE));
-        } else {
-            getPlayer().setState(EnumSet.of(EntityState.MOVING));
-        }
+        //if (controlState.getCombo().isEmpty()) {
+        //    getPlayer().setState(EnumSet.of(EntityState.IDLE));
+        //}
 
         // User can't control the character if it's velocity is greater than Physics.maxMoveSpeed
         // This has the positive side effect of disabling player controls during knockback
@@ -110,10 +108,7 @@ public class Game {
         // Mouse
         if (controlState.isMouseLeft()) {
             // Attack
-            getPlayer().getState().add(EntityState.CASTINGINIT);
             getPlayer().useAbility(Abilities.ATTACKPRIMARY);
-        } else {
-            getPlayer().getState().remove(EntityState.CASTINGINIT);
         }
 
         // Keyboard
@@ -122,15 +117,22 @@ public class Game {
         if (controlState.pressed(KeyCode.SPACE)) {
             modifier *= 10;
         }
+        // if player is busy, don't let him move
+        if (getPlayer().getState().contains(EntityState.CASTINGINIT) ||
+                getPlayer().getState().contains(EntityState.CASTING)) return;
         if (controlState.pressed(KeyCode.W) && !controlState.pressed(KeyCode.S)) {
             getPlayer().accelerate(new Coord(0.0, -modifier), elapsed);
+            getPlayer().setState(EnumSet.of(EntityState.MOVING));
         } else if (controlState.pressed(KeyCode.S) && !controlState.pressed(KeyCode.W)) {
             getPlayer().accelerate(new Coord(0.0, modifier), elapsed);
+            getPlayer().setState(EnumSet.of(EntityState.MOVING));
         }
         if (controlState.pressed(KeyCode.A) && !controlState.pressed(KeyCode.D)) {
             getPlayer().accelerate(new Coord(-modifier, 0.0), elapsed);
+            getPlayer().setState(EnumSet.of(EntityState.MOVING));
         } else if (controlState.pressed(KeyCode.D) && !controlState.pressed(KeyCode.A)) {
             getPlayer().accelerate(new Coord(modifier, 0.0), elapsed);
+            getPlayer().setState(EnumSet.of(EntityState.MOVING));
         }
     }
 

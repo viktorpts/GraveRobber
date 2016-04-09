@@ -1,5 +1,6 @@
 package Models;
 
+import Enumerations.AnimationState;
 import Enumerations.EntityState;
 import Renderer.Animation;
 import World.Coord;
@@ -88,7 +89,16 @@ abstract public class Entity {
 
     public boolean isReady() {
         // Check against a list of all unchangeable states
-        return state.contains(EntityState.READY);
+        if (state.contains(EntityState.BUSY)) return false;
+        return true;
+    }
+
+    // Display
+    public Animation getAnimation() {
+        return animation;
+    }
+    public AnimationState getAnimationState() {
+        return animation.getState();
     }
 
     // TODO: Output sprite to display interface /!\ depends on direction
@@ -96,17 +106,20 @@ abstract public class Entity {
     {
         if (animation == null || !isAlive()) return;
 
-        int selector = 0; // class type based color
-        if (this instanceof Player) selector = 1; // change color of player
-        animation.output(selector, position.getX(), position.getY(), direction);
+        // TODO: selector is a temporary solution, let the Animation handle it's state
+        animation.output(this, position.getX(), position.getY(), direction);
     }
 
     public void animate(double time) {
         animation.advance(time);
     }
 
-    public void changeAnimation(String animation) {
-        // TODO: information should be passed between ability and animation
+    public void changeAnimation(String newSequence) {
+        if (newSequence == "Primary Attack") {
+            animation.setState(AnimationState.ATTACKINGINIT);
+        }
+        // TODO: list of animation sequences can be a map of names or abilities and corresponding frames
+        // TODO: check if named sequence exists? maybe check in Animation class
     }
 
 }
