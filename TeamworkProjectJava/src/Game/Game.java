@@ -79,6 +79,7 @@ public class Game {
         timeLast = timeNew;
 
         level.getEntities().stream().filter(entity -> entity instanceof Creature).forEach(entity -> {
+            entity.animate(elapsed);
             Creature current = (Creature)entity;
             current.update(elapsed);
         });
