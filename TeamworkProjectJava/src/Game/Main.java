@@ -110,8 +110,7 @@ public class Main extends Application {
                  */
             }
         }.start();
-
-        System.out.println();
+        
         // Render stage
         primaryStage.setResizable(false);
         primaryStage.initStyle(StageStyle.UNDECORATED);
