@@ -1,5 +1,6 @@
 package Game;
 
+import Enumerations.EntityState;
 import Models.Enemy;
 import Renderer.DebugView;
 import javafx.animation.AnimationTimer;
@@ -73,7 +74,8 @@ public class Main extends Application {
                 double offsetX = mousePos[0] - game.getLevel().getPlayer().getX() * QuickView.gridSize;
                 double offsetY = mousePos[1] - game.getLevel().getPlayer().getY() * QuickView.gridSize;
                 double dir = Math.atan2(offsetY, offsetX);
-                game.getPlayer().setDirection(dir);
+                if (!game.getPlayer().getState().contains(EntityState.CASTINGINIT) &&
+                        !game.getPlayer().getState().contains(EntityState.CASTING)) game.getPlayer().setDirection(dir);
 
                 // Update state
                 game.update(currentNanoTime);
