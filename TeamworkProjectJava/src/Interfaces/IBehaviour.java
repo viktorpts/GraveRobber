@@ -5,6 +5,6 @@ public interface IBehaviour {
     void pause();
     void stop();
     void reset();
-    void update(double time);
-    void think(double time);
+    boolean update(double time);
+    boolean think(double time);
 }

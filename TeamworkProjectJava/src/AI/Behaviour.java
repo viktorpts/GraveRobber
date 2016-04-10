@@ -23,7 +23,7 @@ abstract public class Behaviour implements IBehaviour {
 
     @Override
     public void start() {
-        state = AIState.GOING;
+        state = AIState.THINKING;
     }
 
     @Override
@@ -43,12 +43,16 @@ abstract public class Behaviour implements IBehaviour {
     }
 
     @Override
-    public void update(double time) {
+    public boolean update(double time) {
         elapsedTime += time;
-        think(time);
+        return think(time);
     }
 
     public AIState getState() {
         return state;
+    }
+
+    public int getWeight() {
+        return weight;
     }
 }

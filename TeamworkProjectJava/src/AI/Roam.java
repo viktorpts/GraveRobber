@@ -26,15 +26,17 @@ public class Roam extends Behaviour {
     }
 
     @Override
-    public void think(double time) {
+    public boolean think(double time) {
         if (state == AIState.PROCESSING) {
             progress -= time;
             if (progress <= 0) { // if action is complete, go back to idle
                 progress = 0;
-                state = AIState.GOING;
+                state = AIState.THINKING;
                 reset();
+                return false;
             }
             act(time);
+            return true;
         } else if (elapsedTime > nextUpdate) { // if not already processing action, wait for trigger (time)
             // Take action
             // Decide whether to look around or to move forward
@@ -46,7 +48,9 @@ public class Roam extends Behaviour {
                 prepareNext();
                 reset();
             }
+            return true;
         }
+        return false;
     }
 
     private void act(double time) {
