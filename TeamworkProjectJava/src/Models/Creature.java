@@ -3,6 +3,7 @@ package Models;
 import Abilities.Ability;
 import Abilities.Attack;
 import Enumerations.Abilities;
+import Enumerations.DamageType;
 import Game.Main;
 import Interfaces.IMovable;
 import Renderer.Animation;
@@ -181,5 +182,38 @@ public class Creature extends Entity implements IMovable{
             abilities.get(ability).use();
         }
     }
+
     // TODO: Methods for taking damage and damage calculation
+    public void takeDamage(double damage) {
+        resolveDamage(damage, DamageType.GENERIC, null);
+    }
+    public void takeDamage(double damage, DamageType type) {
+        resolveDamage(damage, type, null);
+    }
+    public void takeDamage(double damage, Coord source) {
+        resolveDamage(damage, DamageType.GENERIC, source);
+    }
+    public void takeDamage(double damage, DamageType type, Coord source) {
+        resolveDamage(damage, type, source);
+    }
+
+    public void resolveDamage(double damage, DamageType type, Coord source) {
+        // TODO: armor calculation
+        if ((type == DamageType.WEAPONMELEE || type == DamageType.WEAPONRANGED) && source != null) {
+            // knockback
+            double refsize = 0.25; // temp scalar
+            double knockback = 2 - 2 * (radius - 0.5 * refsize) / (1.5 * refsize);
+            if (knockback > 2) knockback = 2;
+            if (knockback > 0) { // don't do anything if entity is not affected
+                Coord kickvector = new Coord(Physics.friction + knockback, 0.0);
+                kickvector.setDirection(Coord.angleBetween(source, getPos()));
+                stop();
+                accelerate(kickvector, 1.0);
+                // TODO: disable movement for a short period
+            }
+        }
+        if (damage > 0) { //prevent negative damage from healing
+            healthPoints -= (int)damage;
+        }
+    }
 }
