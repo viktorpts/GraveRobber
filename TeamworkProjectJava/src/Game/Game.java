@@ -117,7 +117,7 @@ public class Game {
 
         // Keyboard
         // Sloppy dodge roll; this is dependent on framerate, find a better implementation!
-        double modifier = Physics.playerAcceleration;
+        double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
         if (controlState.pressed(KeyCode.SPACE)) {
             modifier *= 10;
         }
