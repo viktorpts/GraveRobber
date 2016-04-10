@@ -79,6 +79,10 @@ public class Game {
         timeLast = timeNew;
 
         level.getEntities().stream().filter(entity -> entity instanceof Creature).forEach(entity -> {
+            if (entity.getState().contains(EntityState.DESTROYED)) { // release dead entries
+                level.getEntities().remove(entity);
+                return;
+            }
             entity.animate(elapsed);
             Creature current = (Creature)entity;
             current.update(elapsed);
