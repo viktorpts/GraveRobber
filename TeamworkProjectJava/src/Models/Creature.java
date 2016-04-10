@@ -69,7 +69,7 @@ public class Creature extends Entity implements IMovable{
     @Override
     public void accelerate(Coord vector, double time) {
         vector.scale(time);
-        velocity.add(vector);
+        velocity.doAdd(vector);
         if (velocity.getMagnitude() > Physics.maxVelocity) {
             velocity.setMagnitude(Physics.maxVelocity);
         }
@@ -94,15 +94,15 @@ public class Creature extends Entity implements IMovable{
     public boolean hitscan(Entity target) {
         // TODO: Implement collision detection
         Coord dist = new Coord(getX(), getY());
-        dist.subtract(target.getPos());
+        dist.doSubtract(target.getPos());
         double penetration = dist.getMagnitude() - (radius + target.getRadius()); // TODO: Replace this with entity size
         if (penetration < 0.0) {
             // collision; resolve via projection (entities placed apart, no vector modification)
             Main.debugInfo += String.format("%ncollision");
             dist.setMagnitude(penetration / 2); // separation vector
-            getPos().subtract(dist);
+            getPos().doSubtract(dist);
             dist.scale(-1); // push target entity in opposite direction
-            target.getPos().subtract(dist);
+            target.getPos().doSubtract(dist);
             // TODO: modify each entity's velocity vector, so they aren't moving towards each other
             return true;
         }
