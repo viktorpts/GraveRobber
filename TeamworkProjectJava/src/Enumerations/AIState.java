@@ -1,7 +1,7 @@
 package Enumerations;
 
 public enum AIState {
-    GOING,
+    THINKING,
     PAUSED,
     STOPPED,
     PROCESSING
