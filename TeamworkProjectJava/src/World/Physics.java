@@ -2,11 +2,11 @@ package World;
 
 public class Physics {
     final public static double maxVelocity = 20.0;          // Tiles per second
-    final public static double maxMoveSpeed = 5.0;          // Tiles per second
+    final public static double maxMoveSpeed = 4.0;          // Tiles per second
     final public static double maxAcceleration = 100.0;      // Tiles per second ^ 2
     final public static double friction = 40.0;             // Tiles per second ^ 2
-    final public static double playerAcceleration = 48.0;    // Tiles per second ^ 2
-    // Effective max acceleration is (maxAcceleration - friction)
+    final public static double playerAcceleration = 8.0;    // Tiles per second ^ 2
+    // When accelerating entities, add the friction value to get a net positive effect
 
     // Object deceleration due to friction
     public static void decelerate(Coord vector, double time) {
