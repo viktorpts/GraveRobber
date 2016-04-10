@@ -84,4 +84,21 @@ public class Coord {
         // Implement map boundary check
         return true;
     }
+
+    // Static methods for vector math
+    public static Coord add(Coord vector1, Coord vector2) {
+        double x = vector1.getX() + vector2.getX();
+        double y = vector1.getY() + vector2.getY();
+        return new Coord(x, y);
+    }
+
+    public static Coord subtract(Coord vector1, Coord vector2) {
+        double x = vector1.getX() - vector2.getX();
+        double y = vector1.getY() - vector2.getY();
+        return new Coord(x, y);
+    }
+
+    public static double angleBetween(Coord vector1, Coord vector2) {
+        return subtract(vector2, vector1).getDirection();
+    }
 }
