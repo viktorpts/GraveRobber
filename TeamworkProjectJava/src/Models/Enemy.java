@@ -1,6 +1,7 @@
 package Models;
 
 import AI.Behaviour;
+import AI.Gank;
 import AI.Roam;
 import Enumerations.AIState;
 import World.Coord;
@@ -17,7 +18,9 @@ public class Enemy extends Creature {
         // Make creature roam around randomly
         brain = new ArrayList<>();
         brain.add(new Roam(this, 0.5));
+        brain.add(new Gank(this, 3.0));
         brain.get(0).start();
+        brain.get(1).start();
     }
     public void addBrain(Behaviour newBrain) {
         brain.add(newBrain);
