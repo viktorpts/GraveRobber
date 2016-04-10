@@ -69,12 +69,12 @@ public class Coord {
         y = magnitude * Math.sin(dir);
     }
 
-    public void subtract(Coord vector) {
+    public void doSubtract(Coord vector) {
         x -= vector.getX();
         y -= vector.getY();
     }
 
-    public void add(Coord vector) {
+    public void doAdd(Coord vector) {
         x += vector.getX();
         y += vector.getY();
     }
