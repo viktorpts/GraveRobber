@@ -16,7 +16,7 @@ public class Physics {
             // Prevent reverse acceleration
             vector.setPos(0.0, 0.0);
         } else {
-            vector.subtract(brake);
+            vector.doSubtract(brake);
         }
     }
 }
