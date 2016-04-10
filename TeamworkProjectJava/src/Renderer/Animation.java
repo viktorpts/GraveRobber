@@ -6,6 +6,18 @@ import Models.Player;
 
 public class Animation {
     // TODO: Add a container and methods to load image frames from disk into memory and output them to a display interface
+    /**
+     * class sprite
+     *
+     * image - interface with ImageView (javafx)
+     *
+     * arraylist name of sequences
+     * for each sequence start index and end index
+     * method for sequence length
+     *
+     * x,y offset
+     *
+     */
     AnimationState state;
     double progress;
     double framerate; // frames per second
