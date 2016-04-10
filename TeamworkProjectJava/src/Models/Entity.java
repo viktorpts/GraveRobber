@@ -67,6 +67,11 @@ abstract public class Entity {
         this.direction = direction;
     }
 
+    // Face particular coordinate (maybe we should overload this to work with entity ID)
+    public void turnTo(double x, double y) {
+        direction = Coord.angleBetween(this.getPos(), new Coord(x, y));
+    }
+
     public double getRadius() {
         return radius;
     }
