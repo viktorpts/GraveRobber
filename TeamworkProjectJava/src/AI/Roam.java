@@ -42,7 +42,7 @@ public class Roam extends Behaviour {
             // Decide whether to look around or to move forward
             if (rnd.nextInt(2) == 1) { // move
                 state = AIState.PROCESSING;
-                progress = 0.25 + rnd.nextDouble() / 2; // 0.25-0.75 seconds of movement
+                progress = 0.25 + rnd.nextDouble(); // 0.25-1.25 seconds of movement
             } else { // look around
                 owner.setDirection(rnd.nextDouble() * Math.PI * 2);
                 prepareNext();
@@ -55,10 +55,7 @@ public class Roam extends Behaviour {
 
     private void act(double time) {
         // move forward
-        Coord moveSome = new Coord(Physics.playerAcceleration * 0.92, 0.0); // 50% of net player acceleration
-        // WARNING! entities are not bound by Physic.maxMoveSpeed! don't accelerate them for too long
-        moveSome.setDirection(owner.getDirection());
-        owner.accelerate(moveSome, time);
+        owner.moveForward(time);
     }
 
     private void prepareNext() {

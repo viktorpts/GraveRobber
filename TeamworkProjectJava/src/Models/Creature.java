@@ -120,6 +120,18 @@ public class Creature extends Entity implements IMovable{
     }
 
     /**
+     * Since many operation require the creature to just move where it's looking, this method takes care of all vector
+     * calc and just adds the needed acceleration in the proper direction
+     * @param time seconds since last update
+     */
+    public void moveForward(double time) {
+        Coord vector = new Coord(maxAcceleration + Physics.friction, 0.0);
+        vector.setDirection(getDirection());
+        accelerate(vector, time);
+        if (velocity.getMagnitude() > maxSpeed) velocity.setMagnitude(maxSpeed); // make sure we're not going too fast
+    }
+
+    /**
      * Update the creature, depending on time elapsed since last update. Process behaviour, if entity has an AI
      * attached, look for collisions with other objects, move physically, cool down all used abilites, etc.
      * @param time Seconds since last update
