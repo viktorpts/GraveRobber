@@ -3,7 +3,9 @@ package Models;
 import Abilities.Ability;
 import Abilities.Attack;
 import Enumerations.Abilities;
+import Enumerations.AbilityState;
 import Enumerations.DamageType;
+import Enumerations.EntityState;
 import Game.Main;
 import Interfaces.IMovable;
 import Renderer.Animation;
@@ -179,8 +181,17 @@ public class Creature extends Entity implements IMovable{
         if (!isReady()) return;
         if (abilities.containsKey(ability)) {
             if (!abilities.get(ability).isReady()) return;
+            stopAbilities(); // cancel all ongoing abilities
             abilities.get(ability).use();
         }
+    }
+
+    // Put all abilities that are processing into cooldown
+    public void stopAbilities() {
+        abilities.entrySet().stream()
+                .filter(entry -> entry.getValue().getState() == AbilityState.CASTINGUP ||
+                        entry.getValue().getState() == AbilityState.CASTINGDOWN)
+                .forEach(entry -> entry.getValue().spend());
     }
 
     // TODO: Methods for taking damage and damage calculation
@@ -214,6 +225,7 @@ public class Creature extends Entity implements IMovable{
         }
         if (damage > 0) { //prevent negative damage from healing
             healthPoints -= (int)damage;
+            if (healthPoints <= 0) getState().add(EntityState.DESTROYED);
         }
     }
 }
