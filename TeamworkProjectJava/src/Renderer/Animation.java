@@ -34,15 +34,20 @@ public class Animation {
     public void output(Entity sender, double x, double y, double direction) {
         // check type and state an output accordingly
         int selector = 0;
-        if (sender instanceof Player) selector = 1;
+        if (sender instanceof Player) {
+            selector = 1;
+            if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);
+        }
         if (state == AnimationState.ATTACKINGINIT) {
             // render swipe
-            QuickView.renderSwipe(x, y, direction, (progress * Math.PI / 6) - Math.PI / 4);
+            QuickView.renderSword(x, y, direction, progress);
+            //QuickView.renderSwipe(x, y, direction, (progress * Math.PI / 6) - Math.PI / 4);
             selector = 2;
         }
         if (state == AnimationState.ATTACKING) {
             // render swipe
-            QuickView.renderSwipe(x, y, direction, Math.PI / 4 - (progress * Math.PI / 10));
+            QuickView.renderSword(x, y, direction, progress + 3);
+            //QuickView.renderSwipe(x, y, direction, Math.PI / 4 - (progress * Math.PI / 10));
             selector = 3;
         }
         QuickView.renderSprite(selector, x, y, direction);
@@ -62,7 +67,7 @@ public class Animation {
                 break;
             case ATTACKING:
                 // if enough time has passed, change back to idle
-                if (progress >= 5.0) {
+                if (progress >= 2.0) {
                     progress = 0;
                     state = AnimationState.IDLE;
                 }

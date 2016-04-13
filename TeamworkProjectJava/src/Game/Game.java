@@ -120,15 +120,6 @@ public class Game {
         if (controlState.isMouseLeft()) {
             // Attack
             getPlayer().useAbility(Abilities.ATTACKPRIMARY);
-            // apply to everyone within range 1, for testing
-            level.getEntities().stream()
-                    .filter(entity -> entity instanceof Creature)
-                    .filter(entity -> Coord.subtract(entity.getPos(), getPlayer().getPos()).getMagnitude() <= 1.0)
-                    .forEach(entity -> {
-                if (entity instanceof Player) return; // don't knock ourselves back, duh
-                Creature current = (Creature)entity;
-                current.takeDamage(10, DamageType.WEAPONMELEE, getPlayer().getPos());
-            });
         }
 
         // Keyboard

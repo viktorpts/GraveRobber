@@ -20,7 +20,7 @@ public class Creature extends Entity implements IMovable{
     private int attackPower;
     private int armorValue;
     HashMap<Abilities, Ability> abilities;
-    double timeSinceDamageInstance = 0;
+    double immuneTime = 0; // time ot next damage instance
 
     // Physical characteristics
     private double radius; // used for collision detection
@@ -141,6 +141,11 @@ public class Creature extends Entity implements IMovable{
      * @param time Seconds since last update
      */
     public void update(double time) {
+        if (immuneTime > 0) immuneTime -= time;
+        if (getState().contains(EntityState.DAMAGED) && immuneTime <= 0) {
+            getState().remove(EntityState.DAMAGED);
+            immuneTime = 0;
+        }
         // Process behaviour
         if (this instanceof Enemy) {
             ((Enemy)this).processBehaviour(time);
@@ -225,7 +230,10 @@ public class Creature extends Entity implements IMovable{
             }
         }
         if (damage > 0) { //prevent negative damage from healing
+            if (getState().contains(EntityState.DAMAGED)) return;
             // todo add damaged state and set cooldown
+            getState().add(EntityState.DAMAGED);
+            immuneTime = 0.5;
             healthPoints -= (int)damage;
 
             if (healthPoints <= 0) getState().add(EntityState.DESTROYED);

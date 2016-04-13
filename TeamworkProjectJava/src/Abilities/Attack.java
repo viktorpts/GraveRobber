@@ -1,10 +1,9 @@
 package Abilities;
 
-import Enumerations.Abilities;
-import Enumerations.AbilityState;
-import Enumerations.AnimationState;
-import Enumerations.EntityState;
+import Enumerations.*;
+import Game.Main;
 import Models.Creature;
+import Models.Player;
 import World.Coord;
 
 import java.util.EnumSet;
@@ -67,6 +66,15 @@ public class Attack extends Ability {
                     state = AbilityState.CASTINGDOWN; // move to next state
                     owner.setState(EnumSet.of(EntityState.CASTING)); // from this point on, animation can be canceled
                     // TODO: damage resolution
+                    // apply to everyone within range 1, for testing
+                    Main.game.getLevel().getEntities().stream()
+                            .filter(entity -> entity instanceof Creature)
+                            .filter(entity -> Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() <= 1.0)
+                            .forEach(entity -> {
+                                if (entity == owner) return; // don't knock ourselves back, duh
+                                Creature current = (Creature)entity;
+                                current.takeDamage(10, DamageType.WEAPONMELEE, owner.getPos());
+                            });
                 }
                 break;
             case CASTINGDOWN: // attack wind down, can be cancelled by other abilities (chaining attacks, dodging, etc.)
