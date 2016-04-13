@@ -20,6 +20,7 @@ public class Creature extends Entity implements IMovable{
     private int attackPower;
     private int armorValue;
     HashMap<Abilities, Ability> abilities;
+    double timeSinceDamageInstance = 0;
 
     // Physical characteristics
     private double radius; // used for collision detection
@@ -224,7 +225,9 @@ public class Creature extends Entity implements IMovable{
             }
         }
         if (damage > 0) { //prevent negative damage from healing
+            // todo add damaged state and set cooldown
             healthPoints -= (int)damage;
+
             if (healthPoints <= 0) getState().add(EntityState.DESTROYED);
         }
     }
