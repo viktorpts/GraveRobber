@@ -25,6 +25,23 @@ public class Creature extends Entity implements IMovable{
     private double maxAcceleration;
     private Coord velocity; // current velocity vector
 
+    public Creature(Animation animation,
+                    double x, double y,
+                    double direction, int healthPoints,
+                    int attackPower, int armorValue,
+                    HashMap<Abilities, Ability> abilities,
+                    double radius, double maxSpeed,
+                    double maxAcceleration) {
+        super(animation, x, y, direction);
+        this.healthPoints = healthPoints;
+        this.attackPower = attackPower;
+        this.armorValue = armorValue;
+        this.abilities = abilities;
+        this.radius = radius;
+        this.maxSpeed = maxSpeed;
+        this.maxAcceleration = maxAcceleration;
+        velocity = new Coord(0.0, 0.0);
+    }
 
     // Constructor
     public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
