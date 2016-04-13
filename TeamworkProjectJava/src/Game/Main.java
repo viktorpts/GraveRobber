@@ -3,6 +3,7 @@ package Game;
 import Enumerations.EntityState;
 import Models.Enemy;
 import Renderer.DebugView;
+import com.sun.xml.internal.bind.v2.model.annotation.Quick;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -49,7 +50,7 @@ public class Main extends Application {
 
         // Initialize Game
         game = new Game(gc, System.nanoTime());
-        QuickView.gridSize = 50; // set zoom level
+        QuickView.adjustRes(50); // set zoom level
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
@@ -58,11 +59,14 @@ public class Main extends Application {
         // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> { game.getControlState().update(event.getX(), event.getY()); });
         scene.setOnMousePressed(event -> {
-            game.getControlState().mouseLeft = true;
+            if (event.isPrimaryButtonDown()) game.getControlState().mouseLeft = true;
             if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add(new Enemy(100, 10, 0, event.getX() / QuickView.gridSize, event.getY() / QuickView.gridSize));
+                    .add( new Enemy( 100, 10, 0, QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()) ) );
         } );
-        scene.setOnMouseReleased(event -> { game.getControlState().mouseLeft = false; } );
+        scene.setOnMouseReleased(event -> {
+            if (game.getControlState().isMouseLeft() && !event.isPrimaryButtonDown()) {
+                game.getControlState().mouseLeft = false;
+            } } );
 
         final long startNanoTime = System.nanoTime();
 
@@ -71,8 +75,8 @@ public class Main extends Application {
             public void handle(long currentNanoTime)
             {
                 double[] mousePos = game.getControlState().getMouse();
-                double offsetX = mousePos[0] - game.getLevel().getPlayer().getX() * QuickView.gridSize;
-                double offsetY = mousePos[1] - game.getLevel().getPlayer().getY() * QuickView.gridSize;
+                double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
+                double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
                 double dir = Math.atan2(offsetY, offsetX);
                 if (!game.getPlayer().getState().contains(EntityState.CASTINGINIT) &&
                         !game.getPlayer().getState().contains(EntityState.CASTING)) game.getPlayer().setDirection(dir);
@@ -83,6 +87,8 @@ public class Main extends Application {
                 // Output
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, horizontalRes, verticalRes);
+                QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
+                        game.getLevel().getPlayer().getY());
                 QuickView.drawGrid(gc);
                 game.render();
                 QuickView.renderArrow(mousePos[0], mousePos[1], dir);

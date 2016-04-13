@@ -14,20 +14,46 @@ import java.util.ArrayList;
 public class QuickView {
     // Grid size
     static public int gridSize = 5;
+    static public double cameraWidth = 160;
+    static public double cameraHeight = 120;
+    static public double cameraX;
+    static public double cameraY;
 
+    // Camera controls
+    static public void adjustRes(int size) {
+        gridSize = size;
+        cameraWidth = Main.horizontalRes / size;
+        cameraHeight = Main.verticalRes / size;
+    }
+
+    static public void moveCamera(double x, double y) {
+        cameraX = x;
+        cameraY = y;
+    }
+
+    // Display world
     static public void drawGrid(GraphicsContext gc) {
         // Line properties
         gc.save();
         gc.setStroke(Color.DARKGRAY);
         gc.setLineWidth(0.5);
 
-        // Vertical lines
-        for (int i = 0; i < 800 / gridSize; i++) {
-            gc.strokeLine(i * gridSize, 0, i * gridSize, 600);
-        }
-        // Horizontal lines
-        for (int i = 0; i < 600 / gridSize; i++) {
-            gc.strokeLine(0, i * gridSize, 800, i * gridSize);
+        int startingX = (int) Math.floor(cameraX - cameraWidth);
+        if (startingX < 0) startingX = 0;
+        int startingY = (int) Math.floor(cameraY - cameraHeight);
+        if (startingY < 0) startingY = 0;
+        int endingX = startingX + (int) cameraWidth * 2;
+        int endingY = startingY + (int) cameraHeight * 2;
+
+        for (int i = startingY; i < endingY; i++) { // Rows
+            for (int j = startingX; j < endingX; j++) { // Columns
+                // Adjust rect so the coordinates are at it's center
+                double[] pos = {
+                        toCanvasX(j - 0.5),
+                        toCanvasY(i - 0.5)
+                };
+                gc.strokeRect(pos[0], pos[1], gridSize, gridSize);
+            }
         }
         gc.restore();
     }
@@ -112,15 +138,14 @@ public class QuickView {
         }
     }
 
+    // Display entities and effects
     static public void renderSprite(int selector, double x, double y, double dir) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
         double size = gridSize / 2;
         // Translate direction indicator
-        // /!\ Inverted coordinate system!
-        // Convert position to pixels
-        x *= gridSize;
-        y *= gridSize;
+        x = toCanvasX(x);
+        y = toCanvasY(y);
         double dirX = x + size * 0.6 * Math.cos(dir);
         double dirY = y + size * 0.6 * Math.sin(dir);
 
@@ -159,8 +184,7 @@ public class QuickView {
         // temp constants
         double size = 15;
         gc.setFill(Color.GREY);
-        if (Main.game.getControlState().isMouseLeft())
-        {
+        if (Main.game.getControlState().isMouseLeft()) {
             gc.setFill(Color.RED);
             size = 25;
         }
@@ -168,29 +192,29 @@ public class QuickView {
     }
 
     static public void renderArrow(double x, double y, double dir) {
+        // Canvas coordinates
         GraphicsContext gc = Main.game.getGc();
         double size = 5;
         gc.setFill(Color.WHITE);
-        if (Main.game.getControlState().isMouseLeft())
-        {
+        if (Main.game.getControlState().isMouseLeft()) {
             gc.setFill(Color.RED);
             size = 6;
         }
         double[] aX = {
                 size * 1 * Math.cos(dir),
-                size * 2 * Math.cos(dir + Math.PI/2),
-                size * 2.82 * Math.cos(dir + Math.PI*3/4),
+                size * 2 * Math.cos(dir + Math.PI / 2),
+                size * 2.82 * Math.cos(dir + Math.PI * 3 / 4),
                 size * 1 * Math.cos(dir + Math.PI),
-                size * 2.82 * Math.cos(dir + Math.PI*5/4),
-                size * 2 * Math.cos(dir + Math.PI*3/2)
+                size * 2.82 * Math.cos(dir + Math.PI * 5 / 4),
+                size * 2 * Math.cos(dir + Math.PI * 3 / 2)
         };
         double[] aY = {
                 size * 1 * Math.sin(dir),
-                size * 2 * Math.sin(dir + Math.PI/2),
-                size * 2.82 * Math.sin(dir + Math.PI*3/4),
+                size * 2 * Math.sin(dir + Math.PI / 2),
+                size * 2.82 * Math.sin(dir + Math.PI * 3 / 4),
                 size * 1 * Math.sin(dir + Math.PI),
-                size * 2.82 * Math.sin(dir + Math.PI*5/4),
-                size * 2 * Math.sin(dir + Math.PI*3/2)
+                size * 2.82 * Math.sin(dir + Math.PI * 5 / 4),
+                size * 2 * Math.sin(dir + Math.PI * 3 / 2)
         };
         for (int i = 0; i < 6; i++) {
             aX[i] += x;
@@ -205,8 +229,8 @@ public class QuickView {
         double size = 10;
         // Convert position to pixels
         dir -= progress;
-        x *= gridSize;
-        y *= gridSize;
+        x = toCanvasX(x);
+        y = toCanvasY(y);
         double dirX = x + size * 3.0 * Math.cos(dir);
         double dirY = y + size * 3.0 * Math.sin(dir);
 
@@ -218,6 +242,28 @@ public class QuickView {
         gc.restore();
         //gc.setFill(Color.RED);
         //gc.fillOval(dirX - size / 2, dirY - size / 2, size, size);
+    }
+
+    // Coordinate transforms
+    static public double[] worldToCanvas(double x, double y) {
+        double[] result = {x * gridSize, y * gridSize};
+        return result;
+    }
+
+    static public double toCanvasX(double x) {
+        return (x - (cameraX - cameraWidth / 2)) * gridSize;
+    }
+
+    static public double toCanvasY(double y) {
+        return (y - (cameraY - cameraHeight / 2)) * gridSize;
+    }
+
+    static public double toWorldX(double x) {
+        return (x / gridSize) + (cameraX - cameraWidth / 2);
+    }
+
+    static public double toWorldY(double y) {
+        return (y / gridSize) + (cameraY - cameraHeight / 2);
     }
 
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
