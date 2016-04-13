@@ -94,7 +94,11 @@ abstract public class Entity {
 
     public boolean isReady() {
         // Check against a list of all unchangeable states
-        if (state.contains(EntityState.BUSY)) return false;
+        // We ignore CASTING, since we can cancel that animation to block, dodge, chain attacks, etc.
+        if (state.contains(EntityState.DEAD) ||
+                state.contains(EntityState.STAGGERED) ||
+                state.contains(EntityState.CASTINGINIT) ||
+                state.contains(EntityState.DESTROYED)) return false;
         return true;
     }
 
