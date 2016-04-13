@@ -1,6 +1,7 @@
 package Renderer;
 
 import Enumerations.AnimationState;
+import Enumerations.EntityState;
 import Models.Entity;
 import Models.Player;
 
@@ -48,8 +49,8 @@ public class Animation {
             // render swipe
             QuickView.renderSword(x, y, direction, progress + 3);
             //QuickView.renderSwipe(x, y, direction, Math.PI / 4 - (progress * Math.PI / 10));
-            selector = 3;
         }
+        if (sender.getState().contains(EntityState.DAMAGED)) selector = 3;
         QuickView.renderSprite(selector, x, y, direction);
     }
 
