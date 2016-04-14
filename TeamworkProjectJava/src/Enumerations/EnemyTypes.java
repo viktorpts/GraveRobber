@@ -6,9 +6,18 @@ import java.util.HashMap;
 
 public enum EnemyTypes {
     GIANT_RAT(new Animation(10),
-            100, 10, 0,
+            100, 5, 0,
             new HashMap<Abilities, Ability>(),
-            0.25, 6, 10);
+            0.25, 6, 10),
+    SLIME(new Animation(10),
+            150, 15, 0,
+            new HashMap<Abilities, Ability>(),
+            0.25, 3.5, 7),
+    ZOMBIE(new Animation(10),
+            200, 10, 5,
+            new HashMap<Abilities, Ability>(),
+            0.25, 4, 8);
+
 
     private Animation animation;
     private int healthPoints;

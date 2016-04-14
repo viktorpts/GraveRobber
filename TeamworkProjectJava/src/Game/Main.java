@@ -53,6 +53,7 @@ public class Main extends Application {
         // Initialize Game
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
+        CreatureFactory.init(); //Initialise list of creatures
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
@@ -63,7 +64,7 @@ public class Main extends Application {
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getControlState().mouseLeft = true;
             if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
+                    .add(CreatureFactory.spawnEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
         } );
         scene.setOnMouseReleased(event -> {
             if (game.getControlState().isMouseLeft() && !event.isPrimaryButtonDown()) {
