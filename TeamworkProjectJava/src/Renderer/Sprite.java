@@ -46,12 +46,6 @@ public class Sprite {
     private Image source;
     private double framerate;
     private ArrayList<AnimationState> sequences;
-    private HashMap<AnimationState, Integer> start;
-    private HashMap<AnimationState, Integer> end;
-    private HashMap<AnimationState, Double> x;
-    private HashMap<AnimationState, Double> y;
-    private HashMap<AnimationState, Double> offsetX;
-    private HashMap<AnimationState, Double> offsetY;
     private ArrayList<ImageView> frames;
 
     public Sprite(String path) {
@@ -59,12 +53,6 @@ public class Sprite {
         source = new Image(path);
         framerate = 10d;
         sequences = new ArrayList<>();
-        start = new HashMap<>();
-        end = new HashMap<>();
-        x = new HashMap<>();
-        y = new HashMap<>();
-        offsetX = new HashMap<>();
-        offsetY = new HashMap<>();
         frames = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -76,23 +64,17 @@ public class Sprite {
                     this.name = tokens[1];
                 } else if (tokens[0].equals("framerate")) {
                     framerate = Double.parseDouble(tokens[1]);
-                } else if (tokens[0].equals(("sequence"))) {
-                    if (tokens[1].equals("name")) {
-                        // Todo Parse AnimationState
-                    } else if (tokens[1].equals("start")) {
-                        // Todo Parse Start
-                    } else if (tokens[1].equals("end")) {
-                        // Todo Parse End
-                    } else if (tokens[1].equals("x")) {
-                        // Todo Parse x
-                    } else if (tokens[1].equals("y")) {
-                        // Todo Parse y
-                    } else if (tokens[1].equals("offsetX")) {
-                        // Todo Parse offsetX
-                    } else if (tokens[1].equals("offsetY")) {
-                        // Todo Parse offsetY
-                    }
+                } else if (tokens[0].equals("frame")) {
+                    ImageView frame = new ImageView(source);
+                    String[] frameSettings = tokens[1].split(",");
+                    frame.setX(Double.parseDouble(frameSettings[0]));
+                    frame.setY(Double.parseDouble(frameSettings[1]));
+                    frame.setFitWidth(Double.parseDouble(frameSettings[2]));
+                    frame.setFitHeight(Double.parseDouble(frameSettings[3]));
+                    frames.add(frame);
 
+                } else if (tokens[0].equals("sequence")) {
+                    // Todo Parse Sequence
                 }
             }
 
