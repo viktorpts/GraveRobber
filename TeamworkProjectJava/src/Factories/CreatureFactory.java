@@ -1,5 +1,6 @@
 package Factories;
 
+import AI.Aggression;
 import AI.Gank;
 import AI.Roam;
 import Abilities.Ability;
@@ -10,6 +11,7 @@ import Interfaces.IPlayerProducible;
 import Models.Enemy;
 import Models.Entity;
 import Abilities.MeleeAttack;
+import Renderer.Animation;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -29,11 +31,11 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
 
     public static Enemy createEnemy(EnemyTypes type, double x, double y, double direction) {
         Enemy thisEnemy = new Enemy(
-                type.getAnimation(), x, y, direction,
+                new Animation(7), x, y, direction,
                 type.getHealthPoints(),
                 type.getAttackPoints(),
                 type.getArmorValue(),
-                type.getAbilities(),
+                new HashMap<Abilities, Ability>(),
                 type.getRadius(),
                 type.getMaxSpeed(),
                 type.getMaxAcceleration()
@@ -41,6 +43,11 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
         thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), type.getRadius()));
         thisEnemy.addBrain(new Roam(thisEnemy, 0.3));
         thisEnemy.addBrain(new Gank(thisEnemy, 3));
+        switch (type) {
+            case SKELETON:
+                thisEnemy.addBrain(new Aggression(thisEnemy, 0.75));
+                break;
+        }
         return thisEnemy;
     }
 
