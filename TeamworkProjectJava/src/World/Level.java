@@ -18,6 +18,8 @@ public class Level {
 
     List<Entity> entities;
 
+    public static byte CURRENT_LEVEL = 2;
+
     // TODO: add level geometry and populate with entities
     public Level() {
         entities = new ArrayList<>();

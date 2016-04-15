@@ -53,13 +53,14 @@ public class TestLevel  extends Application {
                 QuickView.drawGrid(gc);
                 if (ke.getCode() == KeyCode.ENTER) {
                     // Finalize generation, make rooms within boundaries
-                    dungeonList.get(0).generateDungeon();
-                    QuickView.renderDungeon(gc, GenerateDungeon.filterTree(dungeonList), true);
-                } else {
-                    // Iterate dungeon
-                    GenerateDungeon.sampleStep(dungeonList);
-                    QuickView.renderDungeon(gc, dungeonList, false);
+
+                    QuickView.renderDungeon(gc, GenerateDungeon.generateLevel(), true);
                 }
+//                else {
+//                    // Iterate dungeon
+//                    GenerateDungeon.sampleStep(dungeonList);
+//                    QuickView.renderDungeon(gc, dungeonList, false);
+//                }
             }
         });
 
