@@ -15,6 +15,7 @@ abstract public class Ability implements IAbility {
     public Ability (Creature owner, double cooldown) {
         this.owner = owner; // passed by reference, we don't want a copy
         this.cooldown = cooldown;
+        reset();
     }
 
     public AbilityState getState() {
@@ -23,6 +24,14 @@ abstract public class Ability implements IAbility {
 
     public boolean isReady() {
         return state == AbilityState.READY;
+    }
+
+    public boolean isCancelable() {
+        return state == AbilityState.RECOVER;
+    }
+
+    public boolean isCooling() {
+        return state == AbilityState.COOLING;
     }
 
     @Override
@@ -38,10 +47,11 @@ abstract public class Ability implements IAbility {
      */
     @Override
     public void update(double time) {
-        if (!isReady()) cool(time);
-        if (!vrfyState()) {
+        if (isCooling()) cool(time);
+        if ((state == AbilityState.INIT ||state == AbilityState.RESOLVE) &&
+                !vrfyState()) { // make sure owner is not interrupted
             // if ability was initiated, put it in cool down mode, cancel further resolution
-            if (state == AbilityState.CASTINGUP || state == AbilityState.CASTINGDOWN) state = AbilityState.COOLING;
+            state = AbilityState.COOLING;
         }
     }
 
@@ -65,9 +75,8 @@ abstract public class Ability implements IAbility {
      * @return Result of check, true when still committed
      */
     boolean vrfyState() {
-        if (!owner.getState().contains(EntityState.CASTINGINIT) && !owner.getState().contains(EntityState.CASTING)) {
-            // entity state has changed from external source, cancel further updates
-            state = AbilityState.COOLING;
+        if (!owner.getState().contains(EntityState.CASTUP) && !owner.getState().contains(EntityState.CASTING)) {
+            // entity state has changed from external source
             return false;
         }
         return true;

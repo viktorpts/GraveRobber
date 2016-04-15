@@ -1,7 +1,7 @@
 package Models;
 
 import Abilities.Ability;
-import Abilities.Attack;
+import Abilities.MeleeAttack;
 import Enumerations.Abilities;
 import Enumerations.AbilityState;
 import Enumerations.DamageType;
@@ -14,7 +14,7 @@ import World.Physics;
 
 import java.util.HashMap;
 
-public class Creature extends Entity implements IMovable{
+abstract public class Creature extends Entity implements IMovable{
     // Stats
     private int healthPoints;
     private int attackPower;
@@ -39,7 +39,7 @@ public class Creature extends Entity implements IMovable{
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
         abilities = new HashMap<>();
-        abilities.put(Abilities.ATTACKPRIMARY, new Attack(this, 10.0, 0.5));
+        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 0.5));
 
         // Init physical characteristics
         velocity = new Coord(0.0, 0.0);
@@ -129,6 +129,8 @@ public class Creature extends Entity implements IMovable{
      * @param time seconds since last update
      */
     public void moveForward(double time) {
+        // TODO: extend checks for staggering effects that prevent voluntary movement
+        if (velocity.getMagnitude() > Physics.maxVelocity) return; // this checks for sudden movements (like knockback)
         Coord vector = new Coord(maxAcceleration + Physics.friction, 0.0);
         vector.setDirection(getDirection());
         accelerate(vector, time);
@@ -141,6 +143,7 @@ public class Creature extends Entity implements IMovable{
      * @param time Seconds since last update
      */
     public void update(double time) {
+        // Keep track of damage instances
         if (immuneTime > 0) immuneTime -= time;
         if (getState().contains(EntityState.DAMAGED) && immuneTime <= 0) {
             getState().remove(EntityState.DAMAGED);
@@ -153,6 +156,7 @@ public class Creature extends Entity implements IMovable{
 
         // Detect collisions
         // TODO: this will check each pair twice, make a separate list and deplete it
+        // TODO: wall detection
         Main.game.getLevel().getEntities().stream()
                 .filter(entity -> entity instanceof Creature) // get just the creatures
                 .filter(entity -> !entity.equals(this)) // can't collide with self
@@ -195,12 +199,11 @@ public class Creature extends Entity implements IMovable{
     // Put all abilities that are processing into cooldown
     public void stopAbilities() {
         abilities.entrySet().stream()
-                .filter(entry -> entry.getValue().getState() == AbilityState.CASTINGUP ||
-                        entry.getValue().getState() == AbilityState.CASTINGDOWN)
+                .filter(entry -> entry.getValue().getState() == AbilityState.INIT ||
+                        entry.getValue().getState() == AbilityState.RECOVER)
                 .forEach(entry -> entry.getValue().spend());
     }
 
-    // TODO: Methods for taking damage and damage calculation
     public void takeDamage(double damage) {
         resolveDamage(damage, DamageType.GENERIC, null);
     }
@@ -229,13 +232,14 @@ public class Creature extends Entity implements IMovable{
                 // TODO: disable movement for a short period
             }
         }
-        if (damage > 0) { //prevent negative damage from healing
-            if (getState().contains(EntityState.DAMAGED)) return;
-            // todo add damaged state and set cooldown
+        // TODO: stagger for enemies, player
+        if (damage > 0) { // prevent negative damage from healing
+            if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
             getState().add(EntityState.DAMAGED);
             immuneTime = 0.5;
             healthPoints -= (int)damage;
 
+            // todo instead of immediately destroying entity, add dying animation
             if (healthPoints <= 0) getState().add(EntityState.DESTROYED);
         }
     }

@@ -94,10 +94,11 @@ abstract public class Entity {
 
     public boolean isReady() {
         // Check against a list of all unchangeable states
-        // We ignore CASTING, since we can cancel that animation to block, dodge, chain attacks, etc.
+        // We ignore RECOVER, since we can cancel that animation to block, dodge, chain attacks, etc.
         if (state.contains(EntityState.DEAD) ||
                 state.contains(EntityState.STAGGERED) ||
-                state.contains(EntityState.CASTINGINIT) ||
+                state.contains(EntityState.CASTUP) ||
+                state.contains(EntityState.CASTING) ||
                 state.contains(EntityState.DESTROYED)) return false;
         return true;
     }
@@ -125,7 +126,7 @@ abstract public class Entity {
 
     public void changeAnimation(String newSequence) {
         if (newSequence == "Primary Attack") {
-            animation.setState(AnimationState.ATTACKINGINIT);
+            animation.setState(AnimationState.ATTACKUP);
         }
         // TODO: list of animation sequences can be a map of names or abilities and corresponding frames
         // TODO: check if named sequence exists? maybe check in Animation class

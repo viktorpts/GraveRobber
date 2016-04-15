@@ -1,13 +1,10 @@
 package Game;
 
-import Abilities.Attack;
 import Enumerations.Abilities;
-import Enumerations.DamageType;
 import Enumerations.EntityState;
 import Models.Creature;
 import Models.Entity;
 import Models.Player;
-import Renderer.QuickView;
 import World.Coord;
 import World.Level;
 import World.Physics;
@@ -15,7 +12,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 
 /**
@@ -75,6 +71,7 @@ public class Game {
         return elapsed;
     }
 
+    // TODO: place time calculations in separate method, so we can change the order in which input, state, rendering occurs
     public void update(long timeNew) {
         elapsed = (timeNew - timeLast) / 1000000000.0;
         if (elapsed > 1.0) elapsed = 1.0;
@@ -90,7 +87,7 @@ public class Game {
             Creature current = (Creature)entity;
             current.update(elapsed);
         });
-        // Release all marked entitites
+        // Release all marked entities
         for (Entity entity : markedForDeletion) {
             level.getEntities().remove(entity);
         }
@@ -98,6 +95,8 @@ public class Game {
 
     public void render() {
         // TODO: filter out entities outside visibility scope
+        // TODO: terrain rendering
+        // TODO: vertical ordering, to handle overlap
         level.getEntities().stream().filter(entity -> entity.isAlive()).forEach(Entity::render);
     }
 
@@ -106,11 +105,11 @@ public class Game {
         return controlState;
     }
 
+    // TODO: best to move this to the player class and leave minimal processing here
     public void handleInput() {
         // Player states need to go somewhere else, but are here for now
-        //if (controlState.getCombo().isEmpty()) {
-        //    getPlayer().setState(EnumSet.of(EntityState.IDLE));
-        //}
+        // Don't let the pllayer move if he's stunned
+        if (getPlayer().hasState(EntityState.STAGGERED)) return;
 
         // User can't control the character if it's velocity is greater than Physics.maxMoveSpeed
         // This has the positive side effect of disabling player controls during knockback
@@ -119,8 +118,10 @@ public class Game {
         // Mouse
         if (controlState.isMouseLeft()) {
             // Attack
+            // TODO: attack chaining (if Attack ability is in the correct state, add the next ability to the queue)
             getPlayer().useAbility(Abilities.ATTACKPRIMARY);
         }
+        // TODO: add some sort of order queue, so the attack combo and animation cancelling window is more generous
 
         // Keyboard
         // Sloppy dodge roll; this is dependent on framerate, find a better implementation!
@@ -129,8 +130,9 @@ public class Game {
             modifier *= 10;
         }
         // if player is busy, don't let him move
-        if (getPlayer().getState().contains(EntityState.CASTINGINIT) ||
-                getPlayer().getState().contains(EntityState.CASTING)) return;
+        if (getPlayer().hasState(EntityState.CASTUP) ||
+                getPlayer().hasState(EntityState.CASTING) ||
+                getPlayer().hasState(EntityState.CASTDOWN)) return;
         if (controlState.pressed(KeyCode.W) && !controlState.pressed(KeyCode.S)) {
             getPlayer().accelerate(new Coord(0.0, -modifier), elapsed);
             getPlayer().setState(EnumSet.of(EntityState.MOVING));

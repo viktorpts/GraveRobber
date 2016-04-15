@@ -1,8 +1,9 @@
 package Enumerations;
 
 public enum AbilityState {
-    READY,
-    CASTINGUP,
-    CASTINGDOWN,
-    COOLING
+    READY, // nothing going on
+    INIT, // wind up
+    RESOLVE, // resolution of effect
+    RECOVER, // wind down, can be cancelled or chained
+    COOLING // in cool down
 }

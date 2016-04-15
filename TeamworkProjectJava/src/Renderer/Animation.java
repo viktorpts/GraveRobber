@@ -9,15 +9,14 @@ public class Animation {
     // TODO: Add a container and methods to load image frames from disk into memory and output them to a display interface
     /**
      * class sprite
-     *
+     * <p>
      * image - interface with ImageView (javafx)
-     *
+     * <p>
      * arraylist name of sequences
      * for each sequence start index and end index
      * method for sequence length
-     *
+     * <p>
      * x,y offset
-     *
      */
     AnimationState state;
     double progress;
@@ -39,13 +38,13 @@ public class Animation {
             selector = 1;
             if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);
         }
-        if (state == AnimationState.ATTACKINGINIT) {
+        if (state == AnimationState.ATTACKUP) {
             // render swipe
             QuickView.renderSword(x, y, direction, progress);
             //QuickView.renderSwipe(x, y, direction, (progress * Math.PI / 6) - Math.PI / 4);
             selector = 2;
         }
-        if (state == AnimationState.ATTACKING) {
+        if (state == AnimationState.ATTACKDOWN) {
             // render swipe
             QuickView.renderSword(x, y, direction, progress + 3);
             //QuickView.renderSwipe(x, y, direction, Math.PI / 4 - (progress * Math.PI / 10));
@@ -59,7 +58,7 @@ public class Animation {
         // decide if state change is needed
         switch (state) {
             // TODO: these times should be based on the actual length of the sequence of frames
-            case ATTACKINGINIT:
+            case ATTACKUP:
                 // if enough time has passed, change to next state
                 if (progress >= 3.0) {
                     progress = 0;
@@ -67,6 +66,12 @@ public class Animation {
                 }
                 break;
             case ATTACKING:
+                if (progress >= 1.0) {
+                    progress = 0;
+                    state = AnimationState.ATTACKDOWN;
+                }
+                break;
+            case ATTACKDOWN:
                 // if enough time has passed, change back to idle
                 if (progress >= 2.0) {
                     progress = 0;
@@ -81,16 +86,19 @@ public class Animation {
         this.state = state;
         progress = 0;
     }
+
     public AnimationState getState() {
         return state;
     }
 
     // TODO: a method that returns the length of animation and special cue points to ability callers
-    // for instance, attack has three sections - init (unchangeable, interruptable); resolution; wind down (changeable)
+    // for instance, attack has three sections - init (uncancelable, interruptable); resolution; wind down (cancelable)
 
     // note: might actually not be necessary, abilities can just get the state and decide if resolution has occurred
+
     /**
      * Get the length of animation sequence
+     *
      * @param animation target sequence name
      * @return length of sequence in seconds
      */
@@ -100,13 +108,15 @@ public class Animation {
 
     /**
      * Get the moment in time where resolution occurs
+     *
      * @param animation target sequence name
-     * @param index ID of cue point, if more than one
+     * @param index     ID of cue point, if more than one
      * @return moment of resolution since beginning of sequence
      */
     public double getCue(String animation, int index) {
         return 0.0;
     }
+
     public double getCue(String animation) {
         return 0.0;
     }
