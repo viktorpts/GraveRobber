@@ -74,7 +74,8 @@ public class MeleeAttack extends Ability {
                     Main.game.getLevel().getEntities().stream()
                             .filter(entity -> entity instanceof Creature) // only damage creatures
                             .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't hit dead creatures
-                            .filter(entity -> Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() <= 1.0)
+                            .filter(entity -> Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() <= range)
+                            .filter(entity -> Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos()) - owner.getDirection()) <= Math.PI / 4)
                             .forEach(entity -> {
                                 if (entity == owner) return; // don't knock ourselves back, duh
                                 Creature current = (Creature) entity;
