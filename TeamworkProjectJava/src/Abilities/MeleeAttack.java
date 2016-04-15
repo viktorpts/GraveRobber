@@ -84,7 +84,8 @@ public class MeleeAttack extends Ability {
                     // TODO: events are a great idea! we can stream everything just once and register the whole queue
                     // TODO: change this to a sweep, filter with Coord.angleBetween() (currently AoE centered on source)
                     Main.game.getLevel().getEntities().stream()
-                            .filter(entity -> entity instanceof Creature)
+                            .filter(entity -> entity instanceof Creature) // only damage creatures
+                            .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't hit dead creatures
                             .filter(entity -> Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() <= 1.0)
                             .forEach(entity -> {
                                 if (entity == owner) return; // don't knock ourselves back, duh

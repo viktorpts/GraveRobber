@@ -12,6 +12,7 @@ import Renderer.Animation;
 import World.Coord;
 import World.Physics;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 
 abstract public class Creature extends Entity implements IMovable{
@@ -158,6 +159,7 @@ abstract public class Creature extends Entity implements IMovable{
         // TODO: this will check each pair twice, make a separate list and deplete it
         // TODO: wall detection
         Main.game.getLevel().getEntities().stream()
+                .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't collide with corpses
                 .filter(entity -> entity instanceof Creature) // get just the creatures
                 .filter(entity -> !entity.equals(this)) // can't collide with self
                 .forEach(entity -> ((Creature)entity).hitscan(this)); // resolution currently included in detection, can be filtered further
@@ -239,8 +241,11 @@ abstract public class Creature extends Entity implements IMovable{
             immuneTime = 0.5;
             healthPoints -= (int)damage;
 
-            // todo instead of immediately destroying entity, add dying animation
-            if (healthPoints <= 0) getState().add(EntityState.DESTROYED);
+            // todo add dying animation
+            if (healthPoints <= 0) {
+                stopAbilities();
+                setState(EnumSet.of(EntityState.DEAD));
+            }
         }
     }
 }

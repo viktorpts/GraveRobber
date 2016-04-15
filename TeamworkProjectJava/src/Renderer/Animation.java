@@ -35,6 +35,7 @@ public class Animation {
     public void output(Entity sender, double x, double y, double direction) {
         // check type and state an output accordingly
         int selector = 0;
+        if (sender.hasState(EntityState.DEAD)) selector = 4;
         if (sender instanceof Player) {
             selector = 1;
             if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);

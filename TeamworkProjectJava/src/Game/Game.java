@@ -84,6 +84,7 @@ public class Game {
                 return;
             }
             entity.animate(elapsed);
+            if (entity.hasState(EntityState.DEAD)) return; // don't update if it's dead (not destroyed yet!)
             Creature current = (Creature)entity;
             current.update(elapsed);
         });
