@@ -1,6 +1,8 @@
 package World;
 
-public class Tile {
+import Enumerations.TileType;
+
+public class Tile{
     /**
      * Да се създаде клас, който представя квадратно поле с размер 1х1метър от игралната карта. Класа трябва да
      * съхранява следната информация:
@@ -17,4 +19,17 @@ public class Tile {
      *
      * Всички полета се съхраняват в масив, който да може да се обхожда и сортира чрез Stream API
      */
+    private final byte TILE_SIZE = 1;
+    private int id;
+    private static int nextID = 1;
+    private int x,y;
+    private TileType tileType;
+
+    public Tile(int x, int y, TileType tileType) {
+        this.x = x;
+        this.y = y;
+        this.tileType = tileType;
+        this.id = nextID+1;
+    }
+
 }
