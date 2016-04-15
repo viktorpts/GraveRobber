@@ -18,6 +18,7 @@ public class Level {
 
     List<Entity> entities;
 
+    List<Tile> dungeonMap;
     public static byte CURRENT_LEVEL = 1;
 
     // TODO: add level geometry and populate with entities
@@ -26,6 +27,7 @@ public class Level {
         spawnEnemies();
         player = new Player(100, 10, 0, 0, 0);
         entities.add(player);
+        dungeonMap = new ArrayList<>();
     }
 
     public Level(Player player) {
