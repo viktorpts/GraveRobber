@@ -36,7 +36,7 @@ abstract public class Creature extends Entity implements IMovable{
                     HashMap<Abilities, Ability> abilities,
                     double radius, double maxSpeed,
                     double maxAcceleration) {
-        super(animation, x, y, direction);
+        super(animation, x, y, direction, radius);
         this.healthPoints = healthPoints;
         this.attackPower = attackPower;
         this.armorValue = armorValue;
@@ -45,26 +45,6 @@ abstract public class Creature extends Entity implements IMovable{
         this.maxSpeed = maxSpeed;
         this.maxAcceleration = maxAcceleration;
         velocity = new Coord(0.0, 0.0);
-    }
-
-    // Constructor
-    public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
-        // Init parent
-        // TODO: finish proper Animation implementation
-        super(new Animation(15.0), position.getX(), position.getY(), 0.0);
-        // Init stats
-        this.setHealthPoints(startHealthPoints);
-        this.setAttackPower(startAttackPower);
-        this.setArmorValue(startArmorValue);
-        abilities = new HashMap<>();
-        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 1.0));
-
-        // Init physical characteristics
-        velocity = new Coord(0.0, 0.0);
-        // TODO: add a way for these to be set at production time; not a good idea to change them directly though
-        radius = 0.25;
-        maxSpeed = Physics.maxMoveSpeed; // we use the properties of the player for now
-        maxAcceleration = Physics.playerAcceleration;
     }
 
     // Properties
