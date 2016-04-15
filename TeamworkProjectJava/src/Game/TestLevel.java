@@ -1,6 +1,7 @@
 package Game;
 
 import World.Dungeon;
+import World.Tile;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -24,6 +25,7 @@ public class TestLevel  extends Application {
 
     public static void main(String[] args) {
         // Add functionality to display generated map, like a foreach. Use the output of the following method:
+        Tile.getMap();
         Generator.Generate();
         launch(args);
     }

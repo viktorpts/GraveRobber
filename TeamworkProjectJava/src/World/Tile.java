@@ -3,8 +3,6 @@ package World;
 import Enumerations.TileType;
 import javafx.scene.image.*;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.*;
@@ -43,7 +41,7 @@ public class Tile {
 		this.id = ++nextID;
 	}
 
-	public void getMap(){
+	public static void getMap(){
 		List<Dungeon> currentMap = GenerateDungeon.generateLevel();
 		Image floor;
 		for (Dungeon dungeon : currentMap) {
@@ -53,6 +51,7 @@ public class Tile {
 				int y1 = dungeon.getDungeon().getY();
 				int x2 = dungeon.getDungeon().getWidth() + x1;
 				int y2 = dungeon.getDungeon().getHeight() + y1;
+				Image img1 = new Image("/room.png");
 				/*
                     for (int i = x1; i < x2; i++) {
                         setBlock(gc, i, y1, 1);

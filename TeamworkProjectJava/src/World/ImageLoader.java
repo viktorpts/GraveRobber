@@ -11,13 +11,14 @@
 //
 //public class ImageLoader {
 //	String path;
+//	Image img;
 //	public ImageLoader(String path){
 //		this.path = path;
 //	}
 //
-//	public void ImageLoader(Image img){
+//	public void ImageLoader(){
 //		try {
-//			img = ImageIO.read(new File(path));
+//			this.img = new ImageIO());
 //		} catch (IOException e) {
 //		}
 //	}
