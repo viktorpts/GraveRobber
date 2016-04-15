@@ -234,23 +234,30 @@ public class QuickView {
         double px2 = length;
         double py2 = 0.375;
         double angle = 0.0;
-        if (progress > 0 && progress < 3)
-        {
+        if (progress > 0 && progress < 3) { // raise sword
             length = Math.abs(0.25 - progress * 0.25 / 1.5);
             px1 = 0.375;
             py1 = 0.0;
-            px2 = 0.375 + length;
+            px2 = px1 + length;
             py2 = 0.0;
             if (progress <= 2) angle = - Math.PI / 4 - (Math.PI / 2) * (progress / 2);
             else angle = - 3 * Math.PI / 4 + (Math.PI / 2) * (progress - 2);
-        } else if (progress >= 3) {
+        } else if (progress >= 3 && progress < 5) { // swing in front
             progress -= 3;
-            length = 0.25 + progress * 0.1;
+            length = 0.25 + progress * 0.25;
             px1 = 0.375;
             py1 = 0.0;
-            px2 = 0.375 + length;
+            px2 = px1 + length;
             py2 = 0.0;
             angle = - Math.PI / 4 + (Math.PI / 2) * (progress / 2);
+        } else if (progress >= 5) { // recover, sheath sword
+            progress -= 5;
+            length = 0.75 - progress / 3 * 0.5;
+            px1 = 0.375 - progress / 3 * 0.375;
+            py1 = progress / 3 * 0.375;
+            px2 = px1 + length;
+            py2 = progress / 3 * 0.375;
+            angle = Math.PI / 4 - (Math.PI * 3 / 8) * (progress / 3);
         }
 
         double[] point1 = rotateXY(px1, py1, dir - angle);

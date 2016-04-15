@@ -26,6 +26,7 @@ public class Animation {
         state = AnimationState.IDLE;
         progress = 0.0;
         this.framerate = framerate;
+        //this.framerate = 1; // todo /!\ change back when finished testing /!\
     }
 
     /**
@@ -39,15 +40,17 @@ public class Animation {
             if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);
         }
         if (state == AnimationState.ATTACKUP) {
-            // render swipe
             QuickView.renderSword(x, y, direction, progress);
+            selector = 2;
+        }
+        if (state == AnimationState.ATTACKING) {
+            // todo render swipe
+            QuickView.renderSword(x, y, direction, progress + 3);
             //QuickView.renderSwipe(x, y, direction, (progress * Math.PI / 6) - Math.PI / 4);
             selector = 2;
         }
         if (state == AnimationState.ATTACKDOWN) {
-            // render swipe
-            QuickView.renderSword(x, y, direction, progress + 3);
-            //QuickView.renderSwipe(x, y, direction, Math.PI / 4 - (progress * Math.PI / 10));
+            QuickView.renderSword(x, y, direction, progress + 5);
         }
         if (sender.getState().contains(EntityState.DAMAGED)) selector = 3;
         QuickView.renderSprite(selector, x, y, direction);
@@ -66,14 +69,15 @@ public class Animation {
                 }
                 break;
             case ATTACKING:
-                if (progress >= 1.0) {
+                // TODO: tweak animation, implement all 3 states
+                if (progress >= 2.0) {
                     progress = 0;
                     state = AnimationState.ATTACKDOWN;
                 }
                 break;
             case ATTACKDOWN:
                 // if enough time has passed, change back to idle
-                if (progress >= 2.0) {
+                if (progress >= 3.0) {
                     progress = 0;
                     state = AnimationState.IDLE;
                 }
