@@ -17,7 +17,7 @@ public class Player extends Creature {
                   int startAttackPower,
                   int startArmorValue,
                   double x, double y) {
-        super(new Animation(15),
+        super(new Animation(15, "Player"),
                 x, y, 0.0,
                 startHealthPoints, startAttackPower, startArmorValue,
                 new HashMap<Abilities, Ability>(),

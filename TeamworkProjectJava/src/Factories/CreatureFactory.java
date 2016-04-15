@@ -9,8 +9,8 @@ import Enumerations.EnemyTypes;
 import Interfaces.IEnemyProducible;
 import Interfaces.IPlayerProducible;
 import Models.Enemy;
-import Models.Entity;
 import Abilities.MeleeAttack;
+import Abilities.ChargeAttack;
 import Renderer.Animation;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
 
     public static Enemy createEnemy(EnemyTypes type, double x, double y, double direction) {
         Enemy thisEnemy = new Enemy(
-                new Animation(7), x, y, direction,
+                new Animation(10, type.name()), x, y, direction,
                 type.getHealthPoints(),
                 type.getAttackPoints(),
                 type.getArmorValue(),
@@ -40,14 +40,20 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
                 type.getMaxSpeed(),
                 type.getMaxAcceleration()
         );
-        thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), 0.75));
-        thisEnemy.addBrain(new Roam(thisEnemy, 0.3));
+        thisEnemy.addBrain(new Roam(thisEnemy, 0.3)); // all enemies roam randomly
         switch (type) {
             case SKELETON: // skeletons are fearsome
+                thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), 0.75));
                 thisEnemy.addBrain(new Gank(thisEnemy, 6));
                 thisEnemy.addBrain(new Aggression(thisEnemy, 0.75));
                 break;
+            case GIANT_RAT: // rats are fast but feeble
+                thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new ChargeAttack(thisEnemy, type.getAttackPoints(), 0.5));
+                thisEnemy.addBrain(new Gank(thisEnemy, 3));
+                thisEnemy.addBrain(new Aggression(thisEnemy, 1.0));
+                break;
             default:
+                thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), 0.75));
                 thisEnemy.addBrain(new Gank(thisEnemy, 3));
                 break;
         }

@@ -100,12 +100,21 @@ public class Main extends Application {
                 QuickView.drawGrid(gc);
                 game.render();
 
+                // Health bar
+                gc.save();
+                gc.setFill(Color.RED);
+                gc.setStroke(Color.RED);
+                gc.setLineWidth(2);
+                gc.strokeRect(10, 10, 220, 20);
+                gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
+                gc.restore();
+
                 if (game.getPlayer().hasState(EntityState.DEAD)) {
                     gc.save();
                     gc.setFill(Color.RED);
                     gc.setStroke(Color.BLACK);
                     gc.setLineWidth(1);
-                    gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 48));
+                    gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
                     gc.setTextAlign(TextAlignment.CENTER);
                     gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
                     gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);

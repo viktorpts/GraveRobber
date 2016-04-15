@@ -140,10 +140,10 @@ public class QuickView {
     }
 
     // Display entities and effects
-    static public void renderSprite(int selector, double x, double y, double dir, double size) {
+    static public void renderSprite(int selector, double x, double y, double dir, double radius) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
-        size *= 2 * gridSize;
+        double size = radius * 2 * gridSize;
         // Translate direction indicator
         x = toCanvasX(x);
         y = toCanvasY(y);
@@ -229,8 +229,6 @@ public class QuickView {
 
     static public void renderSword(double x, double y, double dir, double progress) {
         GraphicsContext gc = Main.game.getGc();
-        // temp constants
-        double size = 10;
         // Convert position to pixels
         double length = 0.75;
         double px1 = 0.0;
@@ -238,30 +236,33 @@ public class QuickView {
         double px2 = length;
         double py2 = 0.375;
         double angle = 0.0;
-        if (progress > 0 && progress < 3) { // raise sword
-            length = Math.abs(0.25 - progress * 0.25 / 1.5);
+        if (progress > 0 && progress <= 1) { // raise sword
+            Main.debugInfo += String.format("%n%.2f", progress);
+            length = Math.abs(0.25 - progress * 0.5);
             px1 = 0.375;
             py1 = 0.0;
             px2 = px1 + length;
             py2 = 0.0;
-            if (progress <= 2) angle = - Math.PI / 4 - (Math.PI / 2) * (progress / 2);
-            else angle = - 3 * Math.PI / 4 + (Math.PI / 2) * (progress - 2);
-        } else if (progress >= 3 && progress < 4) { // swing in front
-            progress -= 3;
+            if (progress <= 0.5) angle = -Math.PI / 4 - (Math.PI / 2) * (progress * 2);
+            else angle = -3 * Math.PI / 4 + (Math.PI / 2) * (progress - 0.5) * 2;
+        } else if (progress > 1 && progress <= 2) { // swing in front
+            progress -= 1;
+            Main.debugInfo += String.format("%n%.2f", progress);
             length = 0.25 + progress * 0.5;
             px1 = 0.375;
             py1 = 0.0;
             px2 = px1 + length;
             py2 = 0.0;
-            angle = - Math.PI / 4 + (Math.PI / 2) * progress;
-        } else if (progress >= 4) { // recover, sheath sword
-            progress -= 4;
-            length = 0.75 - progress / 3 * 0.5;
-            px1 = 0.375 - progress / 3 * 0.375;
-            py1 = progress / 3 * 0.375;
+            angle = -Math.PI / 4 + (Math.PI / 2) * progress;
+        } else if (progress > 2) { // recover, sheath sword
+            progress -= 2;
+            Main.debugInfo += String.format("%n%.2f", progress);
+            length = 0.75 - progress * 0.5;
+            px1 = 0.375 - progress * 0.375;
+            py1 = progress * 0.375;
             px2 = px1 + length;
-            py2 = progress / 3 * 0.375;
-            angle = Math.PI / 4 - (Math.PI * 3 / 8) * (progress / 3);
+            py2 = progress * 0.375;
+            angle = Math.PI / 4 - (Math.PI * 3 / 8) * progress;
         }
 
         double[] point1 = rotateXY(px1, py1, dir - angle);
@@ -304,6 +305,82 @@ public class QuickView {
         gc.restore();
     }
 
+    static public void renderClaws(double x, double y, double dir, double progress) {
+        GraphicsContext gc = Main.game.getGc();
+        gc.save();
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(3);
+
+        double range = 0.45;
+
+        if (progress <= 1) { // prepare
+            double p1x = 0.25 + progress * 0.2;
+            double p2x = 0.25 + progress * 0.2;
+            double[] p1 = rotateXY(p1x, 0, dir + Math.PI / 6);
+            double[] p2 = rotateXY(p2x, 0, dir - Math.PI / 6);
+            gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p1[0]), toCanvasY(y + p1[1]));
+            gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
+        } else if (progress <= 2) { // strike
+            progress -= 1;
+
+            // Arms
+            gc.setStroke(Color.GREY);
+            double p1x = 0.45;
+            double p2x = 0.45;
+            double[] p1 = rotateXY(p1x, 0, dir + Math.PI / 6);
+            double[] p2 = rotateXY(p2x, 0, dir - Math.PI / 6);
+            gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p1[0]), toCanvasY(y + p1[1]));
+            gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
+
+            // Swipe
+            gc.setStroke(Color.WHITESMOKE);
+            if (progress <= 0.5) {
+                progress *= 2;
+                gc.strokeArc(toCanvasX(x - range),
+                        toCanvasY(y - range),
+                        range * 2 * gridSize,
+                        range * 2 * gridSize,
+                        Math.toDegrees(- dir - Math.PI / 8),
+                        45 * progress,
+                        ArcType.OPEN);
+                gc.strokeArc(toCanvasX(x - range * 0.85),
+                        toCanvasY(y - range * 0.85),
+                        range * 1.7 * gridSize,
+                        range * 1.7 * gridSize,
+                        Math.toDegrees(- dir - Math.PI / 8),
+                        45 * progress,
+                        ArcType.OPEN);
+            } else {
+                progress = (progress - 0.5) * 2;
+                gc.strokeArc(toCanvasX(x - range),
+                        toCanvasY(y - range),
+                        range * 2 * gridSize,
+                        range * 2 * gridSize,
+                        Math.toDegrees(- dir + Math.PI / 8),
+                        - 45 * progress,
+                        ArcType.OPEN);
+                gc.strokeArc(toCanvasX(x - range * 0.85),
+                        toCanvasY(y - range * 0.85),
+                        range * 1.7 * gridSize,
+                        range * 1.7 * gridSize,
+                        Math.toDegrees(- dir + Math.PI / 8),
+                        - 45 * progress,
+                        ArcType.OPEN);
+            }
+        } else { // recover
+            progress -= 2;
+            gc.setStroke(Color.GREY);
+            double p1x = 0.45 - progress * 0.2;
+            double p2x = 0.45 - progress * 0.2;
+            double[] p1 = rotateXY(p1x, 0, dir + Math.PI / 6);
+            double[] p2 = rotateXY(p2x, 0, dir - Math.PI / 6);
+            gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p1[0]), toCanvasY(y + p1[1]));
+            gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
+        }
+
+        gc.restore();
+    }
+
     // Coordinate transforms
     static public double[] toCanvas(double x, double y) {
         double[] result = {x * gridSize, y * gridSize};
@@ -329,7 +406,7 @@ public class QuickView {
     static public double[] rotateXY(double x, double y, double angle) {
         double x1 = x * Math.cos(angle) - y * Math.sin(angle);
         double y1 = x * Math.sin(angle) + y * Math.cos(angle);
-        double[] result = { x1, y1 };
+        double[] result = {x1, y1};
         return result;
     }
 
