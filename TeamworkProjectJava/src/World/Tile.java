@@ -25,12 +25,10 @@ public class Tile {
 	private int x, y;
 	private TileType tileType;
 
-	public Tile(int x, int y, TileType tileType) {
+	public Tile(int x, int y) {
 		this.setX(x);
 		this.setY(y);
-		this.setTileType(tileType);
 		this.id = nextID + 1;
-
 		nextID++;
 	}
 	//Setters
