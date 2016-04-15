@@ -1,6 +1,8 @@
 package Game;
 
+import Enumerations.EnemyTypes;
 import Enumerations.EntityState;
+import Factories.CreatureFactory;
 import Models.Enemy;
 import Renderer.DebugView;
 import com.sun.xml.internal.bind.v2.model.annotation.Quick;
@@ -20,7 +22,7 @@ import javafx.stage.StageStyle;
 public class Main extends Application {
 
     // Application parameters
-    public static Game game; // Container for all of the things
+    public static Game game; // sssContainer for all of the things
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
     // Debug view
@@ -51,6 +53,7 @@ public class Main extends Application {
         // Initialize Game
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
+        CreatureFactory.init(); //Initialise list of creatures
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
@@ -61,7 +64,7 @@ public class Main extends Application {
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getControlState().mouseLeft = true;
             if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add( new Enemy( 100, 10, 0, QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()) ) );
+                    .add(CreatureFactory.spawnEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
         } );
         scene.setOnMouseReleased(event -> {
             if (game.getControlState().isMouseLeft() && !event.isPrimaryButtonDown()) {

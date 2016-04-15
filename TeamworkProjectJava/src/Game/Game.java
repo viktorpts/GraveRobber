@@ -14,6 +14,7 @@ import World.Physics;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 
@@ -79,15 +80,20 @@ public class Game {
         if (elapsed > 1.0) elapsed = 1.0;
         timeLast = timeNew;
 
+        ArrayList<Entity> markedForDeletion = new ArrayList<>(); // prevent ConcurrentModificationException
         level.getEntities().stream().filter(entity -> entity instanceof Creature).forEach(entity -> {
             if (entity.getState().contains(EntityState.DESTROYED)) { // release dead entries
-                level.getEntities().remove(entity);
+                markedForDeletion.add(entity);
                 return;
             }
             entity.animate(elapsed);
             Creature current = (Creature)entity;
             current.update(elapsed);
         });
+        // Release all marked entitites
+        for (Entity entity : markedForDeletion) {
+            level.getEntities().remove(entity);
+        }
     }
 
     public void render() {
