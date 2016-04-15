@@ -47,11 +47,11 @@ public class Animation {
         if (state == AnimationState.ATTACKING) {
             // todo render swipe
             if (progress > 1) {
-                QuickView.renderSword(x, y, direction, 4);
                 QuickView.renderSwipe(x, y, direction, 1);
+                QuickView.renderSword(x, y, direction, 4);
             } else {
-                QuickView.renderSword(x, y, direction, progress + 3);
                 QuickView.renderSwipe(x, y, direction, progress);
+                QuickView.renderSword(x, y, direction, progress + 3);
                 selector = 2;
             }
         }
