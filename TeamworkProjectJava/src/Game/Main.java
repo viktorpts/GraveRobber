@@ -5,7 +5,6 @@ import Enumerations.EntityState;
 import Factories.CreatureFactory;
 import Models.Enemy;
 import Renderer.DebugView;
-import com.sun.xml.internal.bind.v2.model.annotation.Quick;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -81,8 +80,10 @@ public class Main extends Application {
                 double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
                 double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
                 double dir = Math.atan2(offsetY, offsetX);
-                if (!game.getPlayer().getState().contains(EntityState.CASTINGINIT) &&
-                        !game.getPlayer().getState().contains(EntityState.CASTING)) game.getPlayer().setDirection(dir);
+                // Don't let the player look around if he's committed to an animation
+                if (!game.getPlayer().hasState(EntityState.CASTUP) &&
+                        !game.getPlayer().hasState(EntityState.CASTING) &&
+                        !game.getPlayer().hasState(EntityState.CASTDOWN)) game.getPlayer().setDirection(dir);
 
                 // Update state
                 game.update(currentNanoTime);

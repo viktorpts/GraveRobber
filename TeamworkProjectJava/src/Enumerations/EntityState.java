@@ -7,8 +7,9 @@ public enum EntityState {
     MOVING,
     DEAD,
     STAGGERED, // controls disabled
-    CASTINGINIT, // controls disabled, can be interrupted (by staggering effects)
-    CASTING, // movement disabled, can use abilities
+    CASTUP, // controls disabled, can be interrupted (by staggering effects)
+    CASTING, // resolution of effect
+    CASTDOWN, // movement disabled, can use abilities
     DAMAGED, // immune to further damage, don't forget to toggle off!
     DESTROYED; // release instance
 
@@ -16,7 +17,7 @@ public enum EntityState {
     public static final EnumSet<EntityState> BUSY = EnumSet.of(
             DEAD,
             STAGGERED,
-            CASTINGINIT,
+            CASTUP,
             CASTING,
             DESTROYED);
 

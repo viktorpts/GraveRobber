@@ -4,6 +4,7 @@ import Game.Main;
 import World.Dungeon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 
 import java.util.ArrayList;
@@ -163,6 +164,9 @@ public class QuickView {
             case 3:
                 gc.setFill(Color.RED);
                 break;
+            case 4:
+                gc.setFill(Color.BLACK);
+                break;
         }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
@@ -223,29 +227,78 @@ public class QuickView {
         gc.fillPolygon(aX, aY, 6);
     }
 
-    static public void renderSwipe(double x, double y, double dir, double progress) {
+    static public void renderSword(double x, double y, double dir, double progress) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
         double size = 10;
         // Convert position to pixels
-        dir -= progress;
-        x = toCanvasX(x);
-        y = toCanvasY(y);
-        double dirX = x + size * 3.0 * Math.cos(dir);
-        double dirY = y + size * 3.0 * Math.sin(dir);
+        double length = 0.75;
+        double px1 = 0.0;
+        double py1 = 0.375;
+        double px2 = length;
+        double py2 = 0.375;
+        double angle = 0.0;
+        if (progress > 0 && progress < 3) { // raise sword
+            length = Math.abs(0.25 - progress * 0.25 / 1.5);
+            px1 = 0.375;
+            py1 = 0.0;
+            px2 = px1 + length;
+            py2 = 0.0;
+            if (progress <= 2) angle = - Math.PI / 4 - (Math.PI / 2) * (progress / 2);
+            else angle = - 3 * Math.PI / 4 + (Math.PI / 2) * (progress - 2);
+        } else if (progress >= 3 && progress < 4) { // swing in front
+            progress -= 3;
+            length = 0.25 + progress * 0.5;
+            px1 = 0.375;
+            py1 = 0.0;
+            px2 = px1 + length;
+            py2 = 0.0;
+            angle = - Math.PI / 4 + (Math.PI / 2) * progress;
+        } else if (progress >= 4) { // recover, sheath sword
+            progress -= 4;
+            length = 0.75 - progress / 3 * 0.5;
+            px1 = 0.375 - progress / 3 * 0.375;
+            py1 = progress / 3 * 0.375;
+            px2 = px1 + length;
+            py2 = progress / 3 * 0.375;
+            angle = Math.PI / 4 - (Math.PI * 3 / 8) * (progress / 3);
+        }
+
+        double[] point1 = rotateXY(px1, py1, dir - angle);
+        double[] point2 = rotateXY(px2, py2, dir - angle);
+        point1[0] = toCanvasX(x + point1[0]);
+        point1[1] = toCanvasY(y + point1[1]);
+        point2[0] = toCanvasX(x + point2[0]);
+        point2[1] = toCanvasY(y + point2[1]);
 
         gc.save();
         gc.setStroke(Color.GREY);
         gc.setLineWidth(4.0);
         gc.setLineCap(StrokeLineCap.ROUND);
-        gc.strokeLine(x, y, dirX, dirY);
+        gc.strokeLine(point1[0], point1[1], point2[0], point2[1]);
         gc.restore();
-        //gc.setFill(Color.RED);
-        //gc.fillOval(dirX - size / 2, dirY - size / 2, size, size);
+    }
+
+    static public void renderSwipe(double x, double y, double dir, double progress) {
+        GraphicsContext gc = Main.game.getGc();
+
+        double range = progress;
+
+        gc.save();
+        gc.setStroke(Color.WHITESMOKE);
+        gc.setLineWidth(1 + progress * 6);
+        gc.strokeArc(toCanvasX(x - range),
+                toCanvasY(y - range),
+                range * 2 * gridSize,
+                range * 2 * gridSize,
+                Math.toDegrees(-dir - Math.PI / 4),
+                90 * progress,
+                ArcType.OPEN);
+        gc.restore();
     }
 
     // Coordinate transforms
-    static public double[] worldToCanvas(double x, double y) {
+    static public double[] toCanvas(double x, double y) {
         double[] result = {x * gridSize, y * gridSize};
         return result;
     }
@@ -264,6 +317,13 @@ public class QuickView {
 
     static public double toWorldY(double y) {
         return (y / gridSize) + (cameraY - cameraHeight / 2);
+    }
+
+    static public double[] rotateXY(double x, double y, double angle) {
+        double x1 = x * Math.cos(angle) - y * Math.sin(angle);
+        double y1 = x * Math.sin(angle) + y * Math.cos(angle);
+        double[] result = { x1, y1 };
+        return result;
     }
 
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
