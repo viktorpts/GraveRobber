@@ -98,6 +98,7 @@ public class Game {
         // TODO: filter out entities outside visibility scope
         // TODO: terrain rendering
         // TODO: vertical ordering, to handle overlap
+        // todo since we already cleared the list, this check is likely redundant
         level.getEntities().stream().filter(entity -> entity.isAlive()).forEach(Entity::render);
     }
 
@@ -109,7 +110,7 @@ public class Game {
     // TODO: best to move this to the player class and leave minimal processing here
     public void handleInput() {
         // Player states need to go somewhere else, but are here for now
-        // Don't let the pllayer move if he's stunned
+        // Don't let the player move if he's stunned
         if (getPlayer().hasState(EntityState.STAGGERED)) return;
 
         // User can't control the character if it's velocity is greater than Physics.maxMoveSpeed
