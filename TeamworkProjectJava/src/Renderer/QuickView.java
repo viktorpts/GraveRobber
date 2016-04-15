@@ -286,11 +286,18 @@ public class QuickView {
 
         gc.save();
         gc.setStroke(Color.WHITESMOKE);
-        gc.setLineWidth(1 + progress * 6);
+        gc.setLineWidth(1 + progress * 2);
         gc.strokeArc(toCanvasX(x - range),
                 toCanvasY(y - range),
                 range * 2 * gridSize,
                 range * 2 * gridSize,
+                Math.toDegrees(-dir - Math.PI / 4),
+                90 * progress,
+                ArcType.OPEN);
+        gc.strokeArc(toCanvasX(x - range * 0.75),
+                toCanvasY(y - range * 0.75),
+                range * 1.5 * gridSize,
+                range * 1.5 * gridSize,
                 Math.toDegrees(-dir - Math.PI / 4),
                 90 * progress,
                 ArcType.OPEN);
