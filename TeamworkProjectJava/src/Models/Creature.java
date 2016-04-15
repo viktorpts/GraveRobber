@@ -34,13 +34,13 @@ abstract public class Creature extends Entity implements IMovable{
     public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
         // Init parent
         // TODO: finish proper Animation implementation
-        super(new Animation(10.0), position.getX(), position.getY(), 0.0);
+        super(new Animation(15.0), position.getX(), position.getY(), 0.0);
         // Init stats
         this.setHealthPoints(startHealthPoints);
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
         abilities = new HashMap<>();
-        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 0.75));
+        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 1.0));
 
         // Init physical characteristics
         velocity = new Coord(0.0, 0.0);
