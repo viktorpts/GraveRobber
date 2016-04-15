@@ -19,8 +19,7 @@ public class Tile {
 	 * <p>
 	 * Всички полета се съхраняват в масив, който да може да се обхожда и сортира чрез Stream API
 	 */
-	private final byte TILE_SIZE = 1;
-	private int width, height;
+
 	private int id;
 	private static int nextID = 0;
 	private int x, y;
@@ -31,8 +30,7 @@ public class Tile {
 		this.setY(y);
 		this.setTileType(tileType);
 		this.id = nextID + 1;
-		this.width = TILE_SIZE;
-		this.height = TILE_SIZE;
+
 		nextID++;
 	}
 	//Setters
@@ -51,14 +49,6 @@ public class Tile {
 
 
 	//Getters
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
 
 	public int getId() {
 		return id;
