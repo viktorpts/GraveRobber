@@ -8,7 +8,7 @@ public enum EnemyTypes {
     GIANT_RAT(new Animation(10),
             100, 5, 0,
             new HashMap<Abilities, Ability>(),
-            0.25, 6, 10),
+            0.15, 6, 10),
     SLIME(new Animation(10),
             150, 15, 0,
             new HashMap<Abilities, Ability>(),
