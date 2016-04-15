@@ -140,10 +140,10 @@ public class QuickView {
     }
 
     // Display entities and effects
-    static public void renderSprite(int selector, double x, double y, double dir) {
+    static public void renderSprite(int selector, double x, double y, double dir, double size) {
         GraphicsContext gc = Main.game.getGc();
         // temp constants
-        double size = gridSize / 2;
+        size *= 2 * gridSize;
         // Translate direction indicator
         x = toCanvasX(x);
         y = toCanvasY(y);

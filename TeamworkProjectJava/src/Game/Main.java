@@ -61,14 +61,13 @@ public class Main extends Application {
         // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> { game.getControlState().update(event.getX(), event.getY()); });
         scene.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) game.getControlState().mouseLeft = true;
-            if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
+            if (event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(true);
+            if (event.isSecondaryButtonDown()) game.getControlState().setMouseRight(true);
         } );
         scene.setOnMouseReleased(event -> {
-            if (game.getControlState().isMouseLeft() && !event.isPrimaryButtonDown()) {
-                game.getControlState().mouseLeft = false;
-            } } );
+            if (!event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(false);
+            if (!event.isSecondaryButtonDown()) game.getControlState().setMouseRight(false);
+        } );
 
         final long startNanoTime = System.nanoTime();
 

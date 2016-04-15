@@ -44,7 +44,7 @@ public class Game {
     public void makeLevel() {
         // TODO: initialize the level object and all of it's constituents
         // Temp contents
-        level = new Level(new Player(100, 10, 2, new Coord(10, 10), true));
+        level = new Level(new Player(100, 10, 2, 10, 10));
     }
     // TODO: this object can be streamed to a file for a complete game state save and load function
 

@@ -59,7 +59,7 @@ public class Animation {
             QuickView.renderSword(x, y, direction, progress + 4);
         }
         if (sender.getState().contains(EntityState.DAMAGED)) selector = 3;
-        QuickView.renderSprite(selector, x, y, direction);
+        QuickView.renderSprite(selector, x, y, direction, sender.getRadius());
     }
 
     public void advance(double time) {

@@ -29,7 +29,7 @@ public class Enemy extends Creature {
         newBrain.start();
         brain.sort((b1, b2) -> Integer.compare(b2.getWeight(), b1.getWeight()));
     }
-    
+
     public AIState getThought(int index) {
         return brain.get(index).getState();
     }
