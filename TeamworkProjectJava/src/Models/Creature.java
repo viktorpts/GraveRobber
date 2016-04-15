@@ -145,6 +145,7 @@ abstract public class Creature extends Entity implements IMovable{
         if (immuneTime > 0) immuneTime -= time;
         if (getState().contains(EntityState.DAMAGED) && immuneTime <= 0) {
             getState().remove(EntityState.DAMAGED);
+            getState().remove(EntityState.STAGGERED);
             immuneTime = 0;
         }
         // Process behaviour
@@ -224,7 +225,7 @@ abstract public class Creature extends Entity implements IMovable{
             double knockback = 2 - 2 * (radius - 0.5 * refsize) / (1.5 * refsize);
             if (knockback > 2) knockback = 2;
             if (knockback > 0) { // don't do anything if entity is not affected
-                Coord kickvector = new Coord(Physics.friction + knockback, 0.0);
+                Coord kickvector = new Coord(knockback * 5, 0.0);
                 kickvector.setDirection(Coord.angleBetween(source, getPos()));
                 stop();
                 accelerate(kickvector, 1.0);
@@ -234,7 +235,9 @@ abstract public class Creature extends Entity implements IMovable{
         // TODO: stagger for enemies, player
         if (damage > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
+            if (this instanceof Player) setState(EnumSet.of(EntityState.STAGGERED)); // player always gets staggered
             getState().add(EntityState.DAMAGED);
+
             immuneTime = 0.5;
             healthPoints -= (int)damage;
 

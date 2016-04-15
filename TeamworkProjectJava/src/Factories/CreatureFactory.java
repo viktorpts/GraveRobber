@@ -40,12 +40,15 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
                 type.getMaxSpeed(),
                 type.getMaxAcceleration()
         );
-        thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), type.getRadius()));
+        thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), 0.75));
         thisEnemy.addBrain(new Roam(thisEnemy, 0.3));
-        thisEnemy.addBrain(new Gank(thisEnemy, 3));
         switch (type) {
-            case SKELETON:
+            case SKELETON: // skeletons are fearsome
+                thisEnemy.addBrain(new Gank(thisEnemy, 6));
                 thisEnemy.addBrain(new Aggression(thisEnemy, 0.75));
+                break;
+            default:
+                thisEnemy.addBrain(new Gank(thisEnemy, 3));
                 break;
         }
         return thisEnemy;

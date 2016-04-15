@@ -1,22 +1,27 @@
 package Enumerations;
+
 import Abilities.Ability;
 import Renderer.Animation;
 
 import java.util.HashMap;
 
 public enum EnemyTypes {
-    GIANT_RAT(new Animation(10),
-            100, 5, 0,
+    GIANT_RAT(new Animation(7),
+            50, 5, 0,
             new HashMap<Abilities, Ability>(),
             0.15, 6, 10),
-    SLIME(new Animation(10),
+    SLIME(new Animation(7),
             150, 15, 0,
             new HashMap<Abilities, Ability>(),
             0.25, 3.5, 7),
-    ZOMBIE(new Animation(10),
+    ZOMBIE(new Animation(7),
             200, 10, 5,
             new HashMap<Abilities, Ability>(),
-            0.25, 4, 8);
+            0.25, 4, 8),
+    SKELETON(new Animation(7),
+            100, 5, 5,
+            new HashMap<Abilities, Ability>(),
+            0.25, 3, 3);
 
 
     private Animation animation;

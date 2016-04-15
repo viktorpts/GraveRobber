@@ -42,9 +42,12 @@ public class Level {
     }
 
     private void spawnEnemies() {
-        // Add 10 Giant Rats
+        // Add 10 Skeletons and 20 Rats
         Random rnd = new Random();
         for (int i = 0; i < 10; i++) {
+            entities.add(CreatureFactory.createEnemy(EnemyTypes.SKELETON, rnd.nextInt(20), rnd.nextInt(20), rnd.nextDouble() * Math.PI * 2));
+        }
+        for (int i = 0; i < 20; i++) {
             entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT, rnd.nextInt(20), rnd.nextInt(20), rnd.nextDouble() * Math.PI * 2));
         }
     }

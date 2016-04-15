@@ -37,6 +37,7 @@ public class Enemy extends Creature {
     void processBehaviour(double time) {
         // using stream is overkill, since each creature wont have more than a handful of behaviours to cycle trough and
         // having the option to break the loop is better, considering each individual brain might have complex logic
+        if (!isReady()) return;
         for (Behaviour behaviour : brain) {
             if (behaviour.update(time)) break; // break the loop as soon as one brain makes a decision
         }
