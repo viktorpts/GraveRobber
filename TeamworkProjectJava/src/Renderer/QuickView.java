@@ -163,6 +163,9 @@ public class QuickView {
             case 3:
                 gc.setFill(Color.RED);
                 break;
+            case 4:
+                gc.setFill(Color.BLACK);
+                break;
         }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
         gc.strokeOval(x - size / 2, y - size / 2, size, size);
