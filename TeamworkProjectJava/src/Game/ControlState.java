@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ControlState {
-    double mouseX;
-    double mouseY;
-    boolean mouseLeft;
-    boolean mouseRight;
+    private double mouseX;
+    private double mouseY;
+    private boolean mouseLeft;
+    private boolean mouseRight;
 
-    Set<KeyCode> keyState;
+    private Set<KeyCode> keyState;
 
     public ControlState() {
         mouseX = 0.0;
@@ -30,6 +30,14 @@ public class ControlState {
 
     public Set<KeyCode> getCombo() {
         return keyState;
+    }
+
+    public void setMouseLeft(boolean mouseLeft) {
+        this.mouseLeft = mouseLeft;
+    }
+
+    public void setMouseRight(boolean mouseRight) {
+        this.mouseRight = mouseRight;
     }
 
     public boolean isMouseLeft() {
