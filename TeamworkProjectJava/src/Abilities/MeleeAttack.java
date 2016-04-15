@@ -14,28 +14,16 @@ import java.util.EnumSet;
 public class MeleeAttack extends Ability {
 
     double damage;
-    double radius;
-    Coord target;
+    double range;
     double elapsedTime;
 
     // TODO: set cool down from constructor
-    public MeleeAttack(Creature owner, double damage, double radius) {
+    public MeleeAttack(Creature owner, double damage, double range) {
         super(owner, 1.0);
         this.damage = damage;
-        this.radius = radius;
-        this.target = new Coord(0.0, 0.0);
+        this.range = range;
         elapsedTime = 0;
     }
-
-    /**
-     * TODO:
-     * find a way to set target directly with usage; the problem is we want the target some times to be a location
-     * and other times to be an Entity, or even no target
-     */
-    public void setTarget(Coord target) {
-        this.target.setPos(target.getPos());
-    }
-    // TODO: Since this is a melee attack, we likely don't need this, just project in front of caster
 
     @Override
     public void use() {
