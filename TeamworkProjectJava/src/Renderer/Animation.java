@@ -46,12 +46,17 @@ public class Animation {
         }
         if (state == AnimationState.ATTACKING) {
             // todo render swipe
-            QuickView.renderSword(x, y, direction, progress + 3);
-            //QuickView.renderSwipe(x, y, direction, (progress * Math.PI / 6) - Math.PI / 4);
-            selector = 2;
+            if (progress > 1) {
+                QuickView.renderSword(x, y, direction, 4);
+                QuickView.renderSwipe(x, y, direction, 1);
+            } else {
+                QuickView.renderSword(x, y, direction, progress + 3);
+                QuickView.renderSwipe(x, y, direction, progress);
+                selector = 2;
+            }
         }
         if (state == AnimationState.ATTACKDOWN) {
-            QuickView.renderSword(x, y, direction, progress + 5);
+            QuickView.renderSword(x, y, direction, progress + 4);
         }
         if (sender.getState().contains(EntityState.DAMAGED)) selector = 3;
         QuickView.renderSprite(selector, x, y, direction);
@@ -70,8 +75,7 @@ public class Animation {
                 }
                 break;
             case ATTACKING:
-                // TODO: tweak animation, implement all 3 states
-                if (progress >= 2.0) {
+                if (progress >= 3.0) {
                     progress = 0;
                     state = AnimationState.ATTACKDOWN;
                 }
