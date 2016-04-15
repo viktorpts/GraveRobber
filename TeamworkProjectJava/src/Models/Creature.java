@@ -40,7 +40,7 @@ abstract public class Creature extends Entity implements IMovable{
         this.setAttackPower(startAttackPower);
         this.setArmorValue(startArmorValue);
         abilities = new HashMap<>();
-        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 0.5));
+        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 0.75));
 
         // Init physical characteristics
         velocity = new Coord(0.0, 0.0);
