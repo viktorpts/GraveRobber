@@ -63,7 +63,7 @@ public class Main extends Application {
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getControlState().mouseLeft = true;
             if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add(CreatureFactory.spawnEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
+                    .add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
         } );
         scene.setOnMouseReleased(event -> {
             if (game.getControlState().isMouseLeft() && !event.isPrimaryButtonDown()) {
