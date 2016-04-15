@@ -24,24 +24,12 @@ public class Enemy extends Creature {
         this.brain = new ArrayList<>();
     }
 
-    public Enemy(int startHealthPoints, int startAttackPower, int startArmorValue, double x, double y) {
-        super(startHealthPoints, startAttackPower, startArmorValue, new Coord(x, y));
-
-        // Make creature roam around randomly
-        brain = new ArrayList<>();
-        brain.add(new Roam(this, 0.5));
-        brain.add(new Gank(this, 3.0));
-        brain.get(0).start();
-        brain.get(1).start();
-    }
     public void addBrain(Behaviour newBrain) {
         brain.add(newBrain);
         newBrain.start();
         brain.sort((b1, b2) -> Integer.compare(b2.getWeight(), b1.getWeight()));
     }
-
-
-
+    
     public AIState getThought(int index) {
         return brain.get(index).getState();
     }
