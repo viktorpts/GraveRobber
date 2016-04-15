@@ -75,7 +75,7 @@ public class MeleeAttack extends Ability {
                             .filter(entity -> entity instanceof Creature) // only damage creatures
                             .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't hit dead creatures
                             .filter(entity -> Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() <= range)
-                            .filter(entity -> Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos()) - owner.getDirection()) <= Math.PI / 4)
+                            .filter(entity -> Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) <= Math.PI / 4)
                             .forEach(entity -> {
                                 if (entity == owner) return; // don't knock ourselves back, duh
                                 Creature current = (Creature) entity;
@@ -86,7 +86,7 @@ public class MeleeAttack extends Ability {
             case RECOVER: // attack wind down, can be cancelled by other abilities (chaining attacks, dodging, etc.)
                 if (owner.getAnimationState() != AnimationState.ATTACKDOWN) {
                     // animation state has advanced, go back to ready
-                    reset();
+                    reset(); // if attack was successful, reset cooldown
                     owner.setState(EnumSet.of(EntityState.IDLE));
                 }
                 break;
