@@ -1,7 +1,7 @@
 package Enumerations;
 
 public enum TileType {
-    SOLID,
-    TRANSPARENT,
-    CLIP
+    WALL,
+    FLOOR,
+    DOOR
 }

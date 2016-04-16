@@ -1,25 +1,18 @@
-//package World;
-//
-//import javafx.scene.image.*;
-//
-//import javax.imageio.ImageIO;
-//
-//import java.awt.image.BufferedImage;
-//import java.io.File;
-//import java.io.IOException;
-//import javafx.scene.image.Image;
-//
-//public class ImageLoader {
-//	String path;
-//	Image img;
-//	public ImageLoader(String path){
-//		this.path = path;
-//	}
-//
-//	public void ImageLoader(){
-//		try {
-//			this.img = new ImageIO());
-//		} catch (IOException e) {
-//		}
-//	}
-//}
+package World;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+public class ImageLoader {
+
+	public static BufferedImage loadImage(String path) {
+		try {
+			return ImageIO.read(ImageLoader.class.getResource(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return null;
+	}
+}
