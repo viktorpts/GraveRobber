@@ -28,7 +28,7 @@ public class Tile {
 	private TileType tileType;
 	private Image img;
 
-	public Tile(int x, int y, int width, int height) {
+	public Tile(int x, int y, TileType tileType) {
 
 		this.x = x;
 		this.y = y;

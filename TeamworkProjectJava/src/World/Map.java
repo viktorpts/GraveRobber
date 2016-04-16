@@ -1,6 +1,9 @@
 package World;
 
+import Enumerations.TileType;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +16,11 @@ public class Map {
 	public Map() {
 		this.maze = new ArrayList<Dungeon>();
 		dungeonGenerate();
+		getTiles();
+		System.out.println();
 	}
 
-	public void dungeonGenerate(){
+	public void dungeonGenerate() {
 		maze = new ArrayList<>();
 		Dungeon root = new Dungeon(2, 2, 160, 120); //
 		// add root to array and pass it on
@@ -44,36 +49,53 @@ public class Map {
 		return maze;
 	}
 
-	public static void getMap(){
-		List<Dungeon> currentMap = GenerateDungeon.generateLevel();
-		Image floor;
-		for (Dungeon dungeon : currentMap) {
+	public void getTiles() {
+		levelTiles = new ArrayList<>();
+		for (Dungeon dungeon : this.maze) {
 			if (dungeon.getDungeon() != null) {
 				// Room
+				//x firstRow
 				int x1 = dungeon.getDungeon().getX();
+				//y firstCol
 				int y1 = dungeon.getDungeon().getY();
+				//width lastRow
 				int x2 = dungeon.getDungeon().getWidth() + x1;
+				//height lastCol
 				int y2 = dungeon.getDungeon().getHeight() + y1;
-				Image img1 = new Image("/room.png");
-				/*
-                    for (int i = x1; i < x2; i++) {
-                        setBlock(gc, i, y1, 1);
-                        setBlock(gc, i, y2 - 1, 1);
-                    }
-                    for (int j = y1; j < y2; j++) {
-                        setBlock(gc, x1, j, 1);
-                        setBlock(gc, x2 - 1, j, 1);
-                    }
-                    */
-			} else {
+
+
+				for (int r = x1; r < x2; r++) {
+					for (int c = y1; c < y2; c++) {
+						if (r == x1 || c == y1 || r == x2 || c == y2) {
+							levelTiles.add(new Tile(x1, c, TileType.WALL));
+						} else {
+							levelTiles.add(new Tile(x1, c, TileType.FLOOR));
+						}
+
+					}
+				}
+
+
+			} else if (dungeon.getHallway() != null) {
 				// Hallway
-				if (dungeon.getHallway() != null) {
-					int hx1 = dungeon.getHallway().getX();
-					int hy1 = dungeon.getHallway().getY();
-					int hx2 = dungeon.getHallway().getWidth() + hx1;
-					int hy2 = dungeon.getHallway().getHeight() + hy1;
+
+				int hx1 = dungeon.getHallway().getX();
+				int hy1 = dungeon.getHallway().getY();
+				int hx2 = dungeon.getHallway().getWidth() + hx1;
+				int hy2 = dungeon.getHallway().getHeight() + hy1;
+
+				for (int r = hx1; r < hx2; r++) {
+					for (int c = hy1; c < hy2; c++) {
+						if (r == hx1 || c == hy1 || r == hx2 || c == hy2) {
+							levelTiles.add(new Tile(hx1, c, TileType.WALL));
+						} else {
+							levelTiles.add(new Tile(hx1, c, TileType.FLOOR));
+						}
+
+					}
 				}
 			}
+
 		}
 	}
 }
