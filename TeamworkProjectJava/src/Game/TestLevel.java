@@ -1,7 +1,6 @@
 package Game;
 
-import World.Dungeon;
-import World.Tile;
+import World.*;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -13,15 +12,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import World.Generator;
 import Renderer.QuickView;
-import World.GenerateDungeon;
 
 import java.util.ArrayList;
 
 public class TestLevel  extends Application {
     // TODO: place level gen and display code here; display is sensitive to grid size (recommended 4-8)
     static ArrayList<Dungeon> dungeonList;
+    private Map map;
 
     public static void main(String[] args) {
         // Add functionality to display generated map, like a foreach. Use the output of the following method:
@@ -44,7 +42,8 @@ public class TestLevel  extends Application {
         QuickView.drawGrid(gc);
 
         // First pass
-        dungeonList = GenerateDungeon.sampleMake();
+        map = new Map();
+        System.out.println();
         // Register event handler for key presses
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {
@@ -55,7 +54,7 @@ public class TestLevel  extends Application {
                 if (ke.getCode() == KeyCode.ENTER) {
                     // Finalize generation, make rooms within boundaries
 
-                    QuickView.renderDungeon(gc, GenerateDungeon.generateLevel(), true);
+                    QuickView.renderDungeon(gc, map.getMaze(), true);
                 }
 //                else {
 //                    // Iterate dungeon

@@ -6,9 +6,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Map {
-	private Dungeon maze;
+	private ArrayList<Dungeon> maze;
 
 	private ArrayList<Tile> levelTiles;
+
+	public Map() {
+		this.maze = new ArrayList<Dungeon>();
+		dungeonGenerate();
+	}
+
+	public void dungeonGenerate(){
+		maze = new ArrayList<>();
+		Dungeon root = new Dungeon(2, 2, 160, 120); //
+		// add root to array and pass it on
+		maze.add(root);
+
+		for (int i = 0; i < Level.CURRENT_LEVEL + 1; i++) {
+			ArrayList<Dungeon> listCopy = new ArrayList<Dungeon>(maze);
+			for (Dungeon rectangle : listCopy) {
+				if (rectangle.getLeftChild() != null) continue;
+				if (rectangle.split()) { //attempt to split
+					maze.add(rectangle.getLeftChild());
+					maze.add(rectangle.getRightChild());
+				}
+			}
+		}
+		maze.get(0).generateDungeon();
+		ArrayList<Dungeon> result = new ArrayList<>();
+		for (Dungeon dungeon : maze) {
+			if (dungeon.getDungeon() == null && dungeon.getHallway() == null) continue;
+			result.add(dungeon);
+		}
+		maze = result;
+	}
+
+	public ArrayList<Dungeon> getMaze() {
+		return maze;
+	}
 
 	public static void getMap(){
 		List<Dungeon> currentMap = GenerateDungeon.generateLevel();
