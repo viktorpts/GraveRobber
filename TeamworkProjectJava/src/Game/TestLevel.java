@@ -43,7 +43,6 @@ public class TestLevel  extends Application {
 
         // First pass
         map = new Map();
-        System.out.println();
         // Register event handler for key presses
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {

@@ -17,7 +17,6 @@ public class Map {
 		this.maze = new ArrayList<Dungeon>();
 		dungeonGenerate();
 		getTiles();
-		System.out.println();
 	}
 
 	public void dungeonGenerate() {
