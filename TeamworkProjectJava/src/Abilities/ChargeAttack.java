@@ -5,21 +5,21 @@ import Game.Main;
 import Models.Creature;
 import Models.Enemy;
 import World.Coord;
+import World.Physics;
 
 import java.util.EnumSet;
 
 /**
- * Note that attacks don't actually have a cooldown, since another attack cannot be initiated before the first one has
- * resolved, but we use the cooldown to disable attacking if attack was cancelled (by staggering or other effects)
+ * Same as MeleeAttack, but has a short lunge just after INIT state
  */
-public class MeleeAttack extends Ability {
+public class ChargeAttack extends Ability {
 
     double damage;
     double range;
     double elapsedTime;
 
     // TODO: set cool down from constructor
-    public MeleeAttack(Creature owner, double damage, double range) {
+    public ChargeAttack(Creature owner, double damage, double range) {
         super(owner, 1.0);
         this.damage = damage;
         this.range = range;
@@ -58,6 +58,10 @@ public class MeleeAttack extends Ability {
                     // cycle states of owner
                     owner.getState().remove(EntityState.CASTUP);
                     owner.getState().add(EntityState.CASTING);
+                    // Charge forward
+                    Coord vector = new Coord(10, 0.0);
+                    vector.setDirection(owner.getDirection());
+                    owner.accelerate(vector, 1.0);
                 }
                 break;
             case RESOLVE: // apply effect continuously
@@ -68,7 +72,6 @@ public class MeleeAttack extends Ability {
                     owner.getState().remove(EntityState.CASTING);
                     owner.getState().add(EntityState.CASTDOWN);
                 } else {
-                    // apply to everyone within range 1, for testing
                     // TODO: best to replace this with an event for all entities to register and decide what to do
                     // TODO: events are a great idea! we can stream everything just once and register the whole queue
                     Main.game.getLevel().getEntities().stream()
@@ -82,7 +85,7 @@ public class MeleeAttack extends Ability {
                                     return false; // don't hit dead creatures
                                 if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
                                     return false;
-                                if (Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) > Math.PI / 4)
+                                if (Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) > Math.PI / 6)
                                     return false;
                                 return true; // if everything's been fine, process target
                             })

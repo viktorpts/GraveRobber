@@ -2,87 +2,81 @@ package Renderer;
 
 import Enumerations.AnimationState;
 import Enumerations.EntityState;
+import Game.Main;
 import Models.Entity;
 import Models.Player;
 
 public class Animation {
     // TODO: Add a container and methods to load image frames from disk into memory and output them to a display interface
-    /**
-     * class sprite
-     * <p>
-     * image - interface with ImageView (javafx)
-     * <p>
-     * arraylist name of sequences
-     * for each sequence start index and end index
-     * method for sequence length
-     * <p>
-     * x,y offset
-     */
+    // phase lengths instead of sprite, temporary
+    public String type = "";
+    public double phase1 = 3.0;
+    public double phase2 = 3.0;
+    public double phase3 = 3.0;
+
     AnimationState state;
     double progress;
     double framerate; // frames per second
 
-    public Animation(double framerate) {
+    public Animation(double framerate, String caller) {
         state = AnimationState.IDLE;
         progress = 0.0;
         this.framerate = framerate;
         //this.framerate = 1; // todo /!\ change back when finished testing /!\
+
+        // set phase lengths based on caller type, temporary
+        type = caller;
+        if (caller.equals("Player")) {
+            phase1 = 3.0;
+            phase2 = 3.0;
+            phase3 = 3.0;
+        } else if (caller.equals("SKELETON")) {
+            phase1 = 6.0;
+            phase2 = 3.0;
+            phase3 = 4.0;
+        } else if (caller.equals("GIANT_RAT")) {
+            phase1 = 2.0;
+            phase2 = 6.0;
+            phase3 = 8.0;
+        }
     }
 
     /**
      * Output directly to display interface
      */
     public void output(Entity sender, double x, double y, double direction) {
-        // check type and state an output accordingly
-        int selector = 0;
-        if (sender.hasState(EntityState.DEAD)) selector = 4;
-        if (sender instanceof Player) {
-            selector = 1;
-            if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);
+        // temporarily reroute functions trough external class
+        double adjusted = progress;
+        switch (state) {
+            case ATTACKUP: adjusted /= phase1; break;
+            case ATTACKING: adjusted /= phase2; adjusted += 1; break;
+            case ATTACKDOWN: adjusted /= phase3; adjusted += 2; break;
         }
-        if (state == AnimationState.ATTACKUP) {
-            QuickView.renderSword(x, y, direction, progress);
-            selector = 2;
-        }
-        if (state == AnimationState.ATTACKING) {
-            // todo render swipe
-            if (progress > 1) {
-                QuickView.renderSword(x, y, direction, 4);
-                QuickView.renderSwipe(x, y, direction, 1);
-            } else {
-                QuickView.renderSword(x, y, direction, progress + 3);
-                QuickView.renderSwipe(x, y, direction, progress);
-                selector = 2;
-            }
-        }
-        if (state == AnimationState.ATTACKDOWN) {
-            QuickView.renderSword(x, y, direction, progress + 4);
-        }
-        if (sender.getState().contains(EntityState.DAMAGED)) selector = 3;
-        QuickView.renderSprite(selector, x, y, direction);
+        CharView.parseCharacter(sender, x, y, direction, adjusted, state);
     }
 
     public void advance(double time) {
         progress += time * framerate;
         // decide if state change is needed
+
         switch (state) {
             // TODO: these times should be based on the actual length of the sequence of frames
             case ATTACKUP:
                 // if enough time has passed, change to next state
-                if (progress >= 3.0) {
+                if (progress >= phase1) {
                     progress = 0;
                     state = AnimationState.ATTACKING;
                 }
                 break;
             case ATTACKING:
-                if (progress >= 3.0) {
+                if (progress >= phase2) {
                     progress = 0;
                     state = AnimationState.ATTACKDOWN;
                 }
                 break;
             case ATTACKDOWN:
                 // if enough time has passed, change back to idle
-                if (progress >= 3.0) {
+                if (progress >= phase3) {
                     progress = 0;
                     state = AnimationState.IDLE;
                 }

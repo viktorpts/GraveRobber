@@ -1,5 +1,6 @@
 package Factories;
 
+import AI.Aggression;
 import AI.Gank;
 import AI.Roam;
 import Abilities.Ability;
@@ -8,8 +9,9 @@ import Enumerations.EnemyTypes;
 import Interfaces.IEnemyProducible;
 import Interfaces.IPlayerProducible;
 import Models.Enemy;
-import Models.Entity;
 import Abilities.MeleeAttack;
+import Abilities.ChargeAttack;
+import Renderer.Animation;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -29,18 +31,32 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
 
     public static Enemy createEnemy(EnemyTypes type, double x, double y, double direction) {
         Enemy thisEnemy = new Enemy(
-                type.getAnimation(), x, y, direction,
+                new Animation(10, type.name()), x, y, direction,
                 type.getHealthPoints(),
                 type.getAttackPoints(),
                 type.getArmorValue(),
-                type.getAbilities(),
+                new HashMap<Abilities, Ability>(),
                 type.getRadius(),
                 type.getMaxSpeed(),
                 type.getMaxAcceleration()
         );
-        thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), type.getRadius()));
-        thisEnemy.addBrain(new Roam(thisEnemy, 0.3));
-        thisEnemy.addBrain(new Gank(thisEnemy, 3));
+        thisEnemy.addBrain(new Roam(thisEnemy, 0.3)); // all enemies roam randomly
+        switch (type) {
+            case SKELETON: // skeletons are fearsome
+                thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), 0.75));
+                thisEnemy.addBrain(new Gank(thisEnemy, 6));
+                thisEnemy.addBrain(new Aggression(thisEnemy, 0.75));
+                break;
+            case GIANT_RAT: // rats are fast but feeble
+                thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new ChargeAttack(thisEnemy, type.getAttackPoints(), 0.5));
+                thisEnemy.addBrain(new Gank(thisEnemy, 3));
+                thisEnemy.addBrain(new Aggression(thisEnemy, 1.0));
+                break;
+            default:
+                thisEnemy.addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(thisEnemy, type.getAttackPoints(), 0.75));
+                thisEnemy.addBrain(new Gank(thisEnemy, 3));
+                break;
+        }
         return thisEnemy;
     }
 

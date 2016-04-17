@@ -2,10 +2,7 @@ package Models;
 
 import Abilities.Ability;
 import Abilities.MeleeAttack;
-import Enumerations.Abilities;
-import Enumerations.AbilityState;
-import Enumerations.DamageType;
-import Enumerations.EntityState;
+import Enumerations.*;
 import Game.Main;
 import Interfaces.IMovable;
 import Renderer.Animation;
@@ -36,7 +33,7 @@ abstract public class Creature extends Entity implements IMovable{
                     HashMap<Abilities, Ability> abilities,
                     double radius, double maxSpeed,
                     double maxAcceleration) {
-        super(animation, x, y, direction);
+        super(animation, x, y, direction, radius);
         this.healthPoints = healthPoints;
         this.attackPower = attackPower;
         this.armorValue = armorValue;
@@ -45,26 +42,6 @@ abstract public class Creature extends Entity implements IMovable{
         this.maxSpeed = maxSpeed;
         this.maxAcceleration = maxAcceleration;
         velocity = new Coord(0.0, 0.0);
-    }
-
-    // Constructor
-    public Creature(int startHealthPoints, int startAttackPower, int startArmorValue, Coord position) {
-        // Init parent
-        // TODO: finish proper Animation implementation
-        super(new Animation(15.0), position.getX(), position.getY(), 0.0);
-        // Init stats
-        this.setHealthPoints(startHealthPoints);
-        this.setAttackPower(startAttackPower);
-        this.setArmorValue(startArmorValue);
-        abilities = new HashMap<>();
-        abilities.put(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 10.0, 1.0));
-
-        // Init physical characteristics
-        velocity = new Coord(0.0, 0.0);
-        // TODO: add a way for these to be set at production time; not a good idea to change them directly though
-        radius = 0.25;
-        maxSpeed = Physics.maxMoveSpeed; // we use the properties of the player for now
-        maxAcceleration = Physics.playerAcceleration;
     }
 
     // Properties
@@ -165,6 +142,7 @@ abstract public class Creature extends Entity implements IMovable{
         if (immuneTime > 0) immuneTime -= time;
         if (getState().contains(EntityState.DAMAGED) && immuneTime <= 0) {
             getState().remove(EntityState.DAMAGED);
+            getState().remove(EntityState.STAGGERED);
             immuneTime = 0;
         }
         // Process behaviour
@@ -192,6 +170,7 @@ abstract public class Creature extends Entity implements IMovable{
         abilities.entrySet().stream()
                 .filter(entry -> !entry.getValue().isReady()) // Filter used abilities
                 .forEach(entry -> entry.getValue().update(time));
+        resetState(); // make sure we have something
     }
 
     // Abilities
@@ -223,6 +202,16 @@ abstract public class Creature extends Entity implements IMovable{
                 .forEach(entry -> entry.getValue().spend());
     }
 
+    public void cancelAnimation() {
+        getAnimation().setState(AnimationState.IDLE);
+    }
+
+    public void stagger() {
+        stopAbilities();
+        cancelAnimation();
+        setState(EnumSet.of(EntityState.STAGGERED));
+    }
+
     public void takeDamage(double damage) {
         resolveDamage(damage, DamageType.GENERIC, null);
     }
@@ -244,23 +233,30 @@ abstract public class Creature extends Entity implements IMovable{
             double knockback = 2 - 2 * (radius - 0.5 * refsize) / (1.5 * refsize);
             if (knockback > 2) knockback = 2;
             if (knockback > 0) { // don't do anything if entity is not affected
-                Coord kickvector = new Coord(Physics.friction + knockback, 0.0);
+                Coord kickvector = new Coord(knockback * 5, 0.0);
                 kickvector.setDirection(Coord.angleBetween(source, getPos()));
                 stop();
                 accelerate(kickvector, 1.0);
                 // TODO: disable movement for a short period
             }
         }
-        // TODO: stagger for enemies, player
+        // TODO: stagger enemies if damaged more than 30% in 2 seconds
         if (damage > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
+            if (this instanceof Player) {
+                stagger(); // player always gets staggered
+                immuneTime = 0.5;
+            } else {
+                immuneTime = 0.1; // Enemies have a much shorter invinciframe
+            }
             getState().add(EntityState.DAMAGED);
-            immuneTime = 0.5;
+
             healthPoints -= (int)damage;
 
             // todo add dying animation
             if (healthPoints <= 0) {
                 stopAbilities();
+                cancelAnimation();
                 setState(EnumSet.of(EntityState.DEAD));
             }
         }

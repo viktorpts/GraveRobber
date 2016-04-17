@@ -1,6 +1,8 @@
 package AI;
 
 import Enumerations.AIState;
+import Enumerations.EntityState;
+import Game.Main;
 import Models.Creature;
 import World.Coord;
 
@@ -26,7 +28,9 @@ public class Gank extends Behaviour {
 
     @Override
     public boolean think(double time) {
-        if (Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude() <= range) {
+        if (Main.game.getPlayer().getState().contains(EntityState.DEAD)) return false;
+        double distToPlayer = Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude();
+        if (distToPlayer <= range && distToPlayer >= 0.5) {
             // face player
             owner.turnTo(Game.Main.game.getPlayer().getX(), Game.Main.game.getPlayer().getY());
             if (state == AIState.PROCESSING) {

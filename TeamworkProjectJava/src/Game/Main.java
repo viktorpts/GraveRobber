@@ -13,6 +13,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import Renderer.QuickView;
@@ -37,7 +40,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         // Setup scene and nodes
         Pane root = new Pane();
-        root.setPrefSize(horizontalRes,verticalRes);
+        root.setPrefSize(horizontalRes, verticalRes);
         Scene scene = new Scene(root, horizontalRes + 300, verticalRes, Color.BLACK);
         Canvas canvas = new Canvas(horizontalRes, verticalRes); // Main canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -52,38 +55,39 @@ public class Main extends Application {
         // Initialize Game
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
-        CreatureFactory.init(); //Initialise list of creatures
+        //CreatureFactory.init(); //Initialise list of creatures
 
         // Event handler for keyboard input
-        scene.setOnKeyPressed(ke -> { game.getControlState().addKey(ke.getCode()); });
-        scene.setOnKeyReleased(ke -> { game.getControlState().removeKey(ke.getCode()); });
+        scene.setOnKeyPressed(ke -> {
+            game.getControlState().addKey(ke.getCode());
+        });
+        scene.setOnKeyReleased(ke -> {
+            game.getControlState().removeKey(ke.getCode());
+        });
 
         // Event handler for mouse position and input
-        scene.setOnMouseMoved(event -> { game.getControlState().update(event.getX(), event.getY()); });
+        scene.setOnMouseMoved(event -> {
+            game.getControlState().update(event.getX(), event.getY());
+        });
         scene.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) game.getControlState().mouseLeft = true;
-            if (event.isSecondaryButtonDown()) game.getLevel().getEntities()
-                    .add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,QuickView.toWorldX(event.getX()), QuickView.toWorldY(event.getY()), 0));
-        } );
+            if (event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(true);
+            if (event.isSecondaryButtonDown()) game.getControlState().setMouseRight(true);
+        });
         scene.setOnMouseReleased(event -> {
-            if (game.getControlState().isMouseLeft() && !event.isPrimaryButtonDown()) {
-                game.getControlState().mouseLeft = false;
-            } } );
+            if (!event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(false);
+            if (!event.isSecondaryButtonDown()) game.getControlState().setMouseRight(false);
+        });
 
         final long startNanoTime = System.nanoTime();
 
-        new AnimationTimer()
-        {
-            public void handle(long currentNanoTime)
-            {
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
                 double[] mousePos = game.getControlState().getMouse();
                 double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
                 double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
                 double dir = Math.atan2(offsetY, offsetX);
                 // Don't let the player look around if he's committed to an animation
-                if (!game.getPlayer().hasState(EntityState.CASTUP) &&
-                        !game.getPlayer().hasState(EntityState.CASTING) &&
-                        !game.getPlayer().hasState(EntityState.CASTDOWN)) game.getPlayer().setDirection(dir);
+                if (game.getPlayer().isReady()) game.getPlayer().setDirection(dir);
 
                 // Update state
                 game.update(currentNanoTime);
@@ -95,7 +99,29 @@ public class Main extends Application {
                         game.getLevel().getPlayer().getY());
                 QuickView.drawGrid(gc);
                 game.render();
-                QuickView.renderArrow(mousePos[0], mousePos[1], dir);
+
+                // Health bar
+                gc.save();
+                gc.setFill(Color.RED);
+                gc.setStroke(Color.RED);
+                gc.setLineWidth(2);
+                gc.strokeRect(10, 10, 220, 20);
+                gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
+                gc.restore();
+
+                if (game.getPlayer().hasState(EntityState.DEAD)) {
+                    gc.save();
+                    gc.setFill(Color.RED);
+                    gc.setStroke(Color.BLACK);
+                    gc.setLineWidth(1);
+                    gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                    gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                    gc.restore();
+                } else {
+                    QuickView.renderArrow(mousePos[0], mousePos[1], dir);
+                }
 
                 /**
                  * Debug info

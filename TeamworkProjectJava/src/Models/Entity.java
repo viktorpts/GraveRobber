@@ -18,16 +18,14 @@ abstract public class Entity {
     private Animation animation;   // TODO: don't forget to initialize this in a constructor instead
     // TODO: Add methods to initialize a sprite and output it to a display interface /!\ depends on direction
 
-    public Entity(Animation animation, double x, double y, double direction) {
+    public Entity(Animation animation, double x, double y, double direction, double radius) {
         ID = ++lastID; // increment then assign
 
         this.animation = animation;
         position = new Coord(x, y);
         this.direction =  direction;
+        this.radius = radius;
         state = EnumSet.of(EntityState.IDLE); // all entities idle at creation, modify using set method
-
-        // TODO: add a way for this to be initialized to a different value
-        radius = 0.25;
     }
 
     public int getID() {
@@ -103,6 +101,11 @@ abstract public class Entity {
         return true;
     }
 
+    // If nothing's going on, go to idle
+    public void resetState() {
+        if (state.isEmpty()) state = EnumSet.of(EntityState.IDLE);
+    }
+
     // Display
     public Animation getAnimation() {
         return animation;
@@ -116,7 +119,6 @@ abstract public class Entity {
     {
         if (animation == null || !isAlive()) return;
 
-        // TODO: selector is a temporary solution, let the Animation handle it's state
         animation.output(this, position.getX(), position.getY(), direction);
     }
 

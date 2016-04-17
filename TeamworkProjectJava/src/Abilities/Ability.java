@@ -10,7 +10,7 @@ abstract public class Ability implements IAbility {
     double remaining; // time to next use, seconds
     double cooldown; // time between uses, seconds
     AbilityState state; // state
-    Creature owner;
+    protected final Creature owner;
 
     public Ability (Creature owner, double cooldown) {
         this.owner = owner; // passed by reference, we don't want a copy
