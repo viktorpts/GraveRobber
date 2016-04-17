@@ -64,50 +64,38 @@ public class DungeonMaker {
         }
 
         for (Dungeon dungeon : this.maze) {
+            if (dungeon.getDungeon() == null && dungeon.getHallway() == null) continue; // current instance is a parent
+            int x = 0;
+            int y = 0;
+            int width = 0;
+            int height = 0;
             if (dungeon.getDungeon() != null) {
                 // Room
-                //x firstCol
-                int x = dungeon.getDungeon().getX();
-                //y firstRow
-                int y = dungeon.getDungeon().getY();
-                //width lastCol
-                int width = dungeon.getDungeon().getWidth();
-                //height lastRow
-                int height = dungeon.getDungeon().getHeight();
-
-
-                for (int row = y; row < y + height; row++) {
-                    for (int col = x; col < x + width; col++) {
-                        if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
-                            if (levelMatrix[col][row] != 2) // don't place walls on th floor
-                                levelMatrix[col][row] = 1; // wall
-                        } else {
-                            levelMatrix[col][row] = 2; // floor
-                        }
-                    }
-                }
+                x = dungeon.getDungeon().getX(); // x firstCol
+                y = dungeon.getDungeon().getY(); // y firstRow
+                width = dungeon.getDungeon().getWidth(); // width lastCol
+                height = dungeon.getDungeon().getHeight(); // height lastRow
             } else if (dungeon.getHallway() != null) {
                 // Hallway
+                x = dungeon.getHallway().getX();
+                y = dungeon.getHallway().getY();
+                width = dungeon.getHallway().getWidth();
+                height = dungeon.getHallway().getHeight();
+            }
 
-                int x = dungeon.getHallway().getX();
-                int y = dungeon.getHallway().getY();
-                int width = dungeon.getHallway().getWidth();
-                int height = dungeon.getHallway().getHeight();
-
-                for (int row = y; row < y + height; row++) {
-                    for (int col = x; col < x + width; col++) {
-                        if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
-                            if (levelMatrix[col][row] != 2) // don't place walls on th floor
-                                levelMatrix[col][row] = 1; // wall
-                        } else {
-                            levelMatrix[col][row] = 2; // floor
-                        }
+            for (int row = y; row < y + height; row++) {
+                for (int col = x; col < x + width; col++) {
+                    if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
+                        if (levelMatrix[col][row] != 2) // don't place walls on th floor
+                            levelMatrix[col][row] = 1; // wall
+                    } else {
+                        levelMatrix[col][row] = 2; // floor
                     }
                 }
             }
         }
-        // Convert matrix to usable tiles
 
+        // Convert matrix to usable tiles
         for (int i = 0; i < levelMatrix.length; i++) {
             for (int j = 0; j < levelMatrix[i].length; j++) {
                 if (levelMatrix[i][j] == 0) continue;
