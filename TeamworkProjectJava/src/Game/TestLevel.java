@@ -46,16 +46,18 @@ public class TestLevel  extends Application {
                 // Advance generation
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, 800, 600);
-                QuickView.drawGrid(gc);
                 if (ke.getCode() == KeyCode.ENTER) {
                     // Initialize generator, make rooms within boundaries
                     DungeonMaker map = new DungeonMaker();
-                    gc.setFill(Color.WHITE);
+                    // Render dungeon
                     map.getLevelTiles().stream().forEach(tile -> {
-                        gc.setFill(tile.getTileType() == TileType.WALL ? Color.GREY : Color.WHITE);
-                        gc.fillRect(tile.getX() * 2, tile.getY() * 2, 2, 2);
+                        QuickView.setBlock(gc,
+                                tile.getX(),
+                                tile.getY(),
+                                tile.getTileType() == TileType.WALL ? 1 : 2);
                     });
                 }
+                QuickView.drawGrid(gc);
             }
         });
 

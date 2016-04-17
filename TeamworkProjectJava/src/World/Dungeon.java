@@ -4,13 +4,9 @@ import java.util.Random;
 
 public class Dungeon {
 
-    private static final int hallwayWidth = 3; // this includes the walls!
-
-	public Dungeon() {
-	}
-
-	//Update from MIN_SIZE = 5
-	private static int MIN_SIZE = 20;
+    // These include the walls!
+    private static final int hallwayWidth = 3;
+    private static final int MIN_SIZE = 7;
 	private static Random rnd = new Random();
 
 	private int x, y, width, height;
@@ -19,11 +15,9 @@ public class Dungeon {
 	private Dungeon hallway;
 
 
-
 	/**
 	 * Properties
 	 */
-
 	public Dungeon getDungeon() {
 		return dungeon;
 	}
@@ -51,8 +45,6 @@ public class Dungeon {
 	public int getX() {
 		return x;
 	}
-
-	//Set
 
 	public void setLeftChild(Dungeon leftChild) {
 		this.leftChild = leftChild;

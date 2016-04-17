@@ -74,10 +74,10 @@ public class QuickView {
                 gc.setFill(Color.WHITE);
                 break;
             case 2:
-                gc.setFill(Color.GREY);
+                gc.setFill(Color.DARKORANGE);
                 break;
         }
-        gc.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+        gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
     }
 
     static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list, boolean finalize) {
