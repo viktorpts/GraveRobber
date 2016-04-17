@@ -235,10 +235,14 @@ abstract public class Creature extends Entity implements IMovable{
         // TODO: stagger for enemies, player
         if (damage > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
-            if (this instanceof Player) setState(EnumSet.of(EntityState.STAGGERED)); // player always gets staggered
             getState().add(EntityState.DAMAGED);
+            if (this instanceof Player) {
+                setState(EnumSet.of(EntityState.STAGGERED)); // player always gets staggered
+                immuneTime = 0.5;
+            } else {
+                immuneTime = 0.1; // Enemies have a much shorter invinciframe
+            }
 
-            immuneTime = 0.5;
             healthPoints -= (int)damage;
 
             // todo add dying animation
