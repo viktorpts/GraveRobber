@@ -48,53 +48,57 @@ public class Map {
 		return maze;
 	}
 
-	public void getTiles() {
+    public ArrayList<Tile> getLevelTiles() {
+        return levelTiles;
+    }
+
+    public void getTiles() {
 		levelTiles = new ArrayList<>();
 		for (Dungeon dungeon : this.maze) {
 			if (dungeon.getDungeon() != null) {
 				// Room
-				//x firstRow
-				int x1 = dungeon.getDungeon().getX();
-				//y firstCol
-				int y1 = dungeon.getDungeon().getY();
-				//width lastRow
-				int x2 = dungeon.getDungeon().getWidth() + x1;
-				//height lastCol
-				int y2 = dungeon.getDungeon().getHeight() + y1;
+				//x firstCol
+				int x = dungeon.getDungeon().getX();
+				//y firstRow
+				int y = dungeon.getDungeon().getY();
+				//width lastCol
+				int width = dungeon.getDungeon().getWidth();
+				//height lastRow
+				int height = dungeon.getDungeon().getHeight();
 
 
-				for (int r = x1; r < x2; r++) {
-					for (int c = y1; c < y2; c++) {
-						if (r == x1 || c == y1 || r == x2 || c == y2) {
-							levelTiles.add(new Tile(x1, c, TileType.WALL));
+				for (int row = y; row < y + height; row++) {
+					for (int col = x; col < x + width; col++) {
+						if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
+							levelTiles.add(new Tile(col, row, TileType.WALL));
 						} else {
-							levelTiles.add(new Tile(x1, c, TileType.FLOOR));
+							levelTiles.add(new Tile(col, row, TileType.FLOOR));
 						}
-
 					}
 				}
-
-
 			} else if (dungeon.getHallway() != null) {
 				// Hallway
 
-				int hx1 = dungeon.getHallway().getX();
-				int hy1 = dungeon.getHallway().getY();
-				int hx2 = dungeon.getHallway().getWidth() + hx1;
-				int hy2 = dungeon.getHallway().getHeight() + hy1;
+				int x = dungeon.getHallway().getX();
+				int y = dungeon.getHallway().getY();
+				int width = dungeon.getHallway().getWidth();
+				int height = dungeon.getHallway().getHeight();
 
-				for (int r = hx1; r < hx2; r++) {
-					for (int c = hy1; c < hy2; c++) {
-						if (r == hx1 || c == hy1 || r == hx2 || c == hy2) {
-							levelTiles.add(new Tile(hx1, c, TileType.WALL));
-						} else {
-							levelTiles.add(new Tile(hx1, c, TileType.FLOOR));
-						}
-
-					}
-				}
+                for (int row = y; row < y + height; row++) {
+                    for (int col = x; col < x + width; col++) {
+                        if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
+                            levelTiles.add(new Tile(col, row, TileType.WALL));
+                        } else {
+                            levelTiles.add(new Tile(col, row, TileType.FLOOR));
+                        }
+                    }
+                }
 			}
-
 		}
+        // Clean up duplicate tiles
+        ArrayList<Tile> duplicates = new ArrayList<>();
+        levelTiles.stream().forEach(tile -> {
+
+        });
 	}
 }

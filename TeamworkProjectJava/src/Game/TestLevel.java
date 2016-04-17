@@ -1,5 +1,6 @@
 package Game;
 
+import Enumerations.TileType;
 import World.*;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 
 import Renderer.QuickView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class TestLevel  extends Application {
@@ -41,6 +43,10 @@ public class TestLevel  extends Application {
         QuickView.gridSize = 5;
         QuickView.drawGrid(gc);
 
+        File folder = new File(System.getProperty("user.dir"));
+        File pic = new File("wall.jpg");
+        System.out.println(pic.exists());
+
         // First pass
         map = new Map();
         // Register event handler for key presses
@@ -53,7 +59,12 @@ public class TestLevel  extends Application {
                 if (ke.getCode() == KeyCode.ENTER) {
                     // Finalize generation, make rooms within boundaries
 
-                    QuickView.renderDungeon(gc, map.getMaze(), true);
+                    //QuickView.renderDungeon(gc, map.getMaze(), true);
+                    gc.setFill(Color.WHITE);
+                    map.getLevelTiles().stream().forEach(tile -> {
+                        gc.setFill(tile.getTileType() == TileType.WALL ? Color.GREY : Color.WHITE);
+                        gc.fillRect(tile.getX() * 2, tile.getY() * 2, 2, 2);
+                    });
                 }
 //                else {
 //                    // Iterate dungeon

@@ -34,16 +34,16 @@ public class Tile {
 		this.y = y;
 		this.id = ++nextID;
 		this.tileType = tileType;
-		this.img = setImageTile(tileType);
+		//this.img = setImageTile(tileType);
 	}
 
 
 	public Image setImageTile(TileType tileType){
 		Image img;
 		if (tileType == TileType.WALL){
-			img = new Image("/wall.jpg");
+			img = new Image("\\wall.jpg");
 		}else{
-			img = new Image("/floor.jpg");
+			img = new Image("\\floor.jpg");
 		}
 		return img;
 	}
