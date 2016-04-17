@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class DungeonMaker {
 
-    public static final int mazeWidth = 160;
-    public static final int mazeHeight = 120;
+    public static final int mazeWidth = 25;
+    public static final int mazeHeight = 25;
 
     private ArrayList<Dungeon> maze;
     private ArrayList<Tile> levelTiles;
@@ -20,7 +20,7 @@ public class DungeonMaker {
 
     public void dungeonGenerate() {
         maze = new ArrayList<>();
-        Dungeon root = new Dungeon(2, 2, mazeWidth, mazeHeight); //
+        Dungeon root = new Dungeon(0, 0, mazeWidth, mazeHeight); //
         // add root to array and pass it on
         maze.add(root);
 
