@@ -18,11 +18,14 @@ public class Level {
 
     List<Entity> entities;
 
+    ArrayList<Tile> geometry;
+
     public static byte CURRENT_LEVEL = 1;
 
     // TODO: add level geometry and populate with entities
     public Level() {
         entities = new ArrayList<>();
+        generateGeometry();
         spawnEnemies();
         player = new Player(100, 10, 0, 0, 0);
         entities.add(player);
@@ -30,9 +33,15 @@ public class Level {
 
     public Level(Player player) {
         entities = new ArrayList<>();
+        generateGeometry();
         spawnEnemies();
         this.player = player;
         entities.add(this.player);
+    }
+
+    private void generateGeometry() {
+        DungeonMaker generator = new DungeonMaker();
+        geometry = generator.processTiles();
     }
 
     public Player getPlayer() {
@@ -41,6 +50,10 @@ public class Level {
 
     public List<Entity> getEntities() {
         return entities;
+    }
+
+    public ArrayList<Tile> getGeometry() {
+        return geometry;
     }
 
     private void spawnEnemies() {

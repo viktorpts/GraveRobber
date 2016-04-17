@@ -4,13 +4,9 @@ import java.util.Random;
 
 public class Dungeon {
 
-    private static final int hallwayWidth = 3; // this includes the walls!
-
-	public Dungeon() {
-	}
-
-	//Update from MIN_SIZE = 5
-	private static int MIN_SIZE = 20;
+    // These include the walls!
+    private static final int hallwayWidth = 3;
+    private static final int MIN_SIZE = 7;
 	private static Random rnd = new Random();
 
 	private int x, y, width, height;
@@ -19,11 +15,9 @@ public class Dungeon {
 	private Dungeon hallway;
 
 
-
 	/**
 	 * Properties
 	 */
-
 	public Dungeon getDungeon() {
 		return dungeon;
 	}
@@ -51,8 +45,6 @@ public class Dungeon {
 	public int getX() {
 		return x;
 	}
-
-	//Set
 
 	public void setLeftChild(Dungeon leftChild) {
 		this.leftChild = leftChild;
@@ -140,16 +132,17 @@ public class Dungeon {
 		else if (newSize > fullSize * 0.66) newSize = (int) (fullSize * 0.66);
 		else if (newSize < fullSize * 0.33) newSize = (int) (fullSize * 0.33);
 
-		if (direction) { //populate child areas
+        // Populate child areas
+		if (direction) { // top and bottom
 			leftChild = new Dungeon(x, y, width, newSize);
 			rightChild = new Dungeon(x, y + newSize, width, height - newSize);
 			// make a hallway connecting children
-			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), hallwayWidth, rightChild.getCenterY() - leftChild.getCenterY());
-		} else {
+			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), hallwayWidth, rightChild.getCenterY() - leftChild.getCenterY() + 2);
+		} else { // left and right
 			leftChild = new Dungeon(x, y, newSize, height);
 			rightChild = new Dungeon(x + newSize, y, width - newSize, height);
 			// make a hallway connecting children
-			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), rightChild.getCenterX() - leftChild.getCenterX(), hallwayWidth);
+			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), rightChild.getCenterX() - leftChild.getCenterX() + 2, hallwayWidth);
 		}
 		return true; //split successful
 	}

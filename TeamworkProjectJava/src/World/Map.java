@@ -1,3 +1,7 @@
+/**
+ * This class is deprecated and should be removed
+ */
+
 package World;
 
 import Enumerations.TileType;

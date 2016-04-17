@@ -17,8 +17,8 @@ public class QuickView {
     static public int gridSize = 5;
     static public double cameraWidth = 160;
     static public double cameraHeight = 120;
-    static public double cameraX;
-    static public double cameraY;
+    static public double cameraX = 79;
+    static public double cameraY = 59;
 
     // Camera controls
     static public void adjustRes(int size) {
@@ -74,10 +74,10 @@ public class QuickView {
                 gc.setFill(Color.WHITE);
                 break;
             case 2:
-                gc.setFill(Color.GREY);
+                gc.setFill(Color.DARKORANGE);
                 break;
         }
-        gc.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+        gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
     }
 
     static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list, boolean finalize) {
@@ -408,6 +408,28 @@ public class QuickView {
         double y1 = x * Math.sin(angle) + y * Math.cos(angle);
         double[] result = {x1, y1};
         return result;
+    }
+
+    static public void renderBlock(int x, int y, int type) {
+        GraphicsContext gc = Main.game.getGc();
+        /**
+         * Type:
+         * 0 - empty (void)
+         * 1 - white (walls)
+         * 2 - grey (floor)
+         */
+        switch (type) {
+            case 0:
+                gc.setFill(Color.BLACK);
+                break;
+            case 1:
+                gc.setFill(Color.WHITE);
+                break;
+            case 2:
+                gc.setFill(Color.DARKORANGE);
+                break;
+        }
+        gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
     }
 
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter

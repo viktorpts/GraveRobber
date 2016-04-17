@@ -8,6 +8,7 @@ import Models.Player;
 import World.Coord;
 import World.Level;
 import World.Physics;
+import World.Tile;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 
@@ -78,16 +79,21 @@ public class Game {
         timeLast = timeNew;
 
         ArrayList<Entity> markedForDeletion = new ArrayList<>(); // prevent ConcurrentModificationException
-        level.getEntities().stream().filter(entity -> entity instanceof Creature).forEach(entity -> {
-            if (entity.getState().contains(EntityState.DESTROYED)) { // release dead entries
-                markedForDeletion.add(entity);
-                return;
-            }
-            entity.animate(elapsed);
-            if (entity.hasState(EntityState.DEAD)) return; // don't update if it's dead (not destroyed yet!)
-            Creature current = (Creature)entity;
-            current.update(elapsed);
-        });
+        level.getEntities().stream().filter(entity -> entity instanceof Creature)
+                .filter(entity -> entity.getX() > getPlayer().getX() - Physics.activeRange &&
+                        entity.getX() < getPlayer().getX() + Physics.activeRange &&
+                        entity.getY() > getPlayer().getY() - Physics.activeRange &&
+                        entity.getY() < getPlayer().getY() + Physics.activeRange)
+                .forEach(entity -> {
+                    if (entity.getState().contains(EntityState.DESTROYED)) { // release dead entries
+                        markedForDeletion.add(entity);
+                        return;
+                    }
+                    entity.animate(elapsed);
+                    if (entity.hasState(EntityState.DEAD)) return; // don't update if it's dead (not destroyed yet!)
+                    Creature current = (Creature) entity;
+                    current.update(elapsed);
+                });
         // Release all marked entities
         for (Entity entity : markedForDeletion) {
             level.getEntities().remove(entity);
@@ -95,11 +101,21 @@ public class Game {
     }
 
     public void render() {
+        level.getGeometry().stream()
+                .filter(tile -> tile.getX() > getPlayer().getX() - Physics.activeRange &&
+                        tile.getX() < getPlayer().getX() + Physics.activeRange &&
+                        tile.getY() > getPlayer().getY() - Physics.activeRange &&
+                        tile.getY() < getPlayer().getY() + Physics.activeRange)
+                .forEach(Tile::render);
         // TODO: filter out entities outside visibility scope
-        // TODO: terrain rendering
         // TODO: vertical ordering, to handle overlap
         // todo since we already cleared the list, this check is likely redundant
-        level.getEntities().stream().filter(entity -> entity.isAlive()).forEach(Entity::render);
+        level.getEntities().stream()
+                .filter(entity -> entity.getX() > getPlayer().getX() - Physics.activeRange &&
+                        entity.getX() < getPlayer().getX() + Physics.activeRange &&
+                        entity.getY() > getPlayer().getY() - Physics.activeRange &&
+                        entity.getY() < getPlayer().getY() + Physics.activeRange)
+                .forEach(Entity::render);
     }
 
     // TODO: event handlers

@@ -2,6 +2,8 @@ package World;
 
 import Enumerations.TileType;
 import java.util.List;
+
+import Renderer.QuickView;
 import javafx.scene.image.Image;
 
 public class Tile {
@@ -34,10 +36,10 @@ public class Tile {
 		this.y = y;
 		this.id = ++nextID;
 		this.tileType = tileType;
-		//this.img = setImageTile(tileType);
+		//this.img = setImageTile(tileType); // removed to prevent exception error on missing files
 	}
 
-
+    // TODO: fix paths
 	public Image setImageTile(TileType tileType){
 		Image img;
 		if (tileType == TileType.WALL){
@@ -50,7 +52,6 @@ public class Tile {
 
 
 	//Setters
-
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -65,7 +66,6 @@ public class Tile {
 
 
 	//Getters
-
 	public int getId() {
 		return id;
 	}
@@ -81,4 +81,8 @@ public class Tile {
 	public TileType getTileType() {
 		return tileType;
 	}
+
+    public void render() {
+        QuickView.renderBlock(x, y, tileType == TileType.WALL ? 1 : 2);
+    }
 }
