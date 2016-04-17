@@ -2,10 +2,7 @@ package Models;
 
 import Abilities.Ability;
 import Abilities.MeleeAttack;
-import Enumerations.Abilities;
-import Enumerations.AbilityState;
-import Enumerations.DamageType;
-import Enumerations.EntityState;
+import Enumerations.*;
 import Game.Main;
 import Interfaces.IMovable;
 import Renderer.Animation;
@@ -173,6 +170,7 @@ abstract public class Creature extends Entity implements IMovable{
         abilities.entrySet().stream()
                 .filter(entry -> !entry.getValue().isReady()) // Filter used abilities
                 .forEach(entry -> entry.getValue().update(time));
+        resetState(); // make sure we have something
     }
 
     // Abilities
@@ -204,6 +202,16 @@ abstract public class Creature extends Entity implements IMovable{
                 .forEach(entry -> entry.getValue().spend());
     }
 
+    public void cancelAnimation() {
+        getAnimation().setState(AnimationState.IDLE);
+    }
+
+    public void stagger() {
+        stopAbilities();
+        cancelAnimation();
+        setState(EnumSet.of(EntityState.STAGGERED));
+    }
+
     public void takeDamage(double damage) {
         resolveDamage(damage, DamageType.GENERIC, null);
     }
@@ -232,11 +240,11 @@ abstract public class Creature extends Entity implements IMovable{
                 // TODO: disable movement for a short period
             }
         }
-        // TODO: stagger for enemies, player
+        // TODO: stagger enemies if damaged more than 30% in 2 seconds
         if (damage > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
             if (this instanceof Player) {
-                setState(EnumSet.of(EntityState.STAGGERED)); // player always gets staggered
+                stagger(); // player always gets staggered
                 immuneTime = 0.5;
             } else {
                 immuneTime = 0.1; // Enemies have a much shorter invinciframe
@@ -248,6 +256,7 @@ abstract public class Creature extends Entity implements IMovable{
             // todo add dying animation
             if (healthPoints <= 0) {
                 stopAbilities();
+                cancelAnimation();
                 setState(EnumSet.of(EntityState.DEAD));
             }
         }

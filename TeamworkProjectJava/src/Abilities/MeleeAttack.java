@@ -96,7 +96,8 @@ public class MeleeAttack extends Ability {
                 if (owner.getAnimationState() != AnimationState.ATTACKDOWN) {
                     // animation state has advanced, go back to ready
                     reset(); // if attack was successful, reset cooldown
-                    owner.setState(EnumSet.of(EntityState.IDLE));
+                    owner.getState().remove(EntityState.CASTDOWN);
+                    owner.resetState();
                 }
                 break;
         }

@@ -72,7 +72,6 @@ public class ChargeAttack extends Ability {
                     owner.getState().remove(EntityState.CASTING);
                     owner.getState().add(EntityState.CASTDOWN);
                 } else {
-                    // apply to everyone within range 1, for testing
                     // TODO: best to replace this with an event for all entities to register and decide what to do
                     // TODO: events are a great idea! we can stream everything just once and register the whole queue
                     Main.game.getLevel().getEntities().stream()
@@ -100,7 +99,8 @@ public class ChargeAttack extends Ability {
                 if (owner.getAnimationState() != AnimationState.ATTACKDOWN) {
                     // animation state has advanced, go back to ready
                     reset(); // if attack was successful, reset cooldown
-                    owner.setState(EnumSet.of(EntityState.IDLE));
+                    owner.getState().remove(EntityState.CASTDOWN);
+                    owner.resetState();
                 }
                 break;
         }

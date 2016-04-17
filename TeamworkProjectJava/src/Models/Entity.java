@@ -101,6 +101,11 @@ abstract public class Entity {
         return true;
     }
 
+    // If nothing's going on, go to idle
+    public void resetState() {
+        if (state.isEmpty()) state = EnumSet.of(EntityState.IDLE);
+    }
+
     // Display
     public Animation getAnimation() {
         return animation;
@@ -114,7 +119,6 @@ abstract public class Entity {
     {
         if (animation == null || !isAlive()) return;
 
-        // TODO: selector is a temporary solution, let the Animation handle it's state
         animation.output(this, position.getX(), position.getY(), direction);
     }
 
