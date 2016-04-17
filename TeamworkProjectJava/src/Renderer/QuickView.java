@@ -17,8 +17,8 @@ public class QuickView {
     static public int gridSize = 5;
     static public double cameraWidth = 160;
     static public double cameraHeight = 120;
-    static public double cameraX;
-    static public double cameraY;
+    static public double cameraX = 79;
+    static public double cameraY = 59;
 
     // Camera controls
     static public void adjustRes(int size) {
