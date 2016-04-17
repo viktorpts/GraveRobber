@@ -85,10 +85,10 @@ public class QuickView {
             if (finalize) {
                 if (dungeon.getDungeon() != null) {
                     // Room
-                    int x1 = dungeon.dungeon.getX();
-                    int y1 = dungeon.dungeon.getY();
-                    int x2 = dungeon.dungeon.getWidth() + x1;
-                    int y2 = dungeon.dungeon.getHeight() + y1;
+                    int x1 = dungeon.getDungeon().getX();
+                    int y1 = dungeon.getDungeon().getY();
+                    int x2 = dungeon.getDungeon().getWidth() + x1;
+                    int y2 = dungeon.getDungeon().getHeight() + y1;
                     for (int i = x1; i < x2; i++) {
                         for (int j = y1; j < y2; j++) {
                             setBlock(gc, i, j, 1);

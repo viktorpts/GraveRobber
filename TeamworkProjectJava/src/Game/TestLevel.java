@@ -1,6 +1,7 @@
 package Game;
 
-import World.Dungeon;
+import Enumerations.TileType;
+import World.*;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -12,15 +13,15 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import World.Generator;
 import Renderer.QuickView;
-import World.GenerateDungeon;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class TestLevel  extends Application {
     // TODO: place level gen and display code here; display is sensitive to grid size (recommended 4-8)
     static ArrayList<Dungeon> dungeonList;
+    private Map map;
 
     public static void main(String[] args) {
         // Add functionality to display generated map, like a foreach. Use the output of the following method:
@@ -42,8 +43,12 @@ public class TestLevel  extends Application {
         QuickView.gridSize = 5;
         QuickView.drawGrid(gc);
 
+        File folder = new File(System.getProperty("user.dir"));
+        File pic = new File("wall.jpg");
+        System.out.println(pic.exists());
+
         // First pass
-        dungeonList = GenerateDungeon.sampleMake();
+        map = new Map();
         // Register event handler for key presses
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {
@@ -53,13 +58,19 @@ public class TestLevel  extends Application {
                 QuickView.drawGrid(gc);
                 if (ke.getCode() == KeyCode.ENTER) {
                     // Finalize generation, make rooms within boundaries
-                    dungeonList.get(0).generateDungeon();
-                    QuickView.renderDungeon(gc, GenerateDungeon.filterTree(dungeonList), true);
-                } else {
-                    // Iterate dungeon
-                    GenerateDungeon.sampleStep(dungeonList);
-                    QuickView.renderDungeon(gc, dungeonList, false);
+
+                    //QuickView.renderDungeon(gc, map.getMaze(), true);
+                    gc.setFill(Color.WHITE);
+                    map.getLevelTiles().stream().forEach(tile -> {
+                        gc.setFill(tile.getTileType() == TileType.WALL ? Color.GREY : Color.WHITE);
+                        gc.fillRect(tile.getX() * 2, tile.getY() * 2, 2, 2);
+                    });
                 }
+//                else {
+//                    // Iterate dungeon
+//                    GenerateDungeon.sampleStep(dungeonList);
+//                    QuickView.renderDungeon(gc, dungeonList, false);
+//                }
             }
         });
 
