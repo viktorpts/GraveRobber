@@ -4,6 +4,8 @@ import java.util.Random;
 
 public class Dungeon {
 
+    private static final int hallwayWidth = 3; // this includes the walls!
+
 	public Dungeon() {
 	}
 
@@ -142,12 +144,12 @@ public class Dungeon {
 			leftChild = new Dungeon(x, y, width, newSize);
 			rightChild = new Dungeon(x, y + newSize, width, height - newSize);
 			// make a hallway connecting children
-			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), 2, rightChild.getCenterY() - leftChild.getCenterY());
+			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), hallwayWidth, rightChild.getCenterY() - leftChild.getCenterY());
 		} else {
 			leftChild = new Dungeon(x, y, newSize, height);
 			rightChild = new Dungeon(x + newSize, y, width - newSize, height);
 			// make a hallway connecting children
-			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), rightChild.getCenterX() - leftChild.getCenterX(), 2);
+			hallway = new Dungeon(leftChild.getCenterX(), leftChild.getCenterY(), rightChild.getCenterX() - leftChild.getCenterX(), hallwayWidth);
 		}
 		return true; //split successful
 	}
