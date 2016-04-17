@@ -333,5 +333,27 @@ public class QuickView {
         return result;
     }
 
+    static public void renderBlock(int x, int y, int type) {
+        GraphicsContext gc = Main.game.getGc();
+        /**
+         * Type:
+         * 0 - empty (void)
+         * 1 - white (walls)
+         * 2 - grey (floor)
+         */
+        switch (type) {
+            case 0:
+                gc.setFill(Color.BLACK);
+                break;
+            case 1:
+                gc.setFill(Color.WHITE);
+                break;
+            case 2:
+                gc.setFill(Color.DARKORANGE);
+                break;
+        }
+        gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
+    }
+
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
 }
