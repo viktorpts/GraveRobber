@@ -3,6 +3,7 @@ package Abilities;
 import Enumerations.*;
 import Game.Main;
 import Models.Creature;
+import Models.Enemy;
 import World.Coord;
 
 import java.util.EnumSet;
@@ -42,7 +43,7 @@ public class MeleeAttack extends Ability {
             cool(time);
             return;
         }
-        if ((state == AbilityState.INIT ||state == AbilityState.RESOLVE) &&
+        if ((state == AbilityState.INIT || state == AbilityState.RESOLVE) &&
                 !vrfyState()) {
             // entity state has changed from external source, cancel attack
             state = AbilityState.COOLING;
@@ -70,12 +71,21 @@ public class MeleeAttack extends Ability {
                     // apply to everyone within range 1, for testing
                     // TODO: best to replace this with an event for all entities to register and decide what to do
                     // TODO: events are a great idea! we can stream everything just once and register the whole queue
-                    // TODO: change this to a sweep, filter with Coord.angleBetween() (currently AoE centered on source)
                     Main.game.getLevel().getEntities().stream()
-                            .filter(entity -> entity instanceof Creature && entity != owner) // only damage creatures
-                            .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't hit dead creatures
-                            .filter(entity -> Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() <= range)
-                            .filter(entity -> Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) <= Math.PI / 4)
+                            .filter(entity -> {
+                                boolean result = true;
+                                if (!(entity instanceof Creature) || entity == owner)
+                                    return false; // only damage creatures and not self
+                                if (owner instanceof Enemy && entity instanceof Enemy)
+                                    return false; // don't damage allies
+                                if (entity.hasState(EntityState.DEAD))
+                                    return false; // don't hit dead creatures
+                                if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
+                                    return false;
+                                if (Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) > Math.PI / 4)
+                                    return false;
+                                return true; // if everything's been fine, process target
+                            })
                             .forEach(entity -> {
                                 Creature current = (Creature) entity;
                                 current.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos());
