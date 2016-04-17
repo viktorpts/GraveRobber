@@ -80,10 +80,10 @@ public class Game {
 
         ArrayList<Entity> markedForDeletion = new ArrayList<>(); // prevent ConcurrentModificationException
         level.getEntities().stream().filter(entity -> entity instanceof Creature)
-                .filter(entity -> entity.getX() > getPlayer().getX() - 16 &&
-                        entity.getX() < getPlayer().getX() + 16 &&
-                        entity.getY() > getPlayer().getY() - 16 &&
-                        entity.getY() < getPlayer().getY() + 16)
+                .filter(entity -> entity.getX() > getPlayer().getX() - Physics.activeRange &&
+                        entity.getX() < getPlayer().getX() + Physics.activeRange &&
+                        entity.getY() > getPlayer().getY() - Physics.activeRange &&
+                        entity.getY() < getPlayer().getY() + Physics.activeRange)
                 .forEach(entity -> {
                     if (entity.getState().contains(EntityState.DESTROYED)) { // release dead entries
                         markedForDeletion.add(entity);
@@ -102,19 +102,19 @@ public class Game {
 
     public void render() {
         level.getGeometry().stream()
-                .filter(tile -> tile.getX() > getPlayer().getX() - 16 &&
-                        tile.getX() < getPlayer().getX() + 16 &&
-                        tile.getY() > getPlayer().getY() - 16 &&
-                        tile.getY() < getPlayer().getY() + 16)
+                .filter(tile -> tile.getX() > getPlayer().getX() - Physics.activeRange &&
+                        tile.getX() < getPlayer().getX() + Physics.activeRange &&
+                        tile.getY() > getPlayer().getY() - Physics.activeRange &&
+                        tile.getY() < getPlayer().getY() + Physics.activeRange)
                 .forEach(Tile::render);
         // TODO: filter out entities outside visibility scope
         // TODO: vertical ordering, to handle overlap
         // todo since we already cleared the list, this check is likely redundant
         level.getEntities().stream()
-                .filter(entity -> entity.getX() > getPlayer().getX() - 16 &&
-                        entity.getX() < getPlayer().getX() + 16 &&
-                        entity.getY() > getPlayer().getY() - 16 &&
-                        entity.getY() < getPlayer().getY() + 16)
+                .filter(entity -> entity.getX() > getPlayer().getX() - Physics.activeRange &&
+                        entity.getX() < getPlayer().getX() + Physics.activeRange &&
+                        entity.getY() > getPlayer().getY() - Physics.activeRange &&
+                        entity.getY() < getPlayer().getY() + Physics.activeRange)
                 .forEach(Entity::render);
     }
 
