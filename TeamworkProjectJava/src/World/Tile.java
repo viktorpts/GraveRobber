@@ -2,6 +2,8 @@ package World;
 
 import Enumerations.TileType;
 import java.util.List;
+
+import Renderer.QuickView;
 import javafx.scene.image.Image;
 
 public class Tile {
@@ -79,4 +81,8 @@ public class Tile {
 	public TileType getTileType() {
 		return tileType;
 	}
+
+    public void render() {
+        QuickView.renderBlock(x, y, tileType == TileType.WALL ? 1 : 2);
+    }
 }
