@@ -83,6 +83,6 @@ public class Tile {
 	}
 
     public void render() {
-        QuickView.renderBlock(x, y, tileType == TileType.WALL ? 1 : 2);
+        QuickView.renderBlock(x-1, y-1, tileType == TileType.WALL ? 1 : 2);
     }
 }

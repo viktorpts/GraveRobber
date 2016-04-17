@@ -5,7 +5,7 @@ import java.util.Random;
 public class Dungeon {
 
     // These include the walls!
-    private static final int hallwayWidth = 3;
+    private static final int hallwayWidth = 5;
     private static final int MIN_SIZE = 7;
 	private static Random rnd = new Random();
 

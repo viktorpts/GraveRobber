@@ -8,11 +8,12 @@ import Interfaces.IMovable;
 import Renderer.Animation;
 import World.Coord;
 import World.Physics;
+import World.Tile;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 
-abstract public class Creature extends Entity implements IMovable{
+abstract public class Creature extends Entity implements IMovable {
     // Stats
     private int healthPoints;
     private int attackPower;
@@ -21,7 +22,6 @@ abstract public class Creature extends Entity implements IMovable{
     double immuneTime = 0; // time ot next damage instance
 
     // Physical characteristics
-    private double radius; // used for collision detection
     private double maxSpeed;
     private double maxAcceleration;
     private Coord velocity; // current velocity vector
@@ -38,7 +38,6 @@ abstract public class Creature extends Entity implements IMovable{
         this.attackPower = attackPower;
         this.armorValue = armorValue;
         this.abilities = abilities;
-        this.radius = radius;
         this.maxSpeed = maxSpeed;
         this.maxAcceleration = maxAcceleration;
         velocity = new Coord(0.0, 0.0);
@@ -48,18 +47,23 @@ abstract public class Creature extends Entity implements IMovable{
     public int getHealthPoints() {
         return healthPoints;
     }
+
     public void setHealthPoints(int value) {
         this.healthPoints = value;
     }
+
     public int getAttackPower() {
         return attackPower;
     }
+
     public void setAttackPower(int value) {
         this.attackPower = value;
     }
+
     public int getArmorValue() {
         return armorValue;
     }
+
     public void setArmorValue(int value) {
         this.armorValue = value;
     }
@@ -91,10 +95,9 @@ abstract public class Creature extends Entity implements IMovable{
 
     @Override
     public boolean hitscan(Entity target) {
-        // TODO: Implement collision detection
         Coord dist = new Coord(getX(), getY());
         dist.doSubtract(target.getPos());
-        double penetration = dist.getMagnitude() - (radius + target.getRadius()); // TODO: Replace this with entity size
+        double penetration = dist.getMagnitude() - (getRadius() + target.getRadius());
         if (penetration < 0.0) {
             // collision; resolve via projection (entities placed apart, no vector modification)
             Main.debugInfo += String.format("%ncollision");
@@ -105,6 +108,45 @@ abstract public class Creature extends Entity implements IMovable{
             // TODO: modify each entity's velocity vector, so they aren't moving towards each other
             return true;
         }
+        return false;
+    }
+
+    private boolean vrfyBounds(Tile tile) {
+        double tileHalf = 0.5; // this may have to change, if we start checking boundaries
+        double distX = Math.abs(tile.getX() - getX());
+        double distY = Math.abs(tile.getY() - getY());
+        if (distX > tileHalf + getRadius() || distY > tileHalf + getRadius()) return false;
+        if (distX <= tileHalf + getRadius() && distY <= tileHalf) {
+            double penetration = 0;
+            if (tile.getX() - getX() < 0) { // right side
+                penetration =  distX - (tileHalf + getRadius());
+            } else { // left side
+                penetration =  (tileHalf + getRadius()) - distX;
+            }
+            setX(getX() - penetration); // resolve
+            return true;
+        }
+        if (distX <= tileHalf && distY <= tileHalf + getRadius()) {
+            double penetration = 0;
+            if (tile.getY() - getY() < 0) { // bottom side
+                penetration =  distY - (tileHalf + getRadius());
+            } else { // top side
+                penetration =  (tileHalf + getRadius()) - distY;
+            }
+            setY(getY() - penetration); // resolve
+            return true;
+        }
+
+        /* We ignore corner collisions for now
+        double corner = Math.pow(distX - tileHalf, 2) + Math.pow(distY - tileHalf, 2);
+        if (corner <= Math.pow(getRadius(), 2)) {
+            Coord penetration = Coord.subtract(new Coord(tile.getX(), tile.getY()), getPos());
+            penetration.setMagnitude(0.6 + getRadius() - penetration.getMagnitude());
+            getPos().doSubtract(penetration);
+            return true;
+        }
+        */
+
         return false;
     }
 
@@ -121,6 +163,7 @@ abstract public class Creature extends Entity implements IMovable{
     /**
      * Since many operation require the creature to just move where it's looking, this method takes care of all vector
      * calc and just adds the needed acceleration in the proper direction
+     *
      * @param time seconds since last update
      */
     public void moveForward(double time) {
@@ -135,6 +178,7 @@ abstract public class Creature extends Entity implements IMovable{
     /**
      * Update the creature, depending on time elapsed since last update. Process behaviour, if entity has an AI
      * attached, look for collisions with other objects, move physically, cool down all used abilites, etc.
+     *
      * @param time Seconds since last update
      */
     public void update(double time) {
@@ -147,17 +191,23 @@ abstract public class Creature extends Entity implements IMovable{
         }
         // Process behaviour
         if (this instanceof Enemy) {
-            ((Enemy)this).processBehaviour(time);
+            ((Enemy) this).processBehaviour(time);
         }
 
         // Detect collisions
-        // TODO: this will check each pair twice, make a separate list and deplete it
-        // TODO: wall detection
+        // Creatures
         Main.game.getLevel().getEntities().stream()
                 .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't collide with corpses
+                .filter(entity -> Math.abs(entity.getX() - getX()) < Physics.activeRange / 2 && Math.abs(entity.getY() - getY()) < Physics.activeRange / 2)
                 .filter(entity -> entity instanceof Creature) // get just the creatures
                 .filter(entity -> !entity.equals(this)) // can't collide with self
-                .forEach(entity -> ((Creature)entity).hitscan(this)); // resolution currently included in detection, can be filtered further
+                .forEach(entity -> ((Creature) entity).hitscan(this)); // resolution currently included in detection, can be filtered further
+
+        // Walls
+        Main.game.getLevel().getGeometry().stream()
+                .filter(tile -> tile.getTileType() == TileType.WALL) //just the walls
+                .filter(tile -> Math.abs(tile.getX() - getX()) < Physics.activeRange && Math.abs(tile.getY() - getY()) < Physics.activeRange)
+                .forEach(tile -> vrfyBounds(tile));
 
         // If the object is moving, apply friction
         if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);
@@ -177,7 +227,8 @@ abstract public class Creature extends Entity implements IMovable{
 
     /**
      * Add an ability to the list
-     * @param name A name from the dedicated enumeration
+     *
+     * @param name    A name from the dedicated enumeration
      * @param ability An instance of the ability. Do not attach the same reference to two different creatures, since
      *                cooldown and effects are linked back to the creature
      */
@@ -215,12 +266,15 @@ abstract public class Creature extends Entity implements IMovable{
     public void takeDamage(double damage) {
         resolveDamage(damage, DamageType.GENERIC, null);
     }
+
     public void takeDamage(double damage, DamageType type) {
         resolveDamage(damage, type, null);
     }
+
     public void takeDamage(double damage, Coord source) {
         resolveDamage(damage, DamageType.GENERIC, source);
     }
+
     public void takeDamage(double damage, DamageType type, Coord source) {
         resolveDamage(damage, type, source);
     }
@@ -230,7 +284,7 @@ abstract public class Creature extends Entity implements IMovable{
         if ((type == DamageType.WEAPONMELEE || type == DamageType.WEAPONRANGED) && source != null) {
             // knockback
             double refsize = 0.25; // temp scalar
-            double knockback = 2 - 2 * (radius - 0.5 * refsize) / (1.5 * refsize);
+            double knockback = 2 - 2 * (getRadius() - 0.5 * refsize) / (1.5 * refsize);
             if (knockback > 2) knockback = 2;
             if (knockback > 0) { // don't do anything if entity is not affected
                 Coord kickvector = new Coord(knockback * 5, 0.0);
@@ -251,7 +305,7 @@ abstract public class Creature extends Entity implements IMovable{
             }
             getState().add(EntityState.DAMAGED);
 
-            healthPoints -= (int)damage;
+            healthPoints -= (int) damage;
 
             // todo add dying animation
             if (healthPoints <= 0) {
