@@ -51,7 +51,7 @@ public class DungeonMaker {
         return levelTiles;
     }
 
-    public void processTiles() {
+    public ArrayList<Tile> processTiles() {
         levelTiles = new ArrayList<>(); // initialize
 
         // temp matrix
@@ -102,5 +102,7 @@ public class DungeonMaker {
                 levelTiles.add(new Tile(i, j, levelMatrix[i][j] == 1 ? TileType.WALL : TileType.FLOOR));
             }
         }
+
+        return levelTiles;
     }
 }
