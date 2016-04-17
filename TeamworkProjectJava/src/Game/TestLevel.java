@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class TestLevel  extends Application {
     // TODO: place level gen and display code here; display is sensitive to grid size (recommended 4-8)
     static ArrayList<Dungeon> dungeonList;
-    private Map map;
+    private DungeonMaker map;
 
     public static void main(String[] args) {
         // Add functionality to display generated map, like a foreach. Use the output of the following method:
@@ -43,12 +43,8 @@ public class TestLevel  extends Application {
         QuickView.gridSize = 5;
         QuickView.drawGrid(gc);
 
-        File folder = new File(System.getProperty("user.dir"));
-        File pic = new File("wall.jpg");
-        System.out.println(pic.exists());
-
         // First pass
-        map = new Map();
+        map = new DungeonMaker();
         // Register event handler for key presses
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {

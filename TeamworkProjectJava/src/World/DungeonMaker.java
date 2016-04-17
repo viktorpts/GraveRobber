@@ -1,18 +1,10 @@
-/**
- * This class is deprecated and should be removed
- */
-
 package World;
 
 import Enumerations.TileType;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class Map {
+public class DungeonMaker {
 
     public static final int mazeWidth = 160;
     public static final int mazeHeight = 120;
@@ -20,7 +12,7 @@ public class Map {
     private ArrayList<Dungeon> maze;
     private ArrayList<Tile> levelTiles;
 
-    public Map() {
+    public DungeonMaker() {
         this.maze = new ArrayList<Dungeon>();
         dungeonGenerate();
         processTiles();
@@ -57,54 +49,6 @@ public class Map {
 
     public ArrayList<Tile> getLevelTiles() {
         return levelTiles;
-    }
-
-    /*
-    OBSOLETE
-     */
-    public void getTiles() {
-        levelTiles = new ArrayList<>();
-        for (Dungeon dungeon : this.maze) {
-            if (dungeon.getDungeon() != null) {
-                // Room
-                //x firstCol
-                int x = dungeon.getDungeon().getX();
-                //y firstRow
-                int y = dungeon.getDungeon().getY();
-                //width lastCol
-                int width = dungeon.getDungeon().getWidth();
-                //height lastRow
-                int height = dungeon.getDungeon().getHeight();
-
-
-                for (int row = y; row < y + height; row++) {
-                    for (int col = x; col < x + width; col++) {
-                        if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
-                            levelTiles.add(new Tile(col, row, TileType.WALL));
-                        } else {
-                            levelTiles.add(new Tile(col, row, TileType.FLOOR));
-                        }
-                    }
-                }
-            } else if (dungeon.getHallway() != null) {
-                // Hallway
-
-                int x = dungeon.getHallway().getX();
-                int y = dungeon.getHallway().getY();
-                int width = dungeon.getHallway().getWidth();
-                int height = dungeon.getHallway().getHeight();
-
-                for (int row = y; row < y + height; row++) {
-                    for (int col = x; col < x + width; col++) {
-                        if (row == y || row == y + height - 1 || col == x || col == x + width - 1) {
-                            levelTiles.add(new Tile(col, row, TileType.WALL));
-                        } else {
-                            levelTiles.add(new Tile(col, row, TileType.FLOOR));
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public void processTiles() {

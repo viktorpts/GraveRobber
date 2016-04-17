@@ -34,10 +34,10 @@ public class Tile {
 		this.y = y;
 		this.id = ++nextID;
 		this.tileType = tileType;
-		//this.img = setImageTile(tileType);
+		//this.img = setImageTile(tileType); // removed to prevent exception error on missing files
 	}
 
-
+    // TODO: fix paths
 	public Image setImageTile(TileType tileType){
 		Image img;
 		if (tileType == TileType.WALL){
@@ -50,7 +50,6 @@ public class Tile {
 
 
 	//Setters
-
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -65,7 +64,6 @@ public class Tile {
 
 
 	//Getters
-
 	public int getId() {
 		return id;
 	}
