@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ * Deprecated, remove from project
+ */
 public class GenerateDungeon {
 
     private static Random rnd = new Random();

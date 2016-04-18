@@ -21,10 +21,14 @@ import javafx.stage.Stage;
 import Renderer.QuickView;
 import javafx.stage.StageStyle;
 
+/**
+ * Program entry point. We rely on JavaFX to do all the heavy lifting, just define some parameters to keep everything
+ * synced and easily configurable.
+ */
 public class Main extends Application {
 
     // Application parameters
-    public static Game game; // sssContainer for all of the things
+    public static Game game; // Container for all of the things
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
     // Debug view
@@ -55,7 +59,6 @@ public class Main extends Application {
         // Initialize Game
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
-        //CreatureFactory.init(); //Initialise list of creatures
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
@@ -78,26 +81,17 @@ public class Main extends Application {
             if (!event.isSecondaryButtonDown()) game.getControlState().setMouseRight(false);
         });
 
-        final long startNanoTime = System.nanoTime();
-
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                double[] mousePos = game.getControlState().getMouse();
-                double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
-                double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
-                double dir = Math.atan2(offsetY, offsetX);
-                // Don't let the player look around if he's committed to an animation
-                if (game.getPlayer().isReady()) game.getPlayer().setDirection(dir);
-
                 // Update state
-                game.update(currentNanoTime);
+                game.passTime(currentNanoTime);
                 game.handleInput();
+                game.update();
+
                 // Output
-                gc.setFill(Color.BLACK);
-                gc.fillRect(0, 0, horizontalRes, verticalRes);
+                gc.clearRect(0, 0, horizontalRes, verticalRes); // clear the screen before drawing new frame
                 QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
                         game.getLevel().getPlayer().getY());
-                QuickView.drawGrid(gc);
                 game.render();
 
                 // Health bar
@@ -120,7 +114,9 @@ public class Main extends Application {
                     gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
                     gc.restore();
                 } else {
-                    QuickView.renderArrow(mousePos[0], mousePos[1], dir);
+                    QuickView.renderArrow(game.getControlState().getMouseX(),
+                            game.getControlState().getMouseY(),
+                            game.getPlayer().getDirection());
                 }
 
                 /**

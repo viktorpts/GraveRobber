@@ -10,7 +10,7 @@ import javafx.scene.shape.StrokeLineCap;
 import java.util.ArrayList;
 
 /**
- * For testing only
+ * For testing only. Here be dragons, proceed at own risk.
  */
 public class QuickView {
     // Grid size

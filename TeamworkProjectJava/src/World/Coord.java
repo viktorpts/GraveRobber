@@ -1,5 +1,9 @@
 package World;
 
+/**
+ * Definition of a standard vector in 2D Euclidean space. Includes a few static methods for vector calc. Also doubles as
+ * point location. Most methods are self explanatory or documented if otherwise.
+ */
 public class Coord {
     double x;
     double y;
@@ -69,11 +73,13 @@ public class Coord {
         y = magnitude * Math.sin(dir);
     }
 
+    // This will modify the vector!
     public void doSubtract(Coord vector) {
         x -= vector.getX();
         y -= vector.getY();
     }
 
+    // This will modify the vector!
     public void doAdd(Coord vector) {
         x += vector.getX();
         y += vector.getY();
@@ -85,7 +91,7 @@ public class Coord {
         return true;
     }
 
-    // Static methods for vector math
+    // Static methods for vector math; these don't modify the object (duh, they're static)
     public static Coord add(Coord vector1, Coord vector2) {
         double x = vector1.getX() + vector2.getX();
         double y = vector1.getY() + vector2.getY();

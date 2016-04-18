@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Contains the level geometry (grid), a tileset and a list of entity instances. One per game!
+ * Contains the level geometry (grid), a tileset and a list of entity instances. One per game! Methods are self-
+ * explanatory or documented if otherwise.
  */
 public class Level {
 

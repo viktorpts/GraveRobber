@@ -9,6 +9,11 @@ import World.Physics;
 
 import java.util.HashMap;
 
+/**
+ * Dedicated class to differentiate the Player character from his inanimate parent class and his sibling Enemy
+ * creatures. Doesn't actually do much, since we don't have an inventory yet, but at least is very useful for filtering
+ * Entity streams. Note Player framerate is considerably higher than everything else, to make controls feel responsive.
+ */
 public class Player extends Creature {
     private Inventory inventory;
 

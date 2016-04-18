@@ -4,6 +4,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+/**
+ * Deprecated, remove from project
+ */
 public class ImageLoader {
 
 	public static BufferedImage loadImage(String path) {

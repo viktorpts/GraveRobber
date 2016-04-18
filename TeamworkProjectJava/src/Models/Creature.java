@@ -13,13 +13,17 @@ import World.Tile;
 import java.util.EnumSet;
 import java.util.HashMap;
 
+/**
+ * Parent class for everything that is affected by physics (movement, collisions). Maybe not the most apt name, since
+ * inanimate boxes and barriers also fit here
+ */
 abstract public class Creature extends Entity implements IMovable {
     // Stats
     private int healthPoints;
     private int attackPower;
     private int armorValue;
     HashMap<Abilities, Ability> abilities;
-    double immuneTime = 0; // time ot next damage instance
+    double immuneTime = 0; // time to next damage instance
 
     // Physical characteristics
     private double maxSpeed;
@@ -78,6 +82,9 @@ abstract public class Creature extends Entity implements IMovable {
         }
     }
 
+    /**
+     * Unconditional teleport to target location, disregarding physics and timing!
+     */
     @Override
     public void stop() {
         velocity = new Coord(0, 0);
@@ -93,6 +100,13 @@ abstract public class Creature extends Entity implements IMovable {
         super.setPos(newX, newY);
     }
 
+    /**
+     * Check and resolve collision with other entities. Resolution method used is Projection (we calculate penetration
+     * depth and move each entity half that distance away from each other, instantly).
+     * @param target Entity to check against. Both entities will be moved!
+     * @return False if no intersection, true if detected (and resolved)
+     */
+    // TODO second parameter to tell whether to resolve, so we can use this to check for item pickups without bumping them around
     @Override
     public boolean hitscan(Entity target) {
         Coord dist = new Coord(getX(), getY());
@@ -111,8 +125,14 @@ abstract public class Creature extends Entity implements IMovable {
         return false;
     }
 
+    /**
+     * Check and resolve collisions with level geometry. Resolution method used is Projection (we calculate penetration
+     * depth and move entity that distance away from intersecting boundary, instantly).
+     * @param tile Level Tile to check against
+     * @return False if no intersection, true if detected (and resolved)
+     */
     private boolean vrfyBounds(Tile tile) {
-        double tileHalf = 0.5; // this may have to change, if we start checking boundaries
+        double tileHalf = 0.5; // this may have to change, if we start checking irregular boundaries
         double distX = Math.abs(tile.getX() - getX());
         double distY = Math.abs(tile.getY() - getY());
         if (distX > tileHalf + getRadius() || distY > tileHalf + getRadius()) return false;
@@ -137,15 +157,15 @@ abstract public class Creature extends Entity implements IMovable {
             return true;
         }
 
-        /* We ignore corner collisions for now
         double corner = Math.pow(distX - tileHalf, 2) + Math.pow(distY - tileHalf, 2);
         if (corner <= Math.pow(getRadius(), 2)) {
+            /* We ignore corner collisions for now, only report detection
             Coord penetration = Coord.subtract(new Coord(tile.getX(), tile.getY()), getPos());
             penetration.setMagnitude(0.6 + getRadius() - penetration.getMagnitude());
             getPos().doSubtract(penetration);
+            */
             return true;
         }
-        */
 
         return false;
     }
@@ -161,7 +181,7 @@ abstract public class Creature extends Entity implements IMovable {
     }
 
     /**
-     * Since many operation require the creature to just move where it's looking, this method takes care of all vector
+     * Since many operations require the creature to just move where it's looking, this method takes care of all vector
      * calc and just adds the needed acceleration in the proper direction
      *
      * @param time seconds since last update
@@ -209,18 +229,18 @@ abstract public class Creature extends Entity implements IMovable {
                 .filter(tile -> Math.abs(tile.getX() - getX()) < Physics.activeRange && Math.abs(tile.getY() - getY()) < Physics.activeRange)
                 .forEach(tile -> vrfyBounds(tile));
 
-        // If the object is moving, apply friction
+        // If the object is moving, update vector with friction and project new position, based on time and velocity
         if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);
         double newX = super.getX() + velocity.getX() * time;
         double newY = super.getY() + velocity.getY() * time;
         super.setX(newX);
         super.setY(newY);
 
-        // Update used abilities (they cool themselves down)
+        // Update used abilities (they cool themselves down, if needed)
         abilities.entrySet().stream()
-                .filter(entry -> !entry.getValue().isReady()) // Filter used abilities
+                .filter(entry -> !entry.getValue().isReady()) // Abilities that are ready don't do anything
                 .forEach(entry -> entry.getValue().update(time));
-        resetState(); // make sure we have something
+        resetState(); // make sure we have something here
     }
 
     // Abilities
@@ -236,6 +256,12 @@ abstract public class Creature extends Entity implements IMovable {
         abilities.put(name, ability);
     }
 
+    /**
+     * Attempt to use ability. This will make sure we're ready and the ability is present and ready (not in use, not
+     * cooling down) and will also cancel everything else the Creature is doing. If we want to force-trigger an ability,
+     * we can bypass these checks for hilarious results.
+     * @param ability Name of ability to be activated
+     */
     public void useAbility(Abilities ability) {
         if (!isReady()) return;
         if (abilities.containsKey(ability)) {
@@ -245,7 +271,7 @@ abstract public class Creature extends Entity implements IMovable {
         }
     }
 
-    // Put all abilities that are processing into cooldown
+    // Cancel all abilities that are processing and put them in cooldown
     public void stopAbilities() {
         abilities.entrySet().stream()
                 .filter(entry -> entry.getValue().getState() == AbilityState.INIT ||
@@ -257,12 +283,16 @@ abstract public class Creature extends Entity implements IMovable {
         getAnimation().setState(AnimationState.IDLE);
     }
 
+    // Stun the creature
     public void stagger() {
         stopAbilities();
         cancelAnimation();
         setState(EnumSet.of(EntityState.STAGGERED));
     }
 
+    /**
+     * Process damage from different sources and forward to resolver
+     */
     public void takeDamage(double damage) {
         resolveDamage(damage, DamageType.GENERIC, null);
     }
@@ -279,20 +309,26 @@ abstract public class Creature extends Entity implements IMovable {
         resolveDamage(damage, type, source);
     }
 
+    /**
+     * Process incoming damage
+     * @param damage Amount of damage received
+     * @param type Type of source (weapon, world, spell, etc.)
+     * @param source Location of damage source
+     */
     public void resolveDamage(double damage, DamageType type, Coord source) {
         // TODO: armor calculation
+        // Knockback effect, if hit with a weapon from a known source (so we knock back away from source)
         if ((type == DamageType.WEAPONMELEE || type == DamageType.WEAPONRANGED) && source != null) {
-            // knockback
             double refsize = 0.25; // temp scalar
             double knockback = 2 - 2 * (getRadius() - 0.5 * refsize) / (1.5 * refsize);
-            if (knockback > 2) knockback = 2;
-            if (knockback > 0) { // don't do anything if entity is not affected
+            if (knockback > 2) knockback = 2; // Limit to prevent small enemies from flying across the map
+            if (knockback > 0) { // Apply knockback
                 Coord kickvector = new Coord(knockback * 5, 0.0);
                 kickvector.setDirection(Coord.angleBetween(source, getPos()));
                 stop();
                 accelerate(kickvector, 1.0);
                 // TODO: disable movement for a short period
-            }
+            } // don't do anything if entity is not affected
         }
         // TODO: stagger enemies if damaged more than 30% in 2 seconds
         if (damage > 0) { // prevent negative damage from healing
@@ -303,7 +339,7 @@ abstract public class Creature extends Entity implements IMovable {
             } else {
                 immuneTime = 0.1; // Enemies have a much shorter invinciframe
             }
-            getState().add(EntityState.DAMAGED);
+            getState().add(EntityState.DAMAGED); // prevent instances from resolving more than once
 
             healthPoints -= (int) damage;
 

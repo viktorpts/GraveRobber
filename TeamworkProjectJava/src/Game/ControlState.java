@@ -4,6 +4,10 @@ import javafx.scene.input.KeyCode;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This object keeps track of pressed keys and mouse buttons, as well as the position of the cursor, in screen
+ * coordinates.
+ */
 public class ControlState {
     private double mouseX;
     private double mouseY;
