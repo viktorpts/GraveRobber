@@ -60,23 +60,23 @@ public class Main extends Application {
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
-            game.getControlState().addKey(ke.getCode());
+            game.getPlayer().addKey(ke.getCode());
         });
         scene.setOnKeyReleased(ke -> {
-            game.getControlState().removeKey(ke.getCode());
+            game.getPlayer().removeKey(ke.getCode());
         });
 
         // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> {
-            game.getControlState().update(event.getX(), event.getY());
+            game.getPlayer().updateMouse(event.getX(), event.getY());
         });
         scene.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(true);
-            if (event.isSecondaryButtonDown()) game.getControlState().setMouseRight(true);
+            if (event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(true);
+            if (event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(true);
         });
         scene.setOnMouseReleased(event -> {
-            if (!event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(false);
-            if (!event.isSecondaryButtonDown()) game.getControlState().setMouseRight(false);
+            if (!event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(false);
+            if (!event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(false);
         });
 
         new AnimationTimer() {
@@ -121,8 +121,8 @@ public class Main extends Application {
                     gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
                     gc.restore();
                 } else {
-                    QuickView.renderArrow(game.getControlState().getMouseX(),
-                            game.getControlState().getMouseY(),
+                    QuickView.renderArrow(game.getPlayer().getMouseX(),
+                            game.getPlayer().getMouseY(),
                             game.getPlayer().getDirection());
                 }
 

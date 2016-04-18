@@ -9,16 +9,13 @@ import java.util.Set;
  * coordinates.
  */
 public class ControlState {
-    private double mouseX;
-    private double mouseY;
+
     private boolean mouseLeft;
     private boolean mouseRight;
 
     private Set<KeyCode> keyState;
 
     public ControlState() {
-        mouseX = 0.0;
-        mouseY = 0.0;
         mouseLeft = false;
         mouseRight = false;
 
@@ -56,22 +53,6 @@ public class ControlState {
     public boolean pressed(KeyCode kc) {
         if (keyState.contains(kc)) return true;
         return false;
-    }
-
-    public double getMouseX() {
-        return mouseX;
-    }
-    public double getMouseY() {
-        return mouseY;
-    }
-    public double[] getMouse() {
-        double[] result = { mouseX, mouseY };
-        return result;
-    }
-
-    public void update(double x, double y) {
-        mouseX = x;
-        mouseY = y;
     }
 
 }

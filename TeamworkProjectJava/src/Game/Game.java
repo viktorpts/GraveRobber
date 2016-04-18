@@ -30,17 +30,17 @@ import java.util.EnumSet;
 public class Game {
     private GraphicsContext gc;
     private Level level;
-    private ControlState controlState;
-    private long timeLast;      // System time in nanoseconds when last update occured
+    private ControlState controlState; // This should be a reference to the corresponding field from Player
+    private long timeLast;      // System time in nanoseconds when last update occurred
     private double elapsed;     // Time elapsed since last update in seconds
 
     public Game(GraphicsContext gc, long timeStart) {
         this.gc = gc;
-        controlState = new ControlState();
         timeLast = timeStart;
         elapsed = 0;
 
         makeLevel();
+        controlState = level.getPlayer().getControlState();
     }
 
     /**
@@ -144,55 +144,9 @@ public class Game {
      * Control handler. We call this every frame to see what the user is doing and command the player character
      * accordingly.
      */
-    // TODO: best to move this to the player class and leave minimal processing here
     public void handleInput() {
-        // Player states need to go somewhere else, but are here for now
-        // Don't let the player move if he's stunned
-        if (getPlayer().hasState(EntityState.STAGGERED)) return;
-
-        // Face mouse cursor
-        double offsetX = QuickView.toWorldX(Main.game.getControlState().getMouseX()) - getPlayer().getX();
-        double offsetY = QuickView.toWorldY(Main.game.getControlState().getMouseY()) - getPlayer().getY();
-        double dir = Math.atan2(offsetY, offsetX);
-        // Don't let the player look around if he's committed to an animation
-        if (getPlayer().isReady()) getPlayer().setDirection(dir);
-
-        // User can't control the character if it's velocity is greater than Physics.maxMoveSpeed
-        // This has the positive side effect of disabling player controls during knockback
-        if (getPlayer().getVelocity().getMagnitude() > Physics.maxMoveSpeed) return;
-
-        // Mouse
-        if (controlState.isMouseLeft()) {
-            // Attack
-            // TODO: attack chaining (if Attack ability is in the correct state, add the next ability to the queue)
-            getPlayer().useAbility(Abilities.ATTACKPRIMARY);
-        }
-        // TODO: add some sort of order queue, so the attack combo and animation cancelling window is more generous
-
-        // Keyboard
-        double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
-        if (controlState.pressed(KeyCode.SPACE)) {
-            // Dash
-            getPlayer().useAbility(Abilities.DASH);
-        }
-        // if player is busy, don't let him move
-        if (getPlayer().hasState(EntityState.CASTUP) ||
-                getPlayer().hasState(EntityState.CASTING) ||
-                getPlayer().hasState(EntityState.CASTDOWN)) return;
-        if (controlState.pressed(KeyCode.W) && !controlState.pressed(KeyCode.S)) { // go up
-            getPlayer().accelerate(new Coord(0.0, -modifier), elapsed);
-            getPlayer().setState(EnumSet.of(EntityState.MOVING));
-        } else if (controlState.pressed(KeyCode.S) && !controlState.pressed(KeyCode.W)) { // go down
-            getPlayer().accelerate(new Coord(0.0, modifier), elapsed);
-            getPlayer().setState(EnumSet.of(EntityState.MOVING));
-        }
-        if (controlState.pressed(KeyCode.A) && !controlState.pressed(KeyCode.D)) { // go left
-            getPlayer().accelerate(new Coord(-modifier, 0.0), elapsed);
-            getPlayer().setState(EnumSet.of(EntityState.MOVING));
-        } else if (controlState.pressed(KeyCode.D) && !controlState.pressed(KeyCode.A)) { // go right
-            getPlayer().accelerate(new Coord(modifier, 0.0), elapsed);
-            getPlayer().setState(EnumSet.of(EntityState.MOVING));
-        }
+        // Forward call to Player
+        getPlayer().handleInput(elapsed);
     }
 
 }
