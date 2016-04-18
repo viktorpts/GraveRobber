@@ -1,10 +1,7 @@
 package Game;
 
 import Enumerations.Abilities;
-import Enumerations.EnemyTypes;
 import Enumerations.EntityState;
-import Factories.CreatureFactory;
-import Models.Enemy;
 import Renderer.DebugView;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -71,7 +68,7 @@ public class Main extends Application {
 
         // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> {
-            game.getControlState().update(event.getX(), event.getY());
+            game.getControlState().updateMouse(event.getX(), event.getY());
         });
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(true);
