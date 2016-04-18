@@ -127,7 +127,7 @@ abstract public class Entity {
     }
 
     public void changeAnimation(String newSequence) {
-        if (newSequence == "Primary Attack") {
+        if (newSequence.equals("Primary Attack")) {
             animation.setState(AnimationState.ATTACKUP);
         }
         // TODO: list of animation sequences can be a map of names or abilities and corresponding frames

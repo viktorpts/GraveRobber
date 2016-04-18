@@ -151,9 +151,8 @@ public class Game {
         if (getPlayer().hasState(EntityState.STAGGERED)) return;
 
         // Face mouse cursor
-        double[] mousePos = Main.game.getControlState().getMouse();
-        double offsetX = QuickView.toWorldX(mousePos[0]) - getPlayer().getX();
-        double offsetY = QuickView.toWorldY(mousePos[1]) - getPlayer().getY();
+        double offsetX = QuickView.toWorldX(Main.game.getControlState().getMouseX()) - getPlayer().getX();
+        double offsetY = QuickView.toWorldY(Main.game.getControlState().getMouseY()) - getPlayer().getY();
         double dir = Math.atan2(offsetY, offsetX);
         // Don't let the player look around if he's committed to an animation
         if (getPlayer().isReady()) getPlayer().setDirection(dir);
@@ -172,9 +171,9 @@ public class Game {
 
         // Keyboard
         double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
-        // Sloppy dodge roll; this is dependent on framerate, find a better implementation!
         if (controlState.pressed(KeyCode.SPACE)) {
-            modifier *= 10;
+            // Dash
+            getPlayer().useAbility(Abilities.DASH);
         }
         // if player is busy, don't let him move
         if (getPlayer().hasState(EntityState.CASTUP) ||

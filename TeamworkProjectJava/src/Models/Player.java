@@ -2,6 +2,7 @@ package Models;
 
 import Enumerations.Abilities;
 import Abilities.Ability;
+import Abilities.Dash;
 import Abilities.MeleeAttack;
 import Renderer.Animation;
 import World.Coord;
@@ -28,6 +29,7 @@ public class Player extends Creature {
                 new HashMap<Abilities, Ability>(),
                 0.25, Physics.maxMoveSpeed, Physics.maxAcceleration);
         addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, startAttackPower, 1.0));
+        addAbility(Abilities.DASH, new Dash(this, 5, 12));
     }
 
     // TODO: Inventory management

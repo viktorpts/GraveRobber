@@ -17,6 +17,11 @@ abstract public class Ability implements IAbility {
     AbilityState state; // state
     protected final Creature owner; // reference to creature
 
+    /**
+     * Bare bones constructor
+     * @param owner Reference to Creature
+     * @param cooldown Time between uses, in seconds
+     */
     public Ability (Creature owner, double cooldown) {
         this.owner = owner; // passed by reference, we don't want a copy
         this.cooldown = cooldown;
@@ -76,6 +81,10 @@ abstract public class Ability implements IAbility {
     public void reset() {
         remaining = 0;
         state = AbilityState.READY;
+    }
+
+    public double getCooldown() {
+        return cooldown - remaining;
     }
 
     /**

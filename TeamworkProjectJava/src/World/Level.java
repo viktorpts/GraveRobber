@@ -35,7 +35,7 @@ public class Level {
     public Level(Player player) {
         entities = new ArrayList<>();
         generateGeometry();
-        spawnEnemies();
+        //spawnEnemies();
         this.player = player;
         setStart();
         entities.add(this.player);

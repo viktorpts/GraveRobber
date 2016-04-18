@@ -72,6 +72,12 @@ abstract public class Creature extends Entity implements IMovable {
         this.armorValue = value;
     }
 
+    public double getCooldown(Abilities ability) {
+        if (abilities.containsKey(ability))
+            return abilities.get(ability).getCooldown();
+        else return 0.0;
+    }
+
     // Implementation of IMovable, everything to do with motion
     @Override
     public void accelerate(Coord vector, double time) {
@@ -103,6 +109,7 @@ abstract public class Creature extends Entity implements IMovable {
     /**
      * Check and resolve collision with other entities. Resolution method used is Projection (we calculate penetration
      * depth and move each entity half that distance away from each other, instantly).
+     *
      * @param target Entity to check against. Both entities will be moved!
      * @return False if no intersection, true if detected (and resolved)
      */
@@ -128,6 +135,7 @@ abstract public class Creature extends Entity implements IMovable {
     /**
      * Check and resolve collisions with level geometry. Resolution method used is Projection (we calculate penetration
      * depth and move entity that distance away from intersecting boundary, instantly).
+     *
      * @param tile Level Tile to check against
      * @return False if no intersection, true if detected (and resolved)
      */
@@ -139,9 +147,9 @@ abstract public class Creature extends Entity implements IMovable {
         if (distX <= tileHalf + getRadius() && distY <= tileHalf) {
             double penetration = 0;
             if (tile.getX() - getX() < 0) { // right side
-                penetration =  distX - (tileHalf + getRadius());
+                penetration = distX - (tileHalf + getRadius());
             } else { // left side
-                penetration =  (tileHalf + getRadius()) - distX;
+                penetration = (tileHalf + getRadius()) - distX;
             }
             setX(getX() - penetration); // resolve
             return true;
@@ -149,9 +157,9 @@ abstract public class Creature extends Entity implements IMovable {
         if (distX <= tileHalf && distY <= tileHalf + getRadius()) {
             double penetration = 0;
             if (tile.getY() - getY() < 0) { // bottom side
-                penetration =  distY - (tileHalf + getRadius());
+                penetration = distY - (tileHalf + getRadius());
             } else { // top side
-                penetration =  (tileHalf + getRadius()) - distY;
+                penetration = (tileHalf + getRadius()) - distY;
             }
             setY(getY() - penetration); // resolve
             return true;
@@ -260,6 +268,7 @@ abstract public class Creature extends Entity implements IMovable {
      * Attempt to use ability. This will make sure we're ready and the ability is present and ready (not in use, not
      * cooling down) and will also cancel everything else the Creature is doing. If we want to force-trigger an ability,
      * we can bypass these checks for hilarious results.
+     *
      * @param ability Name of ability to be activated
      */
     public void useAbility(Abilities ability) {
@@ -267,6 +276,9 @@ abstract public class Creature extends Entity implements IMovable {
         if (abilities.containsKey(ability)) {
             if (!abilities.get(ability).isReady()) return;
             stopAbilities(); // cancel all ongoing abilities
+            cancelAnimation();
+            getState().remove(EntityState.CASTDOWN);
+            resetState();
             abilities.get(ability).use();
         }
     }
@@ -311,8 +323,9 @@ abstract public class Creature extends Entity implements IMovable {
 
     /**
      * Process incoming damage
+     *
      * @param damage Amount of damage received
-     * @param type Type of source (weapon, world, spell, etc.)
+     * @param type   Type of source (weapon, world, spell, etc.)
      * @param source Location of damage source
      */
     public void resolveDamage(double damage, DamageType type, Coord source) {

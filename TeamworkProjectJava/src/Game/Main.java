@@ -1,5 +1,6 @@
 package Game;
 
+import Enumerations.Abilities;
 import Enumerations.EnemyTypes;
 import Enumerations.EntityState;
 import Factories.CreatureFactory;
@@ -101,6 +102,15 @@ public class Main extends Application {
                 gc.setLineWidth(2);
                 gc.strokeRect(10, 10, 220, 20);
                 gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
+                gc.restore();
+
+                // Dash cooldown indicator
+                gc.save();
+                gc.setFill(Color.LIGHTBLUE);
+                gc.setStroke(Color.LIGHTBLUE);
+                gc.setLineWidth(2);
+                gc.strokeRect(10, 35, 220, 10);
+                gc.fillRect(12, 37, 216 * game.getPlayer().getCooldown(Abilities.DASH) / 5, 6);
                 gc.restore();
 
                 if (game.getPlayer().hasState(EntityState.DEAD)) {

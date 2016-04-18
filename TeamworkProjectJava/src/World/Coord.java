@@ -52,7 +52,9 @@ public class Coord {
         return Math.sqrt(x * x + y * y);
     }
     public void setMagnitude(double magnitude) {
-        double scalar = magnitude / getMagnitude();
+        double current = getMagnitude();
+        if (current == 0) return;
+        double scalar = magnitude / current;
         x *= scalar;
         y *= scalar;
     }
