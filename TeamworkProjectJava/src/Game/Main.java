@@ -68,7 +68,7 @@ public class Main extends Application {
 
         // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> {
-            game.getControlState().updateMouse(event.getX(), event.getY());
+            game.getControlState().update(event.getX(), event.getY());
         });
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(true);
