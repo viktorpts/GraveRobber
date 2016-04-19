@@ -2,6 +2,9 @@ package Game;
 
 import Enumerations.Abilities;
 import Enumerations.EntityState;
+import Enumerations.GameState;
+import Factories.CreatureFactory;
+import Models.Enemy;
 import Abilities.Defend;
 import Renderer.DebugView;
 import World.Coord;
@@ -60,6 +63,9 @@ public class Main extends Application {
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
 
+        //Load cursor image
+        QuickView.loadMouseImage();
+
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
             game.getPlayer().addKey(ke.getCode());
@@ -86,16 +92,18 @@ public class Main extends Application {
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                // Update state
-                game.passTime(currentNanoTime);
-                game.handleInput();
-                game.update();
+                if (game.getGameState() != GameState.MENU) {
+                    // Update state
+                    game.passTime(currentNanoTime);
+                    game.handleInput();
+                    game.update();
 
-                // Output
-                gc.clearRect(0, 0, horizontalRes, verticalRes); // clear the screen before drawing new frame
-                QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
-                        game.getLevel().getPlayer().getY());
-                game.render();
+                    // Output
+                    gc.clearRect(0, 0, horizontalRes, verticalRes); // clear the screen before drawing new frame
+                    QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
+                            game.getLevel().getPlayer().getY());
+                    game.render();
+                }
 
                 // Health bar
                 gc.save();
@@ -130,7 +138,13 @@ public class Main extends Application {
                             game.getPlayer().getMouseY(),
                             game.getPlayer().getDirection());
                 }
-
+                else{
+                    //Visualise start menu
+                    QuickView.renderMenuBackground();
+                    QuickView.renderStartButton(100, 100);
+                    QuickView.renderExitButton(100, 200);
+                    QuickView.renderMenuCursor(game.getControlState().getMouseX(),game.getControlState().getMouseY());
+                }
                 /**
                  * Debug info
                  */
