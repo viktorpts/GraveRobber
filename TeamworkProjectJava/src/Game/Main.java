@@ -129,23 +129,6 @@ public class Main extends Application {
                     QuickView.renderArrow(game.getPlayer().getMouseX(),
                             game.getPlayer().getMouseY(),
                             game.getPlayer().getDirection());
-                    gc.setStroke(Color.BLACK);
-                    gc.setFill(Color.WHITE);
-                    double dDir = game.getPlayer().getDirection();
-                    double dAngle = Coord.angleBetween(game.getPlayer().getPos(), game.getLevel().getEntities().get(0).getPos());
-                    double dOffset = dDir - dAngle;
-                    double dInner = Coord.innerAngle(game.getPlayer().getPos(), game.getLevel().getEntities().get(0).getPos(), dDir);
-                    String dirInfo = String.format("Dir: %.2f%nAngle: %.2f%nOffset: %.2f%nInner: %.2f",
-                            dDir,
-                            dAngle,
-                            dOffset,
-                            dInner);
-                    gc.strokeText(dirInfo,
-                            game.getPlayer().getMouseX() + 10,
-                            game.getPlayer().getMouseY());
-                    gc.fillText(dirInfo,
-                            game.getPlayer().getMouseX() + 10,
-                            game.getPlayer().getMouseY());
                 }
 
                 /**

@@ -380,7 +380,7 @@ abstract public class Creature extends Entity implements IMovable {
                 Defend shield = (Defend) abilities.get(Abilities.DEFEND);
                 // redirect damage to shield
                 if (shield.isActive() && shield.getHealth() > 0 &&
-                        Math.abs(getDirection() - Coord.angleBetween(this.getPos(), source)) < Math.PI / 4) {
+                        Coord.innerAngle(getPos(), source, getDirection()) < Math.PI / 4) {
                     damage = shield.takeDamage(damage);
                     if (damage > 0) stagger();
                 } else {

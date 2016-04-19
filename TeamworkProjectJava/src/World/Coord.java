@@ -121,6 +121,8 @@ public class Coord {
         if (angle < 0) angle += 2 * Math.PI;
         double angle2 = angleBetween(vector1, vector2);
         if (angle2 < 0) angle2 += 2 * Math.PI;
-        return angle;
+        double inner = Math.abs(angle - angle2);
+        if (inner > Math.PI) inner -= 2 * Math.PI;
+        return Math.abs(inner);
     }
 }

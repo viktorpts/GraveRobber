@@ -95,7 +95,7 @@ public class ChargeAttack extends Ability {
                                     return false; // don't hit dead creatures
                                 if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
                                     return false; // only damage those in range
-                                if (Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) > Math.PI / 6)
+                                if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 6)
                                     return false; // only damage those within sweep angle
                                 return true; // if everything's been fine, process target
                             })
