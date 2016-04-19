@@ -5,6 +5,7 @@ public enum AnimationState {
     MOVING,
     ATTACKUP,
     ATTACKING,
-    ATTACKDOWN
+    ATTACKDOWN,
+    DEFEND
     // TODO: add other animations as they come up
 }

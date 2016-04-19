@@ -298,6 +298,14 @@ abstract public class Creature extends Entity implements IMovable {
         return false;
     }
 
+    public void unUseAbility(Abilities ability) {
+        if (abilities.containsKey(ability)) {
+            cancelAnimation();
+            resetState();
+            abilities.get(ability).unUse();
+        }
+    }
+
     // Cancel all abilities that are processing and put them in cooldown
     public void stopAbilities() {
         abilities.entrySet().stream()

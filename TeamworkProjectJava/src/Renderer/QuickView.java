@@ -381,6 +381,18 @@ public class QuickView {
         gc.restore();
     }
 
+    public static void renderShield(double x, double y, double direction) {
+        GraphicsContext gc = Main.game.getGc();
+
+        gc.save();
+        gc.setStroke(Color.BROWN);
+        gc.setLineWidth(4);
+        double[] p1 = rotateXY(0.4, 0.3, direction);
+        double[] p2 = rotateXY(0.4, -0.3, direction);
+        gc.strokeLine(toCanvasX(x + p1[0]), toCanvasY(y + p1[1]), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
+        gc.restore();
+    }
+
     // Coordinate transforms
     static public double[] toCanvas(double x, double y) {
         double[] result = {x * gridSize, y * gridSize};

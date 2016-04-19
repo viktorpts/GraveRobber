@@ -19,7 +19,11 @@ public class DebugView {
     }
 
     public static void showControlInfo() {
-        String controlData = String.format("Mouse [%s|%s]%n", Main.game.getControlState().isMouseLeft() ? "#" : "_", Main.game.getControlState().isMouseRight() ? "#" : "_");
+        String controlData = String.format("Mouse [%s|%s] %.0f, %.0f%n",
+                Main.game.getControlState().isMouseLeft() ? "#" : "_",
+                Main.game.getControlState().isMouseRight() ? "#" : "_",
+                Main.game.getPlayer().getMouseX(),
+                Main.game.getPlayer().getMouseY());
         controlData += String.format("Keyboard: ");
         for (KeyCode key : Main.game.getControlState().getCombo()) {
             controlData += String.format("%s ", key.toString());

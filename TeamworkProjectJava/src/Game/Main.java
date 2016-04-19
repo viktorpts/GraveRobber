@@ -70,6 +70,9 @@ public class Main extends Application {
         scene.setOnMouseMoved(event -> {
             game.getPlayer().updateMouse(event.getX(), event.getY());
         });
+        scene.setOnMouseDragged(event -> {
+            game.getPlayer().updateMouse(event.getX(), event.getY());
+        });
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(true);
             if (event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(true);

@@ -24,6 +24,7 @@ public class CharView {
         if (sender instanceof Player) {
             selector = 1;
             if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);
+            if (state == AnimationState.DEFEND) QuickView.renderShield(x, y, direction);
         }
         if (state == AnimationState.ATTACKUP) {
             QuickView.renderSword(x, y, direction, progress);

@@ -5,5 +5,6 @@ public enum AbilityState {
     INIT, // wind up
     RESOLVE, // resolution of effect
     RECOVER, // wind down, can be cancelled or chained
-    COOLING // in cool down
+    COOLING, // in cool down
+    ACTIVE // for abilities that are toggled on/off
 }

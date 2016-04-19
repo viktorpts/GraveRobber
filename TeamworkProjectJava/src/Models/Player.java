@@ -4,6 +4,7 @@ import Enumerations.Abilities;
 import Abilities.Ability;
 import Abilities.Dash;
 import Abilities.MeleeAttack;
+import Abilities.Defend;
 import Enumerations.EntityState;
 import Enumerations.UserOrders;
 import Game.ControlState;
@@ -13,7 +14,6 @@ import World.Coord;
 import World.Physics;
 import javafx.scene.input.KeyCode;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 
 /**
@@ -46,6 +46,7 @@ public class Player extends Creature {
                 0.25, Physics.maxMoveSpeed, Physics.maxAcceleration);
         addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, startAttackPower, 1.0));
         addAbility(Abilities.DASH, new Dash(this, 5, 12));
+        addAbility(Abilities.DEFEND, new Defend(this, 50));
 
         currentInput = new ControlState();
         movementOrder = UserOrders.EMPTY;
@@ -116,6 +117,13 @@ public class Player extends Creature {
             timeSinceLastCast = 0;
             abilityOrder = UserOrders.ATTACK;
         }
+        if (currentInput.isMouseRight()) { // Defend
+            timeSinceLastCast = 0;
+            abilityOrder = UserOrders.DEFEND;
+        } else {
+            if (abilities.get(Abilities.DEFEND).isActive())
+                unUseAbility(Abilities.DEFEND);
+        }
 
         // Keyboard
         if (currentInput.pressed(KeyCode.SPACE)) { // Dash
@@ -130,10 +138,14 @@ public class Player extends Creature {
         if (currentInput.pressed(KeyCode.A)) movementOrder = UserOrders.MOVE_WEST; // go left
         if (currentInput.pressed(KeyCode.D)) movementOrder = UserOrders.MOVE_EAST; // go right
 
-        if (currentInput.pressed(KeyCode.W) && currentInput.pressed(KeyCode.A)) movementOrder = UserOrders.MOVE_NORTHWEST;
-        if (currentInput.pressed(KeyCode.W) && currentInput.pressed(KeyCode.D)) movementOrder = UserOrders.MOVE_NORTHEAST;
-        if (currentInput.pressed(KeyCode.S) && currentInput.pressed(KeyCode.A)) movementOrder = UserOrders.MOVE_SOUTHWEST;
-        if (currentInput.pressed(KeyCode.S) && currentInput.pressed(KeyCode.D)) movementOrder = UserOrders.MOVE_SOUTHEAST;
+        if (currentInput.pressed(KeyCode.W) && currentInput.pressed(KeyCode.A))
+            movementOrder = UserOrders.MOVE_NORTHWEST;
+        if (currentInput.pressed(KeyCode.W) && currentInput.pressed(KeyCode.D))
+            movementOrder = UserOrders.MOVE_NORTHEAST;
+        if (currentInput.pressed(KeyCode.S) && currentInput.pressed(KeyCode.A))
+            movementOrder = UserOrders.MOVE_SOUTHWEST;
+        if (currentInput.pressed(KeyCode.S) && currentInput.pressed(KeyCode.D))
+            movementOrder = UserOrders.MOVE_SOUTHEAST;
         if (movementOrder != UserOrders.EMPTY && !previous) timeSinceLastMove = 0; // If a key was pressed, reset time
 
         processOrders(elapsed); // Carry out
@@ -166,9 +178,6 @@ public class Player extends Creature {
         if (!canMove()) return false;
         double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
         switch (movementOrder) {
-            case EMPTY:
-                getState().remove(EntityState.MOVING);
-                break;
             case MOVE_EAST:
                 accelerate(new Coord(modifier, 0.0), elapsed);
                 break;
@@ -194,6 +203,8 @@ public class Player extends Creature {
                 accelerate(new Coord(0.71 * modifier, 0.71 * modifier), elapsed);
                 break;
         }
+        if (movementOrder == UserOrders.EMPTY) getState().remove(EntityState.MOVING);
+        else getState().add(EntityState.MOVING);
         return true;
     }
 
@@ -207,6 +218,8 @@ public class Player extends Creature {
                     processMovement(elapsed);
                 }
                 return useAbility(Abilities.DASH);
+            case DEFEND:
+                return useAbility(Abilities.DEFEND);
         }
         return true;
     }

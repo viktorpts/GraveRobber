@@ -83,6 +83,14 @@ abstract public class Ability implements IAbility {
         state = AbilityState.READY;
     }
 
+    public void unUse() { // support for toggleable abilities
+        state = AbilityState.READY;
+    }
+
+    public boolean isActive() {
+        return state == AbilityState.ACTIVE;
+    }
+
     public double getCooldown() {
         return cooldown - remaining;
     }

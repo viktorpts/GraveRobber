@@ -81,6 +81,8 @@ public class Animation {
                     state = AnimationState.IDLE;
                 }
                 break;
+            case DEFEND:
+                break;
             // TODO: other cases
         }
     }
