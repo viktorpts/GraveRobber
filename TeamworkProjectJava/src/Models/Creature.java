@@ -47,7 +47,7 @@ abstract public class Creature extends Entity implements IMovable {
         velocity = new Coord(0.0, 0.0);
     }
 
-    // Properties
+    //region Properties
     public int getHealthPoints() {
         return healthPoints;
     }
@@ -77,6 +77,7 @@ abstract public class Creature extends Entity implements IMovable {
             return abilities.get(ability).getCooldown();
         else return 0.0;
     }
+    //endregion ==============================
 
     // Implementation of IMovable, everything to do with motion
     @Override
@@ -106,6 +107,7 @@ abstract public class Creature extends Entity implements IMovable {
         super.setPos(newX, newY);
     }
 
+    //region Collision detection and resolution
     /**
      * Check and resolve collision with other entities. Resolution method used is Projection (we calculate penetration
      * depth and move each entity half that distance away from each other, instantly).
@@ -177,6 +179,7 @@ abstract public class Creature extends Entity implements IMovable {
 
         return false;
     }
+    //endregion ==============================
 
     @Override
     public Coord getVelocity() {
@@ -222,6 +225,13 @@ abstract public class Creature extends Entity implements IMovable {
             ((Enemy) this).processBehaviour(time);
         }
 
+        // If the object is moving, update vector with friction and project new position, based on time and velocity
+        if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);
+        double newX = super.getX() + velocity.getX() * time;
+        double newY = super.getY() + velocity.getY() * time;
+        super.setX(newX);
+        super.setY(newY);
+
         // Detect collisions
         // Creatures
         Main.game.getLevel().getEntities().stream()
@@ -236,13 +246,6 @@ abstract public class Creature extends Entity implements IMovable {
                 .filter(tile -> tile.getTileType() == TileType.WALL) //just the walls
                 .filter(tile -> Math.abs(tile.getX() - getX()) < Physics.activeRange && Math.abs(tile.getY() - getY()) < Physics.activeRange)
                 .forEach(tile -> vrfyBounds(tile));
-
-        // If the object is moving, update vector with friction and project new position, based on time and velocity
-        if (velocity.getMagnitude() != 0) Physics.decelerate(velocity, time);
-        double newX = super.getX() + velocity.getX() * time;
-        double newY = super.getY() + velocity.getY() * time;
-        super.setX(newX);
-        super.setY(newY);
 
         // Update used abilities (they cool themselves down, if needed)
         abilities.entrySet().stream()
