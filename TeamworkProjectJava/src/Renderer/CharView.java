@@ -23,8 +23,13 @@ public class CharView {
         if (sender.hasState(EntityState.DEAD)) selector = 4;
         if (sender instanceof Player) {
             selector = 1;
-            if (state == AnimationState.IDLE) QuickView.renderSword(x, y, direction, 0.0);
-            if (state == AnimationState.DEFEND) QuickView.renderShield(x, y, direction);
+            if (state == AnimationState.IDLE) {
+                QuickView.renderSword(x, y, direction, 0.0);
+                QuickView.renderShield(x, y, direction, 0);
+            } else if (state == AnimationState.DEFEND) {
+                QuickView.renderSword(x, y, direction, 0.01);
+                QuickView.renderShield(x, y, direction, 1);
+            }
         }
         if (state == AnimationState.ATTACKUP) {
             QuickView.renderSword(x, y, direction, progress);

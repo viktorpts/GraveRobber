@@ -46,7 +46,7 @@ public class Player extends Creature {
                 0.25, Physics.maxMoveSpeed, Physics.maxAcceleration);
         addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, startAttackPower, 1.0));
         addAbility(Abilities.DASH, new Dash(this, 5, 12));
-        addAbility(Abilities.DEFEND, new Defend(this, 50));
+        addAbility(Abilities.DEFEND, new Defend(this, 25, 2));
 
         currentInput = new ControlState();
         movementOrder = UserOrders.EMPTY;

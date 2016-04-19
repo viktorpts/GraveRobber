@@ -1,7 +1,7 @@
 package Models;
 
 import Abilities.Ability;
-import Abilities.MeleeAttack;
+import Abilities.Defend;
 import Enumerations.*;
 import Game.Main;
 import Interfaces.IMovable;
@@ -143,6 +143,7 @@ abstract public class Creature extends Entity implements IMovable {
     //endregion ==============================
 
     //region Collision detection and resolution
+
     /**
      * Check and resolve collision with other entities. Resolution method used is Projection (we calculate penetration
      * depth and move each entity half that distance away from each other, instantly).
@@ -258,13 +259,17 @@ abstract public class Creature extends Entity implements IMovable {
                 .forEach(this::vrfyBounds);
 
         // Update used abilities (they cool themselves down, if needed)
-        abilities.entrySet().stream()
-                .filter(entry -> !entry.getValue().isReady()) // Abilities that are ready don't do anything
-                .forEach(entry -> entry.getValue().update(time));
+        abilities.entrySet().stream().forEach(entry -> entry.getValue().update(time));
         resetState(); // make sure we have something here
     }
 
     //region Abilities
+    public Ability getAbility(Abilities ability) {
+        if (abilities.containsKey(ability))
+            return abilities.get(ability);
+        else return null;
+    }
+
     /**
      * Add an ability to the list
      *
@@ -372,7 +377,15 @@ abstract public class Creature extends Entity implements IMovable {
         if (damage > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
             if (this instanceof Player) {
-                stagger(); // player always gets staggered
+                Defend shield = (Defend) abilities.get(Abilities.DEFEND);
+                // redirect damage to shield
+                if (shield.isActive() && shield.getHealth() > 0 &&
+                        Math.abs(getDirection() - Coord.angleBetween(this.getPos(), source)) < Math.PI / 4) {
+                    damage = shield.takeDamage(damage);
+                    if (damage > 0) stagger();
+                } else {
+                    stagger(); // player always gets staggered
+                }
                 immuneTime = 0.5;
             } else {
                 immuneTime = 0.1; // Enemies have a much shorter invinciframe

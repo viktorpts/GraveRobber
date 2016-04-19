@@ -381,14 +381,21 @@ public class QuickView {
         gc.restore();
     }
 
-    public static void renderShield(double x, double y, double direction) {
+    public static void renderShield(double x, double y, double direction, int position) {
         GraphicsContext gc = Main.game.getGc();
 
         gc.save();
         gc.setStroke(Color.BROWN);
         gc.setLineWidth(4);
-        double[] p1 = rotateXY(0.4, 0.3, direction);
-        double[] p2 = rotateXY(0.4, -0.3, direction);
+        double[] p1;
+        double[] p2;
+        if (position == 0) { // lowered
+            p1 = rotateXY(0.35, 0.2, direction - Math.PI / 3);
+            p2 = rotateXY(0.35, -0.2, direction - Math.PI / 3);
+        } else { // raised
+            p1 = rotateXY(0.4, 0.3, direction);
+            p2 = rotateXY(0.4, -0.3, direction);
+        }
         gc.strokeLine(toCanvasX(x + p1[0]), toCanvasY(y + p1[1]), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
         gc.restore();
     }

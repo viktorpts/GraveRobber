@@ -109,4 +109,18 @@ public class Coord {
     public static double angleBetween(Coord vector1, Coord vector2) {
         return subtract(vector2, vector1).getDirection();
     }
+
+    /**
+     * Calculates angle between two points and a line projected from the first point at given angle
+     * @param vector1 First point
+     * @param vector2 Second point
+     * @param angle Angle of line projected from first point
+     * @return Inner angle of the triangle
+     */
+    public static double innerAngle(Coord vector1, Coord vector2, double angle) {
+        if (angle < 0) angle += 2 * Math.PI;
+        double angle2 = angleBetween(vector1, vector2);
+        if (angle2 < 0) angle2 += 2 * Math.PI;
+        return angle;
+    }
 }

@@ -2,7 +2,9 @@ package Game;
 
 import Enumerations.Abilities;
 import Enumerations.EntityState;
+import Abilities.Defend;
 import Renderer.DebugView;
+import World.Coord;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -104,13 +106,13 @@ public class Main extends Application {
                 gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
                 gc.restore();
 
-                // Dash cooldown indicator
+                // Shield endurance bar
                 gc.save();
                 gc.setFill(Color.LIGHTBLUE);
                 gc.setStroke(Color.LIGHTBLUE);
                 gc.setLineWidth(2);
                 gc.strokeRect(10, 35, 220, 10);
-                gc.fillRect(12, 37, 216 * game.getPlayer().getCooldown(Abilities.DASH) / 5, 6);
+                gc.fillRect(12, 37, 216 * ((Defend) game.getPlayer().getAbility(Abilities.DEFEND)).getHealth() / 25, 6);
                 gc.restore();
 
                 if (game.getPlayer().hasState(EntityState.DEAD)) {
@@ -127,6 +129,23 @@ public class Main extends Application {
                     QuickView.renderArrow(game.getPlayer().getMouseX(),
                             game.getPlayer().getMouseY(),
                             game.getPlayer().getDirection());
+                    gc.setStroke(Color.BLACK);
+                    gc.setFill(Color.WHITE);
+                    double dDir = game.getPlayer().getDirection();
+                    double dAngle = Coord.angleBetween(game.getPlayer().getPos(), game.getLevel().getEntities().get(0).getPos());
+                    double dOffset = dDir - dAngle;
+                    double dInner = Coord.innerAngle(game.getPlayer().getPos(), game.getLevel().getEntities().get(0).getPos(), dDir);
+                    String dirInfo = String.format("Dir: %.2f%nAngle: %.2f%nOffset: %.2f%nInner: %.2f",
+                            dDir,
+                            dAngle,
+                            dOffset,
+                            dInner);
+                    gc.strokeText(dirInfo,
+                            game.getPlayer().getMouseX() + 10,
+                            game.getPlayer().getMouseY());
+                    gc.fillText(dirInfo,
+                            game.getPlayer().getMouseX() + 10,
+                            game.getPlayer().getMouseY());
                 }
 
                 /**

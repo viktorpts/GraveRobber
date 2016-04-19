@@ -38,6 +38,7 @@ public class Level {
         //spawnEnemies();
         this.player = player;
         setStart();
+        entities.add(CreatureFactory.createEnemy(EnemyTypes.SKELETON, player.getX() + 0.5, player.getY(), 0.0));
         entities.add(this.player);
     }
 
