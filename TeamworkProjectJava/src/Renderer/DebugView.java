@@ -19,24 +19,28 @@ public class DebugView {
     }
 
     public static void showControlInfo() {
-        String controlData = String.format("Mouse [%s|%s]%n", Main.game.getControlState().isMouseLeft() ? "#" : "_", Main.game.getControlState().isMouseRight() ? "#" : "_");
+        String controlData = String.format("Mouse [%s|%s] %.0f, %.0f%n",
+                Main.game.getControlState().isMouseLeft() ? "#" : "_",
+                Main.game.getControlState().isMouseRight() ? "#" : "_",
+                Main.game.getPlayer().getMouseX(),
+                Main.game.getPlayer().getMouseY());
         controlData += String.format("Keyboard: ");
         for (KeyCode key : Main.game.getControlState().getCombo()) {
             controlData += String.format("%s ", key.toString());
         }
+        controlData += String.format("%nOrders: %s | %s", Main.game.getPlayer().movementOrder, Main.game.getPlayer().abilityOrder);
         Main.debugc.fillText(controlData, 120, 15);
     }
 
     public static void showEntityData() {
         final String[] entityData = { String.format("Entity Data:%n") };
         Main.game.getLevel().getEntities().stream().forEach(entity -> {
-            entityData[0] += String.format("%3s: [%d]%s - %s %s[%.1f]%n",
+            entityData[0] += String.format("%3s: [%d]%s - %s %s%n",
                     entity.getID(),
                     entity instanceof Creature ? ((Creature)entity).getHealthPoints() : 0,
                     entity.getClass().toString().replaceFirst("class Models.", ""),
                     entity.getState().toString(),
-                    entity instanceof Enemy ? ((Enemy)entity).getThought(0).toString() : entity.getAnimationState().toString(),
-                    Math.abs(Math.abs(Coord.angleBetween(Main.game.getPlayer().getPos(), entity.getPos())) - Math.abs(Main.game.getPlayer().getDirection())));
+                    entity instanceof Enemy ? ((Enemy)entity).getThought(0).toString() : entity.getAnimationState().toString());
                 });
         Main.debugc.fillText(entityData[0], 5, 70);
     }

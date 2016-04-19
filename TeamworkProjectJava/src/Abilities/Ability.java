@@ -5,19 +5,30 @@ import Enumerations.EntityState;
 import Interfaces.IAbility;
 import Models.Creature;
 
+/**
+ * Parent class for all player and enemy abilities. Implements basic functionality shared by all derived classes as well
+ * as some methods that keep track of owner state and prevent overlap, for subclasses that don't have complicated
+ * structure.
+ */
 abstract public class Ability implements IAbility {
 
     double remaining; // time to next use, seconds
     double cooldown; // time between uses, seconds
     AbilityState state; // state
-    protected final Creature owner;
+    protected final Creature owner; // reference to creature
 
+    /**
+     * Bare bones constructor
+     * @param owner Reference to Creature
+     * @param cooldown Time between uses, in seconds
+     */
     public Ability (Creature owner, double cooldown) {
         this.owner = owner; // passed by reference, we don't want a copy
         this.cooldown = cooldown;
         reset();
     }
 
+    // Properties and shorthands
     public AbilityState getState() {
         return state;
     }
@@ -34,6 +45,10 @@ abstract public class Ability implements IAbility {
         return state == AbilityState.COOLING;
     }
 
+    /**
+     * Place ability in cooldown.
+     * Separate from use(), so we can force an ability to resolve, if necessary.
+     */
     @Override
     public void spend() {
         state = AbilityState.COOLING;
@@ -66,6 +81,18 @@ abstract public class Ability implements IAbility {
     public void reset() {
         remaining = 0;
         state = AbilityState.READY;
+    }
+
+    public void unUse() { // support for toggleable abilities
+        state = AbilityState.READY;
+    }
+
+    public boolean isActive() {
+        return state == AbilityState.ACTIVE;
+    }
+
+    public double getCooldown() {
+        return cooldown - remaining;
     }
 
     /**

@@ -1,10 +1,13 @@
 package Game;
 
-import Enumerations.EnemyTypes;
+import Enumerations.Abilities;
 import Enumerations.EntityState;
+import Enumerations.GameState;
 import Factories.CreatureFactory;
 import Models.Enemy;
+import Abilities.Defend;
 import Renderer.DebugView;
+import World.Coord;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -21,10 +24,14 @@ import javafx.stage.Stage;
 import Renderer.QuickView;
 import javafx.stage.StageStyle;
 
+/**
+ * Program entry point. We rely on JavaFX to do all the heavy lifting, just define some parameters to keep everything
+ * synced and easily configurable.
+ */
 public class Main extends Application {
 
     // Application parameters
-    public static Game game; // sssContainer for all of the things
+    public static Game game; // Container for all of the things
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
     // Debug view
@@ -55,50 +62,48 @@ public class Main extends Application {
         // Initialize Game
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
-        //CreatureFactory.init(); //Initialise list of creatures
+
+        //Load cursor image
+        QuickView.loadMouseImage();
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
-            game.getControlState().addKey(ke.getCode());
+            game.getPlayer().addKey(ke.getCode());
         });
         scene.setOnKeyReleased(ke -> {
-            game.getControlState().removeKey(ke.getCode());
+            game.getPlayer().removeKey(ke.getCode());
         });
 
         // Event handler for mouse position and input
         scene.setOnMouseMoved(event -> {
-            game.getControlState().update(event.getX(), event.getY());
+            game.getPlayer().updateMouse(event.getX(), event.getY());
+        });
+        scene.setOnMouseDragged(event -> {
+            game.getPlayer().updateMouse(event.getX(), event.getY());
         });
         scene.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(true);
-            if (event.isSecondaryButtonDown()) game.getControlState().setMouseRight(true);
+            if (event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(true);
+            if (event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(true);
         });
         scene.setOnMouseReleased(event -> {
-            if (!event.isPrimaryButtonDown()) game.getControlState().setMouseLeft(false);
-            if (!event.isSecondaryButtonDown()) game.getControlState().setMouseRight(false);
+            if (!event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(false);
+            if (!event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(false);
         });
-
-        final long startNanoTime = System.nanoTime();
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                double[] mousePos = game.getControlState().getMouse();
-                double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
-                double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
-                double dir = Math.atan2(offsetY, offsetX);
-                // Don't let the player look around if he's committed to an animation
-                if (game.getPlayer().isReady()) game.getPlayer().setDirection(dir);
+                if (game.getGameState() != GameState.MENU) {
+                    // Update state
+                    game.passTime(currentNanoTime);
+                    game.handleInput();
+                    game.update();
 
-                // Update state
-                game.update(currentNanoTime);
-                game.handleInput();
-                // Output
-                gc.setFill(Color.BLACK);
-                gc.fillRect(0, 0, horizontalRes, verticalRes);
-                QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
-                        game.getLevel().getPlayer().getY());
-                QuickView.drawGrid(gc);
-                game.render();
+                    // Output
+                    gc.clearRect(0, 0, horizontalRes, verticalRes); // clear the screen before drawing new frame
+                    QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
+                            game.getLevel().getPlayer().getY());
+                    game.render();
+                }
 
                 // Health bar
                 gc.save();
@@ -107,6 +112,15 @@ public class Main extends Application {
                 gc.setLineWidth(2);
                 gc.strokeRect(10, 10, 220, 20);
                 gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
+                gc.restore();
+
+                // Shield endurance bar
+                gc.save();
+                gc.setFill(Color.LIGHTBLUE);
+                gc.setStroke(Color.LIGHTBLUE);
+                gc.setLineWidth(2);
+                gc.strokeRect(10, 35, 220, 10);
+                gc.fillRect(12, 37, 216 * ((Defend) game.getPlayer().getAbility(Abilities.DEFEND)).getHealth() / 25, 6);
                 gc.restore();
 
                 if (game.getPlayer().hasState(EntityState.DEAD)) {
@@ -120,9 +134,17 @@ public class Main extends Application {
                     gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
                     gc.restore();
                 } else {
-                    QuickView.renderArrow(mousePos[0], mousePos[1], dir);
+                    QuickView.renderArrow(game.getPlayer().getMouseX(),
+                            game.getPlayer().getMouseY(),
+                            game.getPlayer().getDirection());
                 }
-
+                else{
+                    //Visualise start menu
+                    QuickView.renderMenuBackground();
+                    QuickView.renderStartButton(100, 100);
+                    QuickView.renderExitButton(100, 200);
+                    QuickView.renderMenuCursor(game.getControlState().getMouseX(),game.getControlState().getMouseY());
+                }
                 /**
                  * Debug info
                  */

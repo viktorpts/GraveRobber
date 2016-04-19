@@ -5,7 +5,9 @@ import Interfaces.IBehaviour;
 import Models.Creature;
 
 /**
- * Base class for all AI behaviour
+ * Parent class for all AI behaviour.
+ * Since behaviours can vary wildly in what they do, we only put the bare necessities here, like a reference to the
+ * Creature, processing priority and state/time keeping functionality. Methods are mostly self explanatory.
  */
 abstract public class Behaviour implements IBehaviour {
 

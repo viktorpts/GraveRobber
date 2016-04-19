@@ -18,11 +18,12 @@ import Renderer.QuickView;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Test level geometry generation from here. Zoom level is set to very low, so the entire map is visible.
+ */
 public class TestLevel  extends Application {
 
     public static void main(String[] args) {
-        // Add functionality to display generated map, like a foreach. Use the output of the following method:
-        Generator.Generate();
         launch(args);
     }
 

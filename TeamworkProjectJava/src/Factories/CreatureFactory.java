@@ -29,6 +29,14 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
         enemies.put(EnemyTypes.ZOMBIE, Zombie);
     }
 
+    /**
+     * Create an enemy of requested type, using a template, and place them at the desired location
+     * @param type Predetermined from list of templates
+     * @param x Horizontal position, world coordinates (right positive)
+     * @param y Vertical position, world coordinates (bottom positive)
+     * @param direction Facing angle, radians
+     * @return A unique enemy, place this in the entity list of the level
+     */
     public static Enemy createEnemy(EnemyTypes type, double x, double y, double direction) {
         Enemy thisEnemy = new Enemy(
                 new Animation(10, type.name()), x, y, direction,

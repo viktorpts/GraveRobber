@@ -1,5 +1,8 @@
 package Game;
 
+/**
+ * This class is deprecated, remove from project.
+ */
 public class Loop implements Runnable{
 	// TODO: place loop here, add to it all update and display calls
 	// This file is likely redundant

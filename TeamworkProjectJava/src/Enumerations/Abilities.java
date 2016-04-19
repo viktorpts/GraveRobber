@@ -1,7 +1,10 @@
 package Enumerations;
 
 public enum Abilities {
-    ATTACKPRIMARY ("Primary Attack");
+    ATTACKPRIMARY ("Primary Attack"),
+    DASH ("Dash"),
+    DEFEND ("Defend");
+
     private String name;
 
     private Abilities(String name) {

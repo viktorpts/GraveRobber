@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Contains the level geometry (grid), a tileset and a list of entity instances. One per game!
+ * Contains the level geometry (grid), a tileset and a list of entity instances. One per game! Methods are self-
+ * explanatory or documented if otherwise.
  */
 public class Level {
 
@@ -34,9 +35,10 @@ public class Level {
     public Level(Player player) {
         entities = new ArrayList<>();
         generateGeometry();
-        spawnEnemies();
+        //spawnEnemies();
         this.player = player;
         setStart();
+        entities.add(CreatureFactory.createEnemy(EnemyTypes.SKELETON, player.getX() + 0.5, player.getY(), 0.0));
         entities.add(this.player);
     }
 

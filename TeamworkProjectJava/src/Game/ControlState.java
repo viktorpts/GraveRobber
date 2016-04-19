@@ -4,17 +4,18 @@ import javafx.scene.input.KeyCode;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This object keeps track of pressed keys and mouse buttons, as well as the position of the cursor, in screen
+ * coordinates.
+ */
 public class ControlState {
-    private double mouseX;
-    private double mouseY;
+
     private boolean mouseLeft;
     private boolean mouseRight;
 
     private Set<KeyCode> keyState;
 
     public ControlState() {
-        mouseX = 0.0;
-        mouseY = 0.0;
         mouseLeft = false;
         mouseRight = false;
 
@@ -22,6 +23,21 @@ public class ControlState {
     }
 
     public void addKey(KeyCode kc) {
+        // Filter conflicting movement keys
+        switch (kc) {
+            case W:
+                if (keyState.contains(KeyCode.S)) keyState.remove(KeyCode.S);
+                break;
+            case S:
+                if (keyState.contains(KeyCode.W)) keyState.remove(KeyCode.W);
+                break;
+            case A:
+                if (keyState.contains(KeyCode.D)) keyState.remove(KeyCode.D);
+                break;
+            case D:
+                if (keyState.contains(KeyCode.A)) keyState.remove(KeyCode.A);
+                break;
+        }
         keyState.add(kc);
     }
     public void removeKey(KeyCode kc) {
@@ -52,22 +68,6 @@ public class ControlState {
     public boolean pressed(KeyCode kc) {
         if (keyState.contains(kc)) return true;
         return false;
-    }
-
-    public double getMouseX() {
-        return mouseX;
-    }
-    public double getMouseY() {
-        return mouseY;
-    }
-    public double[] getMouse() {
-        double[] result = { mouseX, mouseY };
-        return result;
-    }
-
-    public void update(double x, double y) {
-        mouseX = x;
-        mouseY = y;
     }
 
 }

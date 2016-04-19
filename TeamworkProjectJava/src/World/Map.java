@@ -12,6 +12,9 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Deprecated, remove from project. /!\ ALSO CONFLICTING NAME /!\
+ */
 public class Map {
 
     public static final int mazeWidth = 160;

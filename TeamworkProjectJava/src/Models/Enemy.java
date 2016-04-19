@@ -12,6 +12,9 @@ import Abilities.Ability;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Dedicated class that has a few extra things compared to it's inanimate parent, mainly AI.
+ */
 public class Enemy extends Creature {
     LootTable lootTable;
     ArrayList<Behaviour> brain;
@@ -25,6 +28,11 @@ public class Enemy extends Creature {
         this.brain = new ArrayList<>();
     }
 
+    /**
+     * Add a new behaviour to the Enemy. Note the list sorted by priority each time.
+     * @param newBrain A unique Behaviour. This can't be shared, since it contains a reference to it's owner! OR, it can
+     *                 be shared, or even point to another Enemy, for hilarious results.
+     */
     public void addBrain(Behaviour newBrain) {
         brain.add(newBrain);
         newBrain.start();
@@ -35,6 +43,11 @@ public class Enemy extends Creature {
         return brain.get(index).getState();
     }
 
+    /**
+     * Consult each Behaviour and act accordingly. Once an action is taken, the rest of the possible actions are
+     * ignored, hence sorting them by priority earlier.
+     * @param time Seconds since last update
+     */
     void processBehaviour(double time) {
         // using stream is overkill, since each creature wont have more than a handful of behaviours to cycle trough and
         // having the option to break the loop is better, considering each individual brain might have complex logic

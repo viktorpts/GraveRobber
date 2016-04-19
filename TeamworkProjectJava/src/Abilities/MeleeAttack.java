@@ -26,6 +26,10 @@ public class MeleeAttack extends Ability {
         elapsedTime = 0;
     }
 
+    /**
+     * Place ability in initial stage, begin owner animation accordingly. We set the cooldown at first, so if the owner
+     * gets staggered, there's longer recovery time as punishment. Successful attacks reset the cooldown.
+     */
     @Override
     public void use() {
         spend();
@@ -36,6 +40,12 @@ public class MeleeAttack extends Ability {
         owner.setState(EnumSet.of(EntityState.CASTUP));
     }
 
+    /**
+     * Process attack. Called on every frame, we keep track of what the owner is doing, and it their animation has
+     * changed to the next phase, we update our status. If animation is cancelled (staggered, destroyed, chained), we
+     * also cancel the ability and put it in cooldown.
+     * @param time Seconds since last update
+     */
     @Override
     public void update(double time) {
         if (isReady()) return; // do nothing if ability is ready (not cooling, not in use)
@@ -68,7 +78,6 @@ public class MeleeAttack extends Ability {
                     owner.getState().remove(EntityState.CASTING);
                     owner.getState().add(EntityState.CASTDOWN);
                 } else {
-                    // apply to everyone within range 1, for testing
                     // TODO: best to replace this with an event for all entities to register and decide what to do
                     // TODO: events are a great idea! we can stream everything just once and register the whole queue
                     Main.game.getLevel().getEntities().stream()
@@ -81,9 +90,9 @@ public class MeleeAttack extends Ability {
                                 if (entity.hasState(EntityState.DEAD))
                                     return false; // don't hit dead creatures
                                 if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
-                                    return false;
-                                if (Math.abs(Math.abs(Coord.angleBetween(owner.getPos(), entity.getPos())) - Math.abs(owner.getDirection())) > Math.PI / 4)
-                                    return false;
+                                    return false; // only damage those in range
+                                if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 4)
+                                    return false; // only damage those within sweep angle
                                 return true; // if everything's been fine, process target
                             })
                             .forEach(entity -> {
@@ -97,7 +106,7 @@ public class MeleeAttack extends Ability {
                     // animation state has advanced, go back to ready
                     reset(); // if attack was successful, reset cooldown
                     owner.getState().remove(EntityState.CASTDOWN);
-                    owner.resetState();
+                    owner.resetState(); // TODO: since we update Entity state at end of each frame, this is likely redundant
                 }
                 break;
         }

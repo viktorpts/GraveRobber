@@ -1,16 +1,29 @@
 package Renderer;
 
+import Enumerations.GameState;
 import Game.Main;
 import World.Dungeon;
+import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import org.w3c.dom.css.Rect;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * For testing only
+ * For testing only. Here be dragons, proceed at own risk.
  */
 public class QuickView {
     // Grid size
@@ -19,7 +32,7 @@ public class QuickView {
     static public double cameraHeight = 120;
     static public double cameraX = 79;
     static public double cameraY = 59;
-
+    static public Image menuCursor;
     // Camera controls
     static public void adjustRes(int size) {
         gridSize = size;
@@ -58,6 +71,23 @@ public class QuickView {
         }
         gc.restore();
     }
+
+    public static void loadMouseImage(){
+        InputStream is = null;
+        try {
+            is = Files.newInputStream(Paths.get("resources/cursor.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image img = new Image(is);
+        menuCursor = img;
+        try {
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     static public void setBlock(GraphicsContext gc, int x, int y, int type) {
         /**
@@ -182,6 +212,53 @@ public class QuickView {
             gc.fillText(debug, x + gridSize / 2, y);
         }
     }
+    static public void renderMenuBackground() {
+        GraphicsContext gc = Main.game.getGc();
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0,0,1100,600);
+    }
+    static public void renderStartButton(double x, double y) {
+        GraphicsContext gc = Main.game.getGc();
+        double mouseX = Main.game.getControlState().getMouseX();
+        double mouseY = Main.game.getControlState().getMouseY();
+        if (mouseX >= x && mouseX <= x + 200 && mouseY >= y && mouseY <= y + 30){
+            gc.setFill(Color.RED);
+            gc.fillRoundRect(x,y,200,30,30,30);
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font(30));
+            if (Main.game.getControlState().isMouseLeft()) {
+                Main.game.setGameState(GameState.LIVE);
+            }
+        }
+        else{
+            gc.setFill(Color.WHITE);
+            gc.fillRoundRect(x,y,200,30,30,30);
+            gc.setFill(Color.RED);
+            gc.setFont(Font.font(30));
+        }
+        gc.fillText("START",x + 75,y +24,170);
+    }
+    static public void renderExitButton(double x, double y) {
+        GraphicsContext gc = Main.game.getGc();
+        double mouseX = Main.game.getControlState().getMouseX();
+        double mouseY = Main.game.getControlState().getMouseY();
+        if (mouseX >= x && mouseX <= x + 200 && mouseY >= y && mouseY <= y + 30){
+            gc.setFill(Color.RED);
+            gc.fillRoundRect(x,y,200,30,30,30);
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font(30));
+            if (Main.game.getControlState().isMouseLeft()) {
+                Platform.exit();
+            }
+        }
+        else{
+            gc.setFill(Color.WHITE);
+            gc.fillRoundRect(x,y,200,30,30,30);
+            gc.setFill(Color.RED);
+            gc.setFont(Font.font(30));
+        }
+        gc.fillText("EXIT",x + 75,y +24,170);
+    }
 
     static public void renderDot(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
@@ -193,6 +270,11 @@ public class QuickView {
             size = 25;
         }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
+    }
+    static public void renderMenuCursor(double x, double y) {
+        GraphicsContext gc = Main.game.getGc();
+
+        gc.drawImage(menuCursor, x, y);
     }
 
     static public void renderArrow(double x, double y, double dir) {
@@ -378,6 +460,25 @@ public class QuickView {
             gc.strokeLine(toCanvasX(x), toCanvasY(y), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
         }
 
+        gc.restore();
+    }
+
+    public static void renderShield(double x, double y, double direction, int position) {
+        GraphicsContext gc = Main.game.getGc();
+
+        gc.save();
+        gc.setStroke(Color.BROWN);
+        gc.setLineWidth(4);
+        double[] p1;
+        double[] p2;
+        if (position == 0) { // lowered
+            p1 = rotateXY(0.35, 0.2, direction - Math.PI / 3);
+            p2 = rotateXY(0.35, -0.2, direction - Math.PI / 3);
+        } else { // raised
+            p1 = rotateXY(0.4, 0.3, direction);
+            p2 = rotateXY(0.4, -0.3, direction);
+        }
+        gc.strokeLine(toCanvasX(x + p1[0]), toCanvasY(y + p1[1]), toCanvasX(x + p2[0]), toCanvasY(y + p2[1]));
         gc.restore();
     }
 
