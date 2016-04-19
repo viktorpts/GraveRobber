@@ -14,6 +14,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -68,7 +69,11 @@ public class Main extends Application {
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
-            game.getPlayer().addKey(ke.getCode());
+            if (ke.getCode() == KeyCode.ESCAPE) {
+                if (game.getGameState() == GameState.LIVE) game.setGameState(GameState.MENU);
+                else if (game.getGameState() == GameState.MENU) game.setGameState(GameState.LIVE);
+            } else
+                game.getPlayer().addKey(ke.getCode());
         });
         scene.setOnKeyReleased(ke -> {
             game.getPlayer().removeKey(ke.getCode());
@@ -103,47 +108,46 @@ public class Main extends Application {
                     QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
                             game.getLevel().getPlayer().getY());
                     game.render();
-                }
 
-                // Health bar
-                gc.save();
-                gc.setFill(Color.RED);
-                gc.setStroke(Color.RED);
-                gc.setLineWidth(2);
-                gc.strokeRect(10, 10, 220, 20);
-                gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
-                gc.restore();
-
-                // Shield endurance bar
-                gc.save();
-                gc.setFill(Color.LIGHTBLUE);
-                gc.setStroke(Color.LIGHTBLUE);
-                gc.setLineWidth(2);
-                gc.strokeRect(10, 35, 220, 10);
-                gc.fillRect(12, 37, 216 * ((Defend) game.getPlayer().getAbility(Abilities.DEFEND)).getHealth() / 25, 6);
-                gc.restore();
-
-                if (game.getPlayer().hasState(EntityState.DEAD)) {
+                    // Health bar
                     gc.save();
                     gc.setFill(Color.RED);
-                    gc.setStroke(Color.BLACK);
-                    gc.setLineWidth(1);
-                    gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
-                    gc.setTextAlign(TextAlignment.CENTER);
-                    gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
-                    gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                    gc.setStroke(Color.RED);
+                    gc.setLineWidth(2);
+                    gc.strokeRect(10, 10, 220, 20);
+                    gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
                     gc.restore();
+
+                    // Shield endurance bar
+                    gc.save();
+                    gc.setFill(Color.LIGHTBLUE);
+                    gc.setStroke(Color.LIGHTBLUE);
+                    gc.setLineWidth(2);
+                    gc.strokeRect(10, 35, 220, 10);
+                    gc.fillRect(12, 37, 216 * ((Defend) game.getPlayer().getAbility(Abilities.DEFEND)).getHealth() / 25, 6);
+                    gc.restore();
+
+                    if (game.getPlayer().hasState(EntityState.DEAD)) {
+                        gc.save();
+                        gc.setFill(Color.RED);
+                        gc.setStroke(Color.BLACK);
+                        gc.setLineWidth(1);
+                        gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
+                        gc.setTextAlign(TextAlignment.CENTER);
+                        gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                        gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                        gc.restore();
+                    } else {
+                        QuickView.renderArrow(game.getPlayer().getMouseX(),
+                                game.getPlayer().getMouseY(),
+                                game.getPlayer().getDirection());
+                    }
                 } else {
-                    QuickView.renderArrow(game.getPlayer().getMouseX(),
-                            game.getPlayer().getMouseY(),
-                            game.getPlayer().getDirection());
-                }
-                else{
                     //Visualise start menu
                     QuickView.renderMenuBackground();
                     QuickView.renderStartButton(100, 100);
                     QuickView.renderExitButton(100, 200);
-                    QuickView.renderMenuCursor(game.getControlState().getMouseX(),game.getControlState().getMouseY());
+                    QuickView.renderMenuCursor(game.getPlayer().getMouseX(), game.getPlayer().getMouseY());
                 }
                 /**
                  * Debug info
@@ -157,7 +161,11 @@ public class Main extends Application {
                  * End of Debug info
                  */
             }
-        }.start();
+        }
+
+                .
+
+                        start();
 
         // Render stage
         primaryStage.setResizable(false);

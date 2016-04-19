@@ -219,8 +219,8 @@ public class QuickView {
     }
     static public void renderStartButton(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
-        double mouseX = Main.game.getControlState().getMouseX();
-        double mouseY = Main.game.getControlState().getMouseY();
+        double mouseX = Main.game.getPlayer().getMouseX();
+        double mouseY = Main.game.getPlayer().getMouseY();
         if (mouseX >= x && mouseX <= x + 200 && mouseY >= y && mouseY <= y + 30){
             gc.setFill(Color.RED);
             gc.fillRoundRect(x,y,200,30,30,30);
@@ -240,8 +240,8 @@ public class QuickView {
     }
     static public void renderExitButton(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
-        double mouseX = Main.game.getControlState().getMouseX();
-        double mouseY = Main.game.getControlState().getMouseY();
+        double mouseX = Main.game.getPlayer().getMouseX();
+        double mouseY = Main.game.getPlayer().getMouseY();
         if (mouseX >= x && mouseX <= x + 200 && mouseY >= y && mouseY <= y + 30){
             gc.setFill(Color.RED);
             gc.fillRoundRect(x,y,200,30,30,30);
