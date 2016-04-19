@@ -5,8 +5,8 @@ import Abilities.Ability;
 import Abilities.Dash;
 import Abilities.MeleeAttack;
 import Enumerations.EntityState;
+import Enumerations.UserOrders;
 import Game.ControlState;
-import Game.Main;
 import Renderer.Animation;
 import Renderer.QuickView;
 import World.Coord;
@@ -15,7 +15,6 @@ import javafx.scene.input.KeyCode;
 
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Dedicated class to differentiate the Player character from his inanimate parent class and his sibling Enemy
@@ -27,9 +26,11 @@ public class Player extends Creature {
     // User input record
     private double mouseX;
     private double mouseY;
-    private ControlState current;
-    private ControlState dispatched;
-    private ControlState released;
+    private ControlState currentInput;
+    public UserOrders movementOrder;
+    public UserOrders abilityOrder;
+    private double timeSinceLastMove;
+    private double timeSinceLastCast;
 
     private Inventory inventory;
 
@@ -46,45 +47,50 @@ public class Player extends Creature {
         addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, startAttackPower, 1.0));
         addAbility(Abilities.DASH, new Dash(this, 5, 12));
 
-        current = new ControlState();
-        dispatched = new ControlState();
-        released = new ControlState();
+        currentInput = new ControlState();
+        movementOrder = UserOrders.EMPTY;
+        abilityOrder = UserOrders.EMPTY;
+        timeSinceLastMove = 0;
+        timeSinceLastCast = 0;
     }
 
     // TODO: Inventory management
 
     public ControlState getControlState() {
-        return current;
+        return currentInput;
     }
 
     //region Keyboard Properties
     public void addKey(KeyCode kc) {
-        current.addKey(kc);
+        currentInput.addKey(kc);
     }
+
     public void removeKey(KeyCode kc) {
-        current.removeKey(kc);
-    }
-
-    public void setMouseLeft(boolean mouseLeft) {
-        current.setMouseLeft(mouseLeft);
-    }
-
-    public void setMouseRight(boolean mouseRight) {
-        current.setMouseRight(mouseRight);
+        currentInput.removeKey(kc);
     }
     //endregion ==============================
 
     //region Mouse Properties
+    public void setMouseLeft(boolean mouseLeft) {
+        currentInput.setMouseLeft(mouseLeft);
+    }
+
+    public void setMouseRight(boolean mouseRight) {
+        currentInput.setMouseRight(mouseRight);
+    }
+
     public double getMouseX() {
         return mouseX;
     }
+
     public double getMouseY() {
         return mouseY;
     }
+
     public double[] getMouse() {
-        double[] result = { mouseX, mouseY };
-        return result;
+        return new double[]{mouseX, mouseY};
     }
+
     public void updateMouse(double x, double y) {
         mouseX = x;
         mouseY = y;
@@ -92,51 +98,125 @@ public class Player extends Creature {
     //endregion ==============================
 
     public void handleInput(double elapsed) {
+        timeSinceLastCast += elapsed;
+        timeSinceLastMove += elapsed;
         // Don't let the player move if he's stunned
         if (hasState(EntityState.STAGGERED)) return;
 
-        // Face mouse cursor
-        double offsetX = QuickView.toWorldX(mouseX) - getX();
-        double offsetY = QuickView.toWorldY(mouseY) - getY();
-        double dir = Math.atan2(offsetY, offsetX);
-        // Don't let the player look around if he's committed to an animation
-        if (isReady()) setDirection(dir);
+        // Face mouse cursor, if not committed to an animation
+        if (isReady()) userFaceCursor();
 
         // User can't control the character if it's velocity is greater than Physics.maxMoveSpeed
         // This has the positive side effect of disabling player controls during knockback
         if (getVelocity().getMagnitude() > Physics.maxMoveSpeed) return;
 
         // Mouse
-        if (current.isMouseLeft()) {
-            // Attack
+        if (currentInput.isMouseLeft()) { // Attack
             // TODO: attack chaining (if Attack ability is in the correct state, add the next ability to the queue)
-            useAbility(Abilities.ATTACKPRIMARY);
+            timeSinceLastCast = 0;
+            abilityOrder = UserOrders.ATTACK;
         }
 
         // Keyboard
+        if (currentInput.pressed(KeyCode.SPACE)) { // Dash
+            timeSinceLastCast = 0;
+            abilityOrder = UserOrders.DASH;
+        }
+        // Movement
         double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
-        if (current.pressed(KeyCode.SPACE)) {
-            // Dash
-            useAbility(Abilities.DASH);
+        boolean previous = movementOrder != UserOrders.EMPTY; // We need this to prevent resetting time every tick
+        if (currentInput.pressed(KeyCode.W)) movementOrder = UserOrders.MOVE_NORTH; // go up
+        if (currentInput.pressed(KeyCode.S)) movementOrder = UserOrders.MOVE_SOUTH; // go down
+        if (currentInput.pressed(KeyCode.A)) movementOrder = UserOrders.MOVE_WEST; // go left
+        if (currentInput.pressed(KeyCode.D)) movementOrder = UserOrders.MOVE_EAST; // go right
+
+        if (currentInput.pressed(KeyCode.W) && currentInput.pressed(KeyCode.A)) movementOrder = UserOrders.MOVE_NORTHWEST;
+        if (currentInput.pressed(KeyCode.W) && currentInput.pressed(KeyCode.D)) movementOrder = UserOrders.MOVE_NORTHEAST;
+        if (currentInput.pressed(KeyCode.S) && currentInput.pressed(KeyCode.A)) movementOrder = UserOrders.MOVE_SOUTHWEST;
+        if (currentInput.pressed(KeyCode.S) && currentInput.pressed(KeyCode.D)) movementOrder = UserOrders.MOVE_SOUTHEAST;
+        if (movementOrder != UserOrders.EMPTY && !previous) timeSinceLastMove = 0; // If a key was pressed, reset time
+
+        processOrders(elapsed); // Carry out
+    }
+
+    //region User Orders
+
+    /**
+     * Check current order and carry it out, then remove it from queue
+     */
+    private void processOrders(double elapsed) {
+        // Movement
+        if (timeSinceLastMove <= 0.3) {
+            if (processMovement(elapsed))
+                movementOrder = UserOrders.EMPTY;
+        } else { // don't carry out if enough time has passed
+            movementOrder = UserOrders.EMPTY;
         }
-        // if player is busy, don't let him move
-        if (hasState(EntityState.CASTUP) ||
-                hasState(EntityState.CASTING) ||
-                hasState(EntityState.CASTDOWN)) return;
-        if (current.pressed(KeyCode.W) && !current.pressed(KeyCode.S)) { // go up
-            accelerate(new Coord(0.0, -modifier), elapsed);
-            setState(EnumSet.of(EntityState.MOVING));
-        } else if (current.pressed(KeyCode.S) && !current.pressed(KeyCode.W)) { // go down
-            accelerate(new Coord(0.0, modifier), elapsed);
-            setState(EnumSet.of(EntityState.MOVING));
-        }
-        if (current.pressed(KeyCode.A) && !current.pressed(KeyCode.D)) { // go left
-            accelerate(new Coord(-modifier, 0.0), elapsed);
-            setState(EnumSet.of(EntityState.MOVING));
-        } else if (current.pressed(KeyCode.D) && !current.pressed(KeyCode.A)) { // go right
-            accelerate(new Coord(modifier, 0.0), elapsed);
-            setState(EnumSet.of(EntityState.MOVING));
+
+        // Abilities
+        if (timeSinceLastCast <= 0.3) {
+            if (processAbilities(elapsed))
+                abilityOrder = UserOrders.EMPTY;
+        } else { // don't carry out if enough time has passed
+            abilityOrder = UserOrders.EMPTY;
         }
     }
+
+    private boolean processMovement(double elapsed) {
+        if (!canMove()) return false;
+        double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
+        switch (movementOrder) {
+            case EMPTY:
+                getState().remove(EntityState.MOVING);
+                break;
+            case MOVE_EAST:
+                accelerate(new Coord(modifier, 0.0), elapsed);
+                break;
+            case MOVE_NORTHEAST:
+                accelerate(new Coord(0.71 * modifier, -0.71 * modifier), elapsed);
+                break;
+            case MOVE_NORTH:
+                accelerate(new Coord(0.0, -modifier), elapsed);
+                break;
+            case MOVE_NORTHWEST:
+                accelerate(new Coord(-0.71 * modifier, -0.71 * modifier), elapsed);
+                break;
+            case MOVE_WEST:
+                accelerate(new Coord(-modifier, 0.0), elapsed);
+                break;
+            case MOVE_SOUTHWEST:
+                accelerate(new Coord(-0.71 * modifier, 0.71 * modifier), elapsed);
+                break;
+            case MOVE_SOUTH:
+                accelerate(new Coord(0.0, modifier), elapsed);
+                break;
+            case MOVE_SOUTHEAST:
+                accelerate(new Coord(0.71 * modifier, 0.71 * modifier), elapsed);
+                break;
+        }
+        return true;
+    }
+
+    private boolean processAbilities(double elapsed) {
+        switch (abilityOrder) {
+            case ATTACK:
+                return useAbility(Abilities.ATTACKPRIMARY);
+            case DASH:
+                if (hasState(EntityState.CASTDOWN)) { // allow movement to cancel animation
+                    getState().remove(EntityState.CASTDOWN);
+                    processMovement(elapsed);
+                }
+                return useAbility(Abilities.DASH);
+        }
+        return true;
+    }
+
+    private void userFaceCursor() {
+        double offsetX = QuickView.toWorldX(mouseX) - getX();
+        double offsetY = QuickView.toWorldY(mouseY) - getY();
+        double dir = Math.atan2(offsetY, offsetX);
+        setDirection(dir);
+    }
+    //endregion ==============================
 
 }

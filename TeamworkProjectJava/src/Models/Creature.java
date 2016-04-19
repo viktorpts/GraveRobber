@@ -79,6 +79,7 @@ abstract public class Creature extends Entity implements IMovable {
     }
     //endregion ==============================
 
+    //region Movement
     // Implementation of IMovable, everything to do with motion
     @Override
     public void accelerate(Coord vector, double time) {
@@ -106,6 +107,40 @@ abstract public class Creature extends Entity implements IMovable {
     public void place(double newX, double newY) {
         super.setPos(newX, newY);
     }
+
+    @Override
+    public Coord getVelocity() {
+        return velocity;
+    }
+
+    @Override
+    public void setVelocity(Coord newVelocity) {
+        velocity = newVelocity;
+    }
+
+    /**
+     * Since many operations require the creature to just move where it's looking, this method takes care of all vector
+     * calc and just adds the needed acceleration in the proper direction
+     *
+     * @param time seconds since last update
+     */
+    public void moveForward(double time) {
+        // TODO: extend checks for staggering effects that prevent voluntary movement
+        if (velocity.getMagnitude() > Physics.maxVelocity) return; // this checks for sudden movements (like knockback)
+        Coord vector = new Coord(maxAcceleration + Physics.friction, 0.0);
+        vector.setDirection(getDirection());
+        accelerate(vector, time);
+        if (velocity.getMagnitude() > maxSpeed) velocity.setMagnitude(maxSpeed); // make sure we're not going too fast
+    }
+
+    public boolean canMove() {
+        // if player is busy, don't let him move
+        if (hasState(EntityState.CASTUP) ||
+                hasState(EntityState.CASTING) ||
+                hasState(EntityState.CASTDOWN)) return false;
+        return true;
+    }
+    //endregion ==============================
 
     //region Collision detection and resolution
     /**
@@ -181,31 +216,6 @@ abstract public class Creature extends Entity implements IMovable {
     }
     //endregion ==============================
 
-    @Override
-    public Coord getVelocity() {
-        return velocity;
-    }
-
-    @Override
-    public void setVelocity(Coord newVelocity) {
-        velocity = newVelocity;
-    }
-
-    /**
-     * Since many operations require the creature to just move where it's looking, this method takes care of all vector
-     * calc and just adds the needed acceleration in the proper direction
-     *
-     * @param time seconds since last update
-     */
-    public void moveForward(double time) {
-        // TODO: extend checks for staggering effects that prevent voluntary movement
-        if (velocity.getMagnitude() > Physics.maxVelocity) return; // this checks for sudden movements (like knockback)
-        Coord vector = new Coord(maxAcceleration + Physics.friction, 0.0);
-        vector.setDirection(getDirection());
-        accelerate(vector, time);
-        if (velocity.getMagnitude() > maxSpeed) velocity.setMagnitude(maxSpeed); // make sure we're not going too fast
-    }
-
     /**
      * Update the creature, depending on time elapsed since last update. Process behaviour, if entity has an AI
      * attached, look for collisions with other objects, move physically, cool down all used abilites, etc.
@@ -245,7 +255,7 @@ abstract public class Creature extends Entity implements IMovable {
         Main.game.getLevel().getGeometry().stream()
                 .filter(tile -> tile.getTileType() == TileType.WALL) //just the walls
                 .filter(tile -> Math.abs(tile.getX() - getX()) < Physics.activeRange && Math.abs(tile.getY() - getY()) < Physics.activeRange)
-                .forEach(tile -> vrfyBounds(tile));
+                .forEach(this::vrfyBounds);
 
         // Update used abilities (they cool themselves down, if needed)
         abilities.entrySet().stream()
@@ -254,8 +264,7 @@ abstract public class Creature extends Entity implements IMovable {
         resetState(); // make sure we have something here
     }
 
-    // Abilities
-
+    //region Abilities
     /**
      * Add an ability to the list
      *
@@ -273,17 +282,20 @@ abstract public class Creature extends Entity implements IMovable {
      * we can bypass these checks for hilarious results.
      *
      * @param ability Name of ability to be activated
+     * @return True if ability was activated successfully
      */
-    public void useAbility(Abilities ability) {
-        if (!isReady()) return;
+    public boolean useAbility(Abilities ability) {
+        if (!isReady()) return false;
         if (abilities.containsKey(ability)) {
-            if (!abilities.get(ability).isReady()) return;
+            if (!abilities.get(ability).isReady()) return false;
             stopAbilities(); // cancel all ongoing abilities
             cancelAnimation();
             getState().remove(EntityState.CASTDOWN);
             resetState();
             abilities.get(ability).use();
+            return true;
         }
+        return false;
     }
 
     // Cancel all abilities that are processing and put them in cooldown
@@ -293,11 +305,13 @@ abstract public class Creature extends Entity implements IMovable {
                         entry.getValue().getState() == AbilityState.RECOVER)
                 .forEach(entry -> entry.getValue().spend());
     }
+    //endregion ==============================
 
     public void cancelAnimation() {
         getAnimation().setState(AnimationState.IDLE);
     }
 
+    //region Damage and external effects
     // Stun the creature
     public void stagger() {
         stopAbilities();
@@ -367,4 +381,6 @@ abstract public class Creature extends Entity implements IMovable {
             }
         }
     }
+    //endregion ==============================
+
 }

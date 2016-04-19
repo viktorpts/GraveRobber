@@ -23,6 +23,21 @@ public class ControlState {
     }
 
     public void addKey(KeyCode kc) {
+        // Filter conflicting movement keys
+        switch (kc) {
+            case W:
+                if (keyState.contains(KeyCode.S)) keyState.remove(KeyCode.S);
+                break;
+            case S:
+                if (keyState.contains(KeyCode.W)) keyState.remove(KeyCode.W);
+                break;
+            case A:
+                if (keyState.contains(KeyCode.D)) keyState.remove(KeyCode.D);
+                break;
+            case D:
+                if (keyState.contains(KeyCode.A)) keyState.remove(KeyCode.A);
+                break;
+        }
         keyState.add(kc);
     }
     public void removeKey(KeyCode kc) {
