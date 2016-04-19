@@ -133,6 +133,7 @@ public class Main extends Application {
                     }
                 }
                 else{
+                    //Visualise start menu
                     QuickView.renderMenuBackground();
                     QuickView.renderStartButton(100, 100);
                     QuickView.renderExitButton(100, 200);
