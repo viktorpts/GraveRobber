@@ -35,10 +35,9 @@ public class Level {
     public Level(Player player) {
         entities = new ArrayList<>();
         generateGeometry();
-        //spawnEnemies();
+        spawnEnemies();
         this.player = player;
         setStart();
-        entities.add(CreatureFactory.createEnemy(EnemyTypes.SKELETON, player.getX() + 0.5, player.getY(), 0.0));
         entities.add(this.player);
     }
 
@@ -73,17 +72,17 @@ public class Level {
     }
 
     private void spawnEnemies() {
-        // Add 10 Skeletons and 20 Rats
+        // Add 7 Skeletons and 13 Rats
         Random rnd = new Random();
         // Get just the floor tiles
         ArrayList<Tile> floor = new ArrayList<>();
         geometry.stream().filter(tile -> tile.getTileType() == TileType.FLOOR).forEach(tile -> floor.add(tile));
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 7; i++) {
             Tile current = floor.get(rnd.nextInt(floor.size())); // Pick random tile
             entities.add(CreatureFactory.createEnemy(EnemyTypes.SKELETON, current.getX(), current.getY(), rnd.nextDouble() * Math.PI * 2));
             floor.remove(current); // Remove tile from list
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 13; i++) {
             Tile current = floor.get(rnd.nextInt(floor.size())); // Pick random tile
             entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,current.getX(), current.getY(), rnd.nextDouble() * Math.PI * 2));
             floor.remove(current); // Remove tile from list
