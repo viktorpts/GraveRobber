@@ -2,6 +2,7 @@ package Game;
 
 import Enumerations.EnemyTypes;
 import Enumerations.EntityState;
+import Enumerations.GameState;
 import Factories.CreatureFactory;
 import Models.Enemy;
 import Renderer.DebugView;
@@ -36,6 +37,7 @@ public class Main extends Application {
         launch(args);
     }
 
+
     @Override
     public void start(Stage primaryStage) {
         // Setup scene and nodes
@@ -56,6 +58,9 @@ public class Main extends Application {
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
         //CreatureFactory.init(); //Initialise list of creatures
+
+        //Load cursor image
+        QuickView.loadMouseImage();
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
@@ -82,47 +87,57 @@ public class Main extends Application {
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                double[] mousePos = game.getControlState().getMouse();
-                double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
-                double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
-                double dir = Math.atan2(offsetY, offsetX);
-                // Don't let the player look around if he's committed to an animation
-                if (game.getPlayer().isReady()) game.getPlayer().setDirection(dir);
 
-                // Update state
-                game.update(currentNanoTime);
-                game.handleInput();
-                // Output
-                gc.setFill(Color.BLACK);
-                gc.fillRect(0, 0, horizontalRes, verticalRes);
-                QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
-                        game.getLevel().getPlayer().getY());
-                QuickView.drawGrid(gc);
-                game.render();
+                    double[] mousePos = game.getControlState().getMouse();
+                    double offsetX = QuickView.toWorldX(mousePos[0]) - game.getLevel().getPlayer().getX();
+                    double offsetY = QuickView.toWorldY(mousePos[1]) - game.getLevel().getPlayer().getY();
+                    double dir = Math.atan2(offsetY, offsetX);
+                    // Don't let the player look around if he's committed to an animation
+                    if (game.getPlayer().isReady()) game.getPlayer().setDirection(dir);
+                if (game.getGameState() != GameState.MENU) {
+                    // Update state
 
-                // Health bar
-                gc.save();
-                gc.setFill(Color.RED);
-                gc.setStroke(Color.RED);
-                gc.setLineWidth(2);
-                gc.strokeRect(10, 10, 220, 20);
-                gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
-                gc.restore();
+                    game.update(currentNanoTime);
+                    game.handleInput();
+                    // Output
+                    gc.setFill(Color.BLACK);
+                    gc.fillRect(0, 0, horizontalRes, verticalRes);
+                    QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
+                            game.getLevel().getPlayer().getY());
+                    QuickView.drawGrid(gc);
+                    if (game.getGameState() != GameState.MENU) {
+                        game.render();
+                    }
 
-                if (game.getPlayer().hasState(EntityState.DEAD)) {
+                    // Health bar
                     gc.save();
                     gc.setFill(Color.RED);
-                    gc.setStroke(Color.BLACK);
-                    gc.setLineWidth(1);
-                    gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
-                    gc.setTextAlign(TextAlignment.CENTER);
-                    gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
-                    gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                    gc.setStroke(Color.RED);
+                    gc.setLineWidth(2);
+                    gc.strokeRect(10, 10, 220, 20);
+                    gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
                     gc.restore();
-                } else {
-                    QuickView.renderArrow(mousePos[0], mousePos[1], dir);
-                }
 
+                    if (game.getPlayer().hasState(EntityState.DEAD)) {
+                        gc.save();
+                        gc.setFill(Color.RED);
+                        gc.setStroke(Color.BLACK);
+                        gc.setLineWidth(1);
+                        gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
+                        gc.setTextAlign(TextAlignment.CENTER);
+                        gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                        gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
+                        gc.restore();
+                    } else {
+                        QuickView.renderArrow(mousePos[0], mousePos[1], dir);
+                    }
+                }
+                else{
+                    QuickView.renderMenuBackground();
+                    QuickView.renderStartButton(100, 100);
+                    QuickView.renderExitButton(100, 200);
+                    QuickView.renderMenuCursor(game.getControlState().getMouseX(),game.getControlState().getMouseY());
+                }
                 /**
                  * Debug info
                  */
@@ -134,6 +149,7 @@ public class Main extends Application {
                 /**
                  * End of Debug info
                  */
+
             }
         }.start();
 

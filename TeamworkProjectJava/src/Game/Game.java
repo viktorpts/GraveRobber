@@ -2,6 +2,7 @@ package Game;
 
 import Enumerations.Abilities;
 import Enumerations.EntityState;
+import Enumerations.GameState;
 import Models.Creature;
 import Models.Entity;
 import Models.Player;
@@ -32,14 +33,16 @@ public class Game {
     private ControlState controlState;
     private long timeLast;      // System time in nanoseconds when last update occured
     private double elapsed;     // Time elapsed since last update in seconds
+    private GameState gameState;
 
     public Game(GraphicsContext gc, long timeStart) {
         this.gc = gc;
         controlState = new ControlState();
         timeLast = timeStart;
         elapsed = 0;
-
+        gameState = GameState.MENU;
         makeLevel();
+
     }
 
     public void makeLevel() {
@@ -66,6 +69,14 @@ public class Game {
     // Timekeeping
     public long getTime() {
         return timeLast;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     public double getElapsed() {
