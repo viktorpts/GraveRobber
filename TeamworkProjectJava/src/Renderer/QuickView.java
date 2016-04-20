@@ -32,7 +32,6 @@ public class QuickView {
     static public double cameraHeight = 120;
     static public double cameraX = 79;
     static public double cameraY = 59;
-    static public Image menuCursor;
     // Camera controls
     static public void adjustRes(int size) {
         gridSize = size;
@@ -71,23 +70,6 @@ public class QuickView {
         }
         gc.restore();
     }
-
-    public static void loadMouseImage(){
-        InputStream is = null;
-        try {
-            is = Files.newInputStream(Paths.get("resources/cursor.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Image img = new Image(is);
-        menuCursor = img;
-        try {
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     static public void setBlock(GraphicsContext gc, int x, int y, int type) {
         /**
@@ -212,53 +194,6 @@ public class QuickView {
             gc.fillText(debug, x + gridSize / 2, y);
         }
     }
-    static public void renderMenuBackground() {
-        GraphicsContext gc = Main.game.getGc();
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0,0,1100,600);
-    }
-    static public void renderStartButton(double x, double y) {
-        GraphicsContext gc = Main.game.getGc();
-        double mouseX = Main.game.getPlayer().getMouseX();
-        double mouseY = Main.game.getPlayer().getMouseY();
-        if (mouseX >= x && mouseX <= x + 200 && mouseY >= y && mouseY <= y + 30){
-            gc.setFill(Color.RED);
-            gc.fillRoundRect(x,y,200,30,30,30);
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font(30));
-            if (Main.game.getControlState().isMouseLeft()) {
-                Main.game.setGameState(GameState.LIVE);
-            }
-        }
-        else{
-            gc.setFill(Color.WHITE);
-            gc.fillRoundRect(x,y,200,30,30,30);
-            gc.setFill(Color.RED);
-            gc.setFont(Font.font(30));
-        }
-        gc.fillText("START",x + 75,y +24,170);
-    }
-    static public void renderExitButton(double x, double y) {
-        GraphicsContext gc = Main.game.getGc();
-        double mouseX = Main.game.getPlayer().getMouseX();
-        double mouseY = Main.game.getPlayer().getMouseY();
-        if (mouseX >= x && mouseX <= x + 200 && mouseY >= y && mouseY <= y + 30){
-            gc.setFill(Color.RED);
-            gc.fillRoundRect(x,y,200,30,30,30);
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font(30));
-            if (Main.game.getControlState().isMouseLeft()) {
-                Platform.exit();
-            }
-        }
-        else{
-            gc.setFill(Color.WHITE);
-            gc.fillRoundRect(x,y,200,30,30,30);
-            gc.setFill(Color.RED);
-            gc.setFont(Font.font(30));
-        }
-        gc.fillText("EXIT",x + 75,y +24,170);
-    }
 
     static public void renderDot(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
@@ -270,11 +205,6 @@ public class QuickView {
             size = 25;
         }
         gc.fillOval(x - size / 2, y - size / 2, size, size);
-    }
-    static public void renderMenuCursor(double x, double y) {
-        GraphicsContext gc = Main.game.getGc();
-
-        gc.drawImage(menuCursor, x, y);
     }
 
     static public void renderArrow(double x, double y, double dir) {

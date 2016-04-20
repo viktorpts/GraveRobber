@@ -3,11 +3,9 @@ package Game;
 import Enumerations.Abilities;
 import Enumerations.EntityState;
 import Enumerations.GameState;
-import Factories.CreatureFactory;
-import Models.Enemy;
 import Abilities.Defend;
 import Renderer.DebugView;
-import World.Coord;
+import Renderer.UserInterface;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -65,7 +63,7 @@ public class Main extends Application {
         QuickView.adjustRes(50); // set zoom level
 
         //Load cursor image
-        QuickView.loadMouseImage();
+        UserInterface.loadMouseImage();
 
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
@@ -144,10 +142,10 @@ public class Main extends Application {
                     }
                 } else {
                     //Visualise start menu
-                    QuickView.renderMenuBackground();
-                    QuickView.renderStartButton(100, 100);
-                    QuickView.renderExitButton(100, 200);
-                    QuickView.renderMenuCursor(game.getPlayer().getMouseX(), game.getPlayer().getMouseY());
+                    UserInterface.renderMenuBackground();
+                    UserInterface.renderStartButton(100, 100);
+                    UserInterface.renderExitButton(100, 200);
+                    UserInterface.renderMenuCursor(game.getPlayer().getMouseX(), game.getPlayer().getMouseY());
                 }
                 /**
                  * Debug info
