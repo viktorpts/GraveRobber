@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,13 @@ public class UserInterface {
         gc.setFill(Color.BLACK);
         gc.fillRect(0,0,1100,600);
     }
+    static public void renderTitle(double x, double y) {
+        GraphicsContext gc = Main.game.getGc();
+        gc.setFill(Color.GRAY);
+        String t = "GRAVE ROBBER";
+        gc.setFont(Font.font(68));
+        gc.fillText("GRAVE ROBBER",x,y);
+    }
 
     static public void renderStartButton(double x, double y) {
         GraphicsContext gc = Main.game.getGc();
@@ -58,7 +66,7 @@ public class UserInterface {
             gc.setFill(Color.RED);
             gc.setFont(Font.font(30));
         }
-        gc.fillText("START",x + 75,y +24,170);
+        gc.fillText("START",x + 64,y +24,170);
     }
 
     static public void renderExitButton(double x, double y) {

@@ -143,8 +143,9 @@ public class Main extends Application {
                 } else {
                     //Visualise start menu
                     UserInterface.renderMenuBackground();
-                    UserInterface.renderStartButton(100, 100);
-                    UserInterface.renderExitButton(100, 200);
+                    UserInterface.renderTitle(180,300);
+                    UserInterface.renderStartButton(300, 350);
+                    UserInterface.renderExitButton(300, 400);
                     UserInterface.renderMenuCursor(game.getPlayer().getMouseX(), game.getPlayer().getMouseY());
                 }
                 /**
