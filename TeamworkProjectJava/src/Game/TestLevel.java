@@ -47,6 +47,11 @@ public class TestLevel  extends Application {
                 // Advance generation
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, 800, 600);
+                if (ke.getCode() == KeyCode.SPACE) {
+                    Level.CURRENT_LEVEL++;
+                    DungeonMaker.mazeHeight *= 2;
+                    DungeonMaker.mazeWidth *= 2;
+                }
                 if (ke.getCode() == KeyCode.ENTER) {
                     // Initialize generator, make rooms within boundaries
                     DungeonMaker map = new DungeonMaker();

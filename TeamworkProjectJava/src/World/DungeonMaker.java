@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class DungeonMaker {
 
-    public static final int mazeWidth = 25;
-    public static final int mazeHeight = 25;
+    public static int mazeWidth = 25;
+    public static int mazeHeight = 25;
 
     private ArrayList<Dungeon> maze;
     private ArrayList<Tile> levelTiles;
