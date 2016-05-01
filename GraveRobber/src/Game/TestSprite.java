@@ -1,14 +1,19 @@
 package Game;
 
+import Renderer.Sequence;
+import Renderer.Sprite;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.io.File;
 
 public class TestSprite extends Application {
 
@@ -27,27 +32,15 @@ public class TestSprite extends Application {
         Scene scene = new Scene(root, horizontalRes, verticalRes, Color.BLACK);
         Canvas canvas = new Canvas(horizontalRes, verticalRes); // Main canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.setLineWidth(2.0);
+        gc.setFill(Color.WHITE);
+        gc.setStroke(Color.WHITE);
         root.getChildren().addAll(canvas);
 
-        /* Input
-        // Event handler for keyboard input
-        scene.setOnKeyPressed(ke -> {
-            if (ke.getCode() == KeyCode.ESCAPE) {
-                if (game.getGameState() == GameState.LIVE) game.setGameState(GameState.MENU);
-                else if (game.getGameState() == GameState.MENU) game.setGameState(GameState.LIVE);
-            } else
-                game.getPlayer().addKey(ke.getCode());
-        });
-        scene.setOnKeyReleased(ke -> {
-            game.getPlayer().removeKey(ke.getCode());
-        });
+        Sprite sprite = new Sprite("./resources/warrior.ini");
 
-        // Event handler for mouse position and input
-        scene.setOnMouseMoved(event -> {
-            game.getPlayer().updateMouse(event.getX(), event.getY());
-        });
+        /* Input
+
+
         scene.setOnMouseDragged(event -> {
             game.getPlayer().updateMouse(event.getX(), event.getY());
         });
@@ -61,9 +54,34 @@ public class TestSprite extends Application {
         });
         */
 
+        // Event handler for keyboard input
+        final double[] currentDir = {1.5};
+        scene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.SPACE) {
+                currentDir[0] += 0.1;
+            }
+        });
+        scene.setOnKeyReleased(ke -> {
+            // Key released
+        });
+
+        // Event handler for mouse position and input
+        double[] mouse = {0, 0};
+        scene.setOnMouseMoved(event -> {
+            mouse[0] = event.getX();
+            mouse[1] = event.getY();
+        });
+
+        long lastTick = System.nanoTime();
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-
+                double elapsed = (double) (currentNanoTime - lastTick) / 1_000_000_000;
+                int index = (int) (elapsed * 10) % 8;
+                gc.clearRect(0, 0, horizontalRes, verticalRes);
+                gc.fillText(String.format("%.2f", elapsed), 10, 20);
+                //currentDir[0] = 0;
+                Sequence sequence = sprite.getSequence("walk", currentDir[0]);
+                gc.drawImage(sequence.get(index).get(), mouse[0] - sprite.getOX(index), mouse[1] - sprite.getOY(index));
             }
         }.start();
 

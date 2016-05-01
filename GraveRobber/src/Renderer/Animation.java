@@ -9,6 +9,7 @@ import Models.Player;
 public class Animation {
     // TODO: Add a container and methods to load image frames from disk into memory and output them to a display interface
     // phase lengths instead of sprite, temporary
+    private Sprite sprite;
     public String type = "";
     public double phase1 = 3.0;
     public double phase2 = 3.0;
@@ -27,6 +28,7 @@ public class Animation {
         // set phase lengths based on caller type, temporary
         type = caller;
         if (caller.equals("Player")) {
+            sprite = new Sprite("./resources/warrior.ini");
             phase1 = 3.0;
             phase2 = 3.0;
             phase3 = 3.0;
@@ -53,6 +55,26 @@ public class Animation {
             case ATTACKDOWN: adjusted /= phase3; adjusted += 2; break;
         }
         CharView.parseCharacter(sender, x, y, direction, adjusted, state);
+        if (type.equals("Player")) {
+            Sequence sequence;
+            int index;
+            if (Main.game.getPlayer().hasState(EntityState.MOVING)) {
+                sequence = sprite.getSequence("walk", direction);
+                index = (int) (progress) % 8;
+            } else if (state == AnimationState.ATTACKUP ||
+                    state == AnimationState.ATTACKING ||
+                    state == AnimationState.ATTACKDOWN) {
+                sequence = sprite.getSequence("attack", direction);
+                index = (int) (adjusted * 5);
+            } else {
+                sequence = sprite.getSequence("idle", direction);
+                index = (int) (progress) % 10;
+            }
+            Frame current = sequence.get(index);
+            Main.game.getGc().drawImage(current.get(),
+                    QuickView.toCanvasX(x) - current.getOX(),
+                    QuickView.toCanvasY(y) - current.getOY());
+        }
     }
 
     public void advance(double time) {
