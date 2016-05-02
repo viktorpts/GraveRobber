@@ -32,6 +32,8 @@ public class Frame {
      * @param offsetY Origin y (based on cropped frame)
      */
     public Frame(Image src, int x, int y, int width, int height, int offsetX, int offsetY) {
+        while (x + width >= src.getWidth()) width--;
+        while (y + height >= src.getHeight()) height--;
         this.image = new WritableImage(src.getPixelReader(), x, y, width, height);
         this.offsetX = offsetX;
         this.offsetY = offsetY;

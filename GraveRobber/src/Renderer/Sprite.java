@@ -131,4 +131,8 @@ public class Sprite {
         return result;
     }
 
+    public int nOfSequences() {
+        return sequences.size();
+    }
+
 }

@@ -27,6 +27,10 @@ public class Sequence {
         return frames.get(index);
     }
 
+    public int length() {
+        return frames.size();
+    }
+
     public boolean isDir(double dir) {
         while (dir > Math.PI) dir -= 2 * Math.PI;
         if (dir >= fromDir && dir < toDir) return true;

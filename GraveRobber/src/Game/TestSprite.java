@@ -2,6 +2,7 @@ package Game;
 
 import Renderer.Sequence;
 import Renderer.Sprite;
+import World.Coord;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -13,12 +14,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.File;
-
 public class TestSprite extends Application {
 
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
+    static Sprite sprite;
+    static String testPath = "./resources/rat.ini";
 
     public static void main(String[] args) {
         launch(args);
@@ -36,29 +37,23 @@ public class TestSprite extends Application {
         gc.setStroke(Color.WHITE);
         root.getChildren().addAll(canvas);
 
-        Sprite sprite = new Sprite("./resources/warrior.ini");
+        // Initialize sprite for testing
+        initSprite(testPath);
 
         /* Input
-
-
-        scene.setOnMouseDragged(event -> {
-            game.getPlayer().updateMouse(event.getX(), event.getY());
-        });
         scene.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(true);
             if (event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(true);
         });
-        scene.setOnMouseReleased(event -> {
-            if (!event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(false);
-            if (!event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(false);
-        });
         */
 
         // Event handler for keyboard input
-        final double[] currentDir = {1.5};
+        final int[] currentSequence = {0};
         scene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.SPACE) {
-                currentDir[0] += 0.1;
+                currentSequence[0]++;
+            } else if (ke.getCode() == KeyCode.ENTER) {
+                initSprite(testPath);
             }
         });
         scene.setOnKeyReleased(ke -> {
@@ -66,22 +61,50 @@ public class TestSprite extends Application {
         });
 
         // Event handler for mouse position and input
-        double[] mouse = {0, 0};
+        final double[] mouse = {0, 0};
         scene.setOnMouseMoved(event -> {
             mouse[0] = event.getX();
             mouse[1] = event.getY();
         });
+        Coord origin = new Coord(horizontalRes / 2, verticalRes / 2);
+        Coord relative = new Coord(0,0);
 
         long lastTick = System.nanoTime();
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
+                // Timing
                 double elapsed = (double) (currentNanoTime - lastTick) / 1_000_000_000;
-                int index = (int) (elapsed * 10) % 8;
+
+                // Determine direction
+                relative.setPos(mouse[0], mouse[1]);
+                double direction = Coord.angleBetween(origin, relative);
+
+                // Sequence
+                int sequenceID = currentSequence[0] % 3;
+                String current = "idle";
+                switch (sequenceID) {
+                    case 0:
+                        current = "idle";
+                        break;
+                    case 1:
+                        current = "walk";
+                        break;
+                    case 2:
+                        current = "attack";
+                        break;
+                }
+                Sequence sequence = sprite.getSequence(current, direction);
+
+                // Select frame based on time
+                int index = (int) (elapsed * 10) % sequence.length();
+
+                // Output
                 gc.clearRect(0, 0, horizontalRes, verticalRes);
-                gc.fillText(String.format("%.2f", elapsed), 10, 20);
-                //currentDir[0] = 0;
-                Sequence sequence = sprite.getSequence("walk", currentDir[0]);
-                gc.drawImage(sequence.get(index).get(), mouse[0] - sprite.getOX(index), mouse[1] - sprite.getOY(index));
+                String debug = String.format("Time: %.2f%n", elapsed);
+                debug += String.format("Sequence: %d %s%n", currentSequence[0], current);
+                gc.fillText(debug, 10, 20);
+                gc.strokeOval(origin.getX() - 10, origin.getY() - 10, 20, 20);
+                gc.drawImage(sequence.get(index).get(), origin.getX() - sequence.get(index).getOX(), origin.getY() - sequence.get(index).getOY());
             }
         }.start();
 
@@ -91,6 +114,10 @@ public class TestSprite extends Application {
         primaryStage.setTitle("Test Window");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public static void initSprite(String path) {
+        sprite = new Sprite(path);
     }
 
 }

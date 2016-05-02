@@ -3,13 +3,15 @@ package Renderer;
 import Enumerations.AnimationState;
 import Enumerations.EntityState;
 import Game.Main;
+import Models.Creature;
 import Models.Entity;
 import Models.Player;
 
 public class Animation {
-    // TODO: Add a container and methods to load image frames from disk into memory and output them to a display interface
     // phase lengths instead of sprite, temporary
     private Sprite sprite;
+    private Sequence sequence; // current sequence of frames
+    private Frame frame; // current frame
     public String type = "";
     public double phase1 = 3.0;
     public double phase2 = 3.0;
@@ -33,10 +35,12 @@ public class Animation {
             phase2 = 3.0;
             phase3 = 3.0;
         } else if (caller.equals("SKELETON")) {
+            sprite = new Sprite("./resources/skeleton.ini");
             phase1 = 6.0;
             phase2 = 3.0;
             phase3 = 4.0;
         } else if (caller.equals("GIANT_RAT")) {
+            sprite = new Sprite("./resources/rat.ini");
             phase1 = 2.0;
             phase2 = 6.0;
             phase3 = 8.0;
@@ -50,9 +54,17 @@ public class Animation {
         // temporarily reroute functions trough external class
         double adjusted = progress;
         switch (state) {
-            case ATTACKUP: adjusted /= phase1; break;
-            case ATTACKING: adjusted /= phase2; adjusted += 1; break;
-            case ATTACKDOWN: adjusted /= phase3; adjusted += 2; break;
+            case ATTACKUP:
+                adjusted /= phase1;
+                break;
+            case ATTACKING:
+                adjusted /= phase2;
+                adjusted += 1;
+                break;
+            case ATTACKDOWN:
+                adjusted /= phase3;
+                adjusted += 2;
+                break;
         }
         CharView.parseCharacter(sender, x, y, direction, adjusted, state);
         if (type.equals("Player")) {
@@ -74,6 +86,27 @@ public class Animation {
             Main.game.getGc().drawImage(current.get(),
                     QuickView.toCanvasX(x) - current.getOX(),
                     QuickView.toCanvasY(y) - current.getOY());
+        } else if (sender instanceof Creature) {
+            Creature current = (Creature) sender;
+            Sequence sequence;
+            int index;
+            if (current.hasState(EntityState.CASTUP) ||
+                    current.hasState(EntityState.CASTING) ||
+                    current.hasState(EntityState.CASTDOWN)) {
+                sequence = sprite.getSequence("attack", direction);
+                index = (int) ((adjusted / 3) * sequence.length()) % sequence.length();
+            }
+            else if (current.getVelocity().getMagnitude() > 0) { // moving
+                sequence = sprite.getSequence("walk", direction);
+                index = (int) (progress) % sequence.length();
+            } else { // idle
+                sequence = sprite.getSequence("idle", direction);
+                index = (int) (progress) % sequence.length();
+            }
+            Frame currentFrame = sequence.get(index);
+            Main.game.getGc().drawImage(currentFrame.get(),
+                    QuickView.toCanvasX(x) - currentFrame.getOX(),
+                    QuickView.toCanvasY(y) - currentFrame.getOY());
         }
     }
 
