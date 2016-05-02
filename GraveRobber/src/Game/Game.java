@@ -143,6 +143,7 @@ public class Game {
                         entity.getX() < getPlayer().getX() + Physics.activeRange &&
                         entity.getY() > getPlayer().getY() - Physics.activeRange &&
                         entity.getY() < getPlayer().getY() + Physics.activeRange)
+                .sorted((e1, e2) -> Double.compare(e1.getY(), e2.getY()))
                 .forEach(Entity::render);
     }
 
