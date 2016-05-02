@@ -2,6 +2,7 @@ package Renderer;
 
 import Enumerations.AnimationState;
 import Enumerations.EntityState;
+import Enumerations.Sequences;
 import Game.Main;
 import Models.Creature;
 import Models.Entity;
@@ -22,8 +23,7 @@ public class Animation {
     double framerate; // frames per second
 
     public Animation(double framerate, String caller) {
-        state = AnimationState.IDLE;
-        progress = 0.0;
+        setState(AnimationState.IDLE);
         this.framerate = framerate;
         //this.framerate = 1; // todo /!\ change back when finished testing /!\
 
@@ -71,15 +71,15 @@ public class Animation {
             Sequence sequence;
             int index;
             if (Main.game.getPlayer().hasState(EntityState.MOVING)) {
-                sequence = sprite.getSequence("walk", direction);
+                sequence = sprite.getSequence(Sequences.WALK, direction);
                 index = (int) (progress) % 8;
             } else if (state == AnimationState.ATTACKUP ||
                     state == AnimationState.ATTACKING ||
                     state == AnimationState.ATTACKDOWN) {
-                sequence = sprite.getSequence("attack", direction);
+                sequence = sprite.getSequence(Sequences.ATTACK, direction);
                 index = (int) (adjusted * 5);
             } else {
-                sequence = sprite.getSequence("idle", direction);
+                sequence = sprite.getSequence(Sequences.IDLE, direction);
                 index = (int) (progress) % 10;
             }
             Frame current = sequence.get(index);
@@ -93,14 +93,14 @@ public class Animation {
             if (current.hasState(EntityState.CASTUP) ||
                     current.hasState(EntityState.CASTING) ||
                     current.hasState(EntityState.CASTDOWN)) {
-                sequence = sprite.getSequence("attack", direction);
+                sequence = sprite.getSequence(Sequences.ATTACK, direction);
                 index = (int) ((adjusted / 3) * sequence.length()) % sequence.length();
             }
             else if (current.getVelocity().getMagnitude() > 0) { // moving
-                sequence = sprite.getSequence("walk", direction);
+                sequence = sprite.getSequence(Sequences.WALK, direction);
                 index = (int) (progress) % sequence.length();
             } else { // idle
-                sequence = sprite.getSequence("idle", direction);
+                sequence = sprite.getSequence(Sequences.IDLE, direction);
                 index = (int) (progress) % sequence.length();
             }
             Frame currentFrame = sequence.get(index);

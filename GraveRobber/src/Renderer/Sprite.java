@@ -2,6 +2,7 @@ package Renderer;
 
 
 import Enumerations.AnimationState;
+import Enumerations.Sequences;
 import Game.Main;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -120,18 +121,19 @@ public class Sprite {
         else return frames.get(0);
     }
 
-    public Sequence getSequence(String name, double dir) {
+    public Sequence getSequence(Sequences name, double dir) {
         Sequence result;
         Optional<Sequence> found = sequences.stream()
-                .filter(entry -> entry.getName().equals(name))
+                .filter(entry -> entry.getName() == name)
                 .filter(entry -> entry.isDir(dir)).findFirst();
         if (found.isPresent()) {
             result = found.get();
-        } else result = new Sequence(name, 0, 0, new Frame[]{getFrame(0)}); // return sequence of first frame, if target not found
+        } else result = new Sequence("DEFAULT", 0, 0, new Frame[]{getFrame(0)}); // return sequence of first frame, if target not found
         return result;
     }
 
     public int nOfSequences() {
+        // TODO return actual number of different animations, not the sum of all sequences (which would include direction variants)
         return sequences.size();
     }
 

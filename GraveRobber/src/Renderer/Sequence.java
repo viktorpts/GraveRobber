@@ -1,16 +1,18 @@
 package Renderer;
 
+import Enumerations.Sequences;
+
 import java.util.ArrayList;
 
 public class Sequence {
 
-    String name;
+    Sequences name;
     final ArrayList<Frame> frames;
     final double fromDir;
     final double toDir;
 
     public Sequence(String name, double fromDir, double toDir, Frame... frames) {
-        this.name = name;
+        this.name = parseName(name);
         this.frames = new ArrayList<>();
         this.fromDir = fromDir;
         this.toDir = toDir;
@@ -19,7 +21,7 @@ public class Sequence {
         }
     }
 
-    public String getName() {
+    public Sequences getName() {
         return name;
     }
 
@@ -43,6 +45,13 @@ public class Sequence {
             else if (fromDir < 0 && dir >= fromDir && toDir > 0) return true;
             else return false;
         }
+    }
+
+    private Sequences parseName(String name) {
+        if (name.equals("idle")) return Sequences.IDLE;
+        else if (name.equals("walk")) return Sequences.WALK;
+        else if (name.equals("attack")) return Sequences.ATTACK;
+        return Sequences.IDLE;
     }
 
 }

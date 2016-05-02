@@ -1,5 +1,6 @@
 package Game;
 
+import Enumerations.Sequences;
 import Renderer.Sequence;
 import Renderer.Sprite;
 import World.Coord;
@@ -81,16 +82,16 @@ public class TestSprite extends Application {
 
                 // Sequence
                 int sequenceID = currentSequence[0] % 3;
-                String current = "idle";
+                Sequences current = Sequences.IDLE;
                 switch (sequenceID) {
                     case 0:
-                        current = "idle";
+                        current = Sequences.IDLE;
                         break;
                     case 1:
-                        current = "walk";
+                        current = Sequences.WALK;
                         break;
                     case 2:
-                        current = "attack";
+                        current = Sequences.ATTACK;
                         break;
                 }
                 Sequence sequence = sprite.getSequence(current, direction);
