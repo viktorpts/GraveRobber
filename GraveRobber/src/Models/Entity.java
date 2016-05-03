@@ -2,6 +2,7 @@ package Models;
 
 import Enumerations.AnimationState;
 import Enumerations.EntityState;
+import Enumerations.Sequences;
 import Renderer.Animation;
 import World.Coord;
 
@@ -94,6 +95,7 @@ abstract public class Entity {
         // Check against a list of all unchangeable states
         // We ignore RECOVER, since we can cancel that animation to block, dodge, chain attacks, etc.
         if (state.contains(EntityState.DEAD) ||
+                state.contains(EntityState.DIE) ||
                 state.contains(EntityState.STAGGERED) ||
                 state.contains(EntityState.CASTUP) ||
                 state.contains(EntityState.CASTING) ||
@@ -110,32 +112,27 @@ abstract public class Entity {
     public Animation getAnimation() {
         return animation;
     }
-    public AnimationState getAnimationState() {
+    public Sequences getAnimationState() {
         return animation.getState();
     }
 
-    // TODO: Output sprite to display interface /!\ depends on direction
-    public void render()
-    {
-        if (animation == null || !isAlive()) return;
-
-        animation.output(this, position.getX(), position.getY(), direction);
+    public void update(double time) {
+        animate(time);
     }
 
     public void animate(double time) {
-        animation.advance(time);
+        animation.update(time, direction);
+        if (animation.getState() == Sequences.IDLE) // If animation has ended, go to idle
+            state = EnumSet.of(EntityState.IDLE);
     }
 
-    public void changeAnimation(String newSequence) {
-        if (newSequence.equals("Idle")) {
-            animation.setState(AnimationState.IDLE);
-        } else if (newSequence.equals("Primary Attack")) {
-            animation.setState(AnimationState.ATTACKUP);
-        } else if (newSequence.equals("Defend")) {
-            animation.setState(AnimationState.DEFEND);
-        }
-        // TODO: list of animation sequences can be a map of names or abilities and corresponding frames
-        // TODO: check if named sequence exists? maybe check in Animation class
+    public void render() {
+        if (animation == null || !isAlive()) return;
+        animation.render(position.getX(), position.getY());
+    }
+
+    public void changeAnimation(Sequences name, boolean looping) {
+        animation.play(name, looping);
     }
 
 }

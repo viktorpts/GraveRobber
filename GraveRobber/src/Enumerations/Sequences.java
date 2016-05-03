@@ -3,5 +3,7 @@ package Enumerations;
 public enum Sequences {
     IDLE,
     WALK,
-    ATTACK
+    ATTACK,
+    GETHIT,
+    DIE
 }

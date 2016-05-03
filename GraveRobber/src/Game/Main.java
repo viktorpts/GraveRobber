@@ -4,6 +4,7 @@ import Enumerations.Abilities;
 import Enumerations.EntityState;
 import Enumerations.GameState;
 import Abilities.Defend;
+import Factories.AnimationFactory;
 import Renderer.DebugView;
 import Renderer.UserInterface;
 import javafx.animation.AnimationTimer;
@@ -59,6 +60,7 @@ public class Main extends Application {
         root.getChildren().addAll(canvas, debugCanvas);
 
         // Initialize Game
+        AnimationFactory.init(); // WE NEED THIS BEFORE CREATURES ARE MADE
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
 

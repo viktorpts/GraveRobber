@@ -113,10 +113,8 @@ public class Game {
                         markedForDeletion.add(entity);
                         return;
                     }
-                    entity.animate(elapsed); // process animation first, since we need to know if state has changed (note this wont output, only update!)
                     if (entity.hasState(EntityState.DEAD)) return; // don't update if it's dead (not destroyed yet!)
-                    Creature current = (Creature) entity;
-                    current.update(elapsed);
+                    entity.update(elapsed);
                 });
         // Release all marked entities
         for (Entity entity : markedForDeletion) {
@@ -144,6 +142,10 @@ public class Game {
                         entity.getY() > getPlayer().getY() - Physics.activeRange &&
                         entity.getY() < getPlayer().getY() + Physics.activeRange)
                 .sorted((e1, e2) -> Double.compare(e1.getY(), e2.getY()))
+                .sorted((e1, e2) -> {
+                    if (e1.hasState(EntityState.DEAD)) return -1;
+                    else return 0;
+                })
                 .forEach(Entity::render);
     }
 

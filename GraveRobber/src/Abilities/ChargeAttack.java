@@ -19,8 +19,8 @@ public class ChargeAttack extends Ability {
     double elapsedTime;
 
     // TODO: set cool down from constructor
-    public ChargeAttack(Creature owner, double damage, double range) {
-        super(owner, 1.0);
+    public ChargeAttack(Creature owner, double resolution, double damage, double range) {
+        super(owner, 1.0, resolution);
         this.damage = damage;
         this.range = range;
         elapsedTime = 0;
@@ -36,16 +36,43 @@ public class ChargeAttack extends Ability {
         elapsedTime = 0;
         state = AbilityState.INIT;
         owner.stop();
-        owner.changeAnimation(Abilities.ATTACKPRIMARY.getName());
+        //owner.changeAnimation(Abilities.ATTACKPRIMARY.getName());
         owner.setState(EnumSet.of(EntityState.CASTUP));
+    }
+
+    @Override
+    public void resolve() {
+        Main.game.getLevel().getEntities().stream()
+                .filter(entity -> {
+                    boolean result = true;
+                    if (!(entity instanceof Creature) || entity == owner)
+                        return false; // only damage creatures and not self
+                    if (owner instanceof Enemy && entity instanceof Enemy)
+                        return false; // don't damage allies
+                    if (entity.hasState(EntityState.DEAD))
+                        return false; // don't hit dead creatures
+                    if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
+                        return false; // only damage those in range
+                    if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 6)
+                        return false; // only damage those within sweep angle
+                    return true; // if everything's been fine, process target
+                })
+                .forEach(entity -> {
+                    Creature current = (Creature) entity;
+                    current.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos());
+                });
+        //owner.getState().remove(EntityState.CASTUP);
+        reset();
     }
 
     /**
      * Process attack. Called on every frame, we keep track of what the owner is doing, and it their animation has
      * changed to the next phase, we update our status. If animation is cancelled (staggered, destroyed, chained), we
      * also cancel the ability and put it in cooldown.
+     *
      * @param time Seconds since last update
      */
+    /*
     @Override
     public void update(double time) {
         if (isReady()) return; // do nothing if ability is ready (not cooling, not in use)
@@ -115,4 +142,6 @@ public class ChargeAttack extends Ability {
                 break;
         }
     }
+    */
+
 }

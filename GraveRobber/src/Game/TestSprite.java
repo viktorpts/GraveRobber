@@ -20,7 +20,8 @@ public class TestSprite extends Application {
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
     static Sprite sprite;
-    static String testPath = "./resources/rat.ini";
+    static String testPath = "./resources/warrior.ini";
+    static int index[] = {0};
 
     public static void main(String[] args) {
         launch(args);
@@ -48,14 +49,36 @@ public class TestSprite extends Application {
         });
         */
 
+        final double[] elapsed = {0};
+
         // Event handler for keyboard input
         final int[] currentSequence = {0};
         scene.setOnKeyPressed(ke -> {
-            if (ke.getCode() == KeyCode.SPACE) {
-                currentSequence[0]++;
-            } else if (ke.getCode() == KeyCode.ENTER) {
-                initSprite(testPath);
+            switch (ke.getCode()) {
+                case SPACE:
+                    currentSequence[0]++;
+                    break;
+                case ENTER:
+                    initSprite(testPath);
+                    break;
+                case DIGIT1:
+                    currentSequence[0] = 0;
+                    break;
+                case DIGIT2:
+                    currentSequence[0] = 1;
+                    break;
+                case DIGIT3:
+                    currentSequence[0] = 2;
+                    break;
+                case DIGIT4:
+                    currentSequence[0] = 3;
+                    break;
+                case DIGIT5:
+                    currentSequence[0] = 4;
+                    break;
             }
+            elapsed[0] = 0;
+            index[0] = 0;
         });
         scene.setOnKeyReleased(ke -> {
             // Key released
@@ -68,20 +91,21 @@ public class TestSprite extends Application {
             mouse[1] = event.getY();
         });
         Coord origin = new Coord(horizontalRes / 2, verticalRes / 2);
-        Coord relative = new Coord(0,0);
+        Coord relative = new Coord(0, 0);
 
-        long lastTick = System.nanoTime();
+        final long[] lastTick = {System.nanoTime()};
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
                 // Timing
-                double elapsed = (double) (currentNanoTime - lastTick) / 1_000_000_000;
+                elapsed[0] += (double) (currentNanoTime - lastTick[0]) / 1_000_000_000;
+                lastTick[0] = currentNanoTime;
 
                 // Determine direction
                 relative.setPos(mouse[0], mouse[1]);
                 double direction = Coord.angleBetween(origin, relative);
 
                 // Sequence
-                int sequenceID = currentSequence[0] % 3;
+                int sequenceID = currentSequence[0] % 5;
                 Sequences current = Sequences.IDLE;
                 switch (sequenceID) {
                     case 0:
@@ -93,19 +117,28 @@ public class TestSprite extends Application {
                     case 2:
                         current = Sequences.ATTACK;
                         break;
+                    case 3:
+                        current = Sequences.GETHIT;
+                        break;
+                    case 4:
+                        current = Sequences.DIE;
+                        break;
                 }
                 Sequence sequence = sprite.getSequence(current, direction);
 
                 // Select frame based on time
-                int index = (int) (elapsed * 10) % sequence.length();
+                int newIndex = (int) (elapsed[0] * 10) % sequence.length();
+                if (newIndex != index[0]) {
+                    index[0] = newIndex;
+                }
 
                 // Output
                 gc.clearRect(0, 0, horizontalRes, verticalRes);
-                String debug = String.format("Time: %.2f%n", elapsed);
+                String debug = String.format("Time: %.2f%n", elapsed[0]);
                 debug += String.format("Sequence: %d %s%n", currentSequence[0], current);
                 gc.fillText(debug, 10, 20);
                 gc.strokeOval(origin.getX() - 10, origin.getY() - 10, 20, 20);
-                gc.drawImage(sequence.get(index).get(), origin.getX() - sequence.get(index).getOX(), origin.getY() - sequence.get(index).getOY());
+                gc.drawImage(sequence.get(index[0]).get(), origin.getX() - sequence.get(index[0]).getOX(), origin.getY() - sequence.get(index[0]).getOY());
             }
         }.start();
 

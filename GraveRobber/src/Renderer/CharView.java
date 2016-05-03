@@ -9,14 +9,6 @@ import Models.Player;
 
 public class CharView {
 
-    public static void parseCharacter(Entity sender, double x, double y, double direction, double progress, AnimationState state) {
-        if (sender instanceof Player) animateSwordsman(sender, x, y, direction, progress, state);
-        else if (sender instanceof Enemy) {
-            if (sender.getAnimation().type.equals("SKELETON")) animateSwordsman(sender, x, y, direction, progress, state);
-            else if (sender.getAnimation().type.equals("GIANT_RAT")) animateBeast(sender, x, y, direction, progress, state);
-        }
-    }
-
     public static void animateSwordsman(Entity sender, double x, double y, double direction, double progress, AnimationState state) {
         // check type and state an output accordingly
         int selector = 0;

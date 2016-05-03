@@ -51,6 +51,8 @@ public class Sequence {
         if (name.equals("idle")) return Sequences.IDLE;
         else if (name.equals("walk")) return Sequences.WALK;
         else if (name.equals("attack")) return Sequences.ATTACK;
+        else if (name.equals("gethit")) return Sequences.GETHIT;
+        else if (name.equals("die")) return Sequences.DIE;
         return Sequences.IDLE;
     }
 

@@ -6,6 +6,7 @@ public enum EntityState {
     IDLE,
     MOVING,
     DEAD,
+    DIE,
     STAGGERED, // controls disabled
     CASTUP, // controls disabled, can be interrupted (by staggering effects)
     CASTING, // resolution of effect
@@ -15,6 +16,7 @@ public enum EntityState {
 
     // This state prevents the entity from changing it's state voluntarily
     public static final EnumSet<EntityState> BUSY = EnumSet.of(
+            DIE,
             DEAD,
             STAGGERED,
             CASTUP,

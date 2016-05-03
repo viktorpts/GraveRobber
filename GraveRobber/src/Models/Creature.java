@@ -223,6 +223,7 @@ abstract public class Creature extends Entity implements IMovable {
      *
      * @param time Seconds since last update
      */
+    @Override
     public void update(double time) {
         // Keep track of damage instances
         if (immuneTime > 0) immuneTime -= time;
@@ -261,6 +262,18 @@ abstract public class Creature extends Entity implements IMovable {
         // Update used abilities (they cool themselves down, if needed)
         abilities.entrySet().stream().forEach(entry -> entry.getValue().update(time));
         resetState(); // make sure we have something here
+
+        // TODO Find a better place for these animations
+        if (hasState(EntityState.DIE)) {
+            if (getAnimation().ended()) setState(EnumSet.of(EntityState.DEAD));
+        } else if (hasState(EntityState.DAMAGED)) {
+            if (getAnimationState() == Sequences.IDLE ||
+                    getAnimationState() == Sequences.WALK) {
+                changeAnimation(Sequences.GETHIT, false);
+            }
+        } else if (getAnimationState() == Sequences.WALK && velocity.getMagnitude() == 0) getAnimation().reset();
+        else if (velocity.getMagnitude() > 0 && canMove() && getAnimationState() != Sequences.WALK) changeAnimation(Sequences.WALK, true);
+        animate(time);
     }
 
     //region Abilities
@@ -321,7 +334,7 @@ abstract public class Creature extends Entity implements IMovable {
     //endregion ==============================
 
     public void cancelAnimation() {
-        getAnimation().setState(AnimationState.IDLE);
+        getAnimation().reset();
     }
 
     //region Damage and external effects
@@ -394,11 +407,11 @@ abstract public class Creature extends Entity implements IMovable {
 
             healthPoints -= (int) damage;
 
-            // todo add dying animation
             if (healthPoints <= 0) {
                 stopAbilities();
                 cancelAnimation();
-                setState(EnumSet.of(EntityState.DEAD));
+                changeAnimation(Sequences.DIE, false);
+                setState(EnumSet.of(EntityState.DIE));
             }
         }
     }

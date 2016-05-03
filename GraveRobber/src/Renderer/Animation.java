@@ -6,178 +6,110 @@ import Enumerations.Sequences;
 import Game.Main;
 import Models.Creature;
 import Models.Entity;
-import Models.Player;
 
 public class Animation {
-    // phase lengths instead of sprite, temporary
+
     private Sprite sprite;
-    private Sequence sequence; // current sequence of frames
-    private Frame frame; // current frame
-    public String type = "";
-    public double phase1 = 3.0;
-    public double phase2 = 3.0;
-    public double phase3 = 3.0;
+    private Sequences state;
+    private Sequence currentSequence;
+    private Frame currentFrame;
+    private double currentDirection;
+    private boolean looping = true;
+    private double progress;
+    private int currentIndex;
+    private double framerate; // frames per second
 
-    AnimationState state;
-    double progress;
-    double framerate; // frames per second
-
-    public Animation(double framerate, String caller) {
-        setState(AnimationState.IDLE);
-        this.framerate = framerate;
+    public Animation(Sprite sprite, double startingDirection) {
+        this.sprite = sprite;
+        state = Sequences.IDLE;
+        currentDirection = startingDirection;
+        progress = 0;
+        currentIndex = 0;
+        framerate = sprite.getFramerate();
         //this.framerate = 1; // todo /!\ change back when finished testing /!\
 
-        // set phase lengths based on caller type, temporary
-        type = caller;
-        if (caller.equals("Player")) {
-            sprite = new Sprite("./resources/warrior.ini");
-            phase1 = 3.0;
-            phase2 = 3.0;
-            phase3 = 3.0;
-        } else if (caller.equals("SKELETON")) {
-            sprite = new Sprite("./resources/skeleton.ini");
-            phase1 = 6.0;
-            phase2 = 3.0;
-            phase3 = 4.0;
-        } else if (caller.equals("GIANT_RAT")) {
-            sprite = new Sprite("./resources/rat.ini");
-            phase1 = 2.0;
-            phase2 = 6.0;
-            phase3 = 8.0;
+        updateSequence();
+        updateFrame();
+    }
+
+    public void update(double time, double direction) {
+        progress += time * framerate;
+        currentDirection = direction;
+        // See if sequence or direction has changed
+        if (!vrfySequence()) updateSequence();
+        // Loop
+        if (progress >= currentSequence.length()) {
+            if (!looping) {
+                reset();
+            } else if (state != Sequences.DIE) {
+                progress = 0;
+                currentIndex = 0;
+            } else {
+                progress = currentSequence.length() - 1;
+                currentIndex = (int) progress;
+            }
         }
+        // Change frame
+        if ((int) progress > currentIndex) {
+            currentIndex++;
+            updateFrame();
+        }
+        // Debug info
+        Main.debugInfo += String.format("Progress: %.2f%n", progress);
+        Main.debugInfo += String.format("Index: %d", currentIndex);
+    }
+
+    public void render(double x, double y) {
+        Main.game.getGc().drawImage(currentFrame.get(),
+                QuickView.toCanvasX(x) - currentFrame.getOX(),
+                QuickView.toCanvasY(y) - currentFrame.getOY());
+    }
+
+    private void updateSequence() {
+        currentSequence = sprite.getSequence(state, currentDirection);
+    }
+
+    private void updateFrame() {
+        currentFrame = currentSequence.get(currentIndex);
+    }
+
+    private boolean vrfySequence() {
+        if (currentSequence.getName() != state ||
+                !currentSequence.isDir(currentDirection))
+            return false;
+        return true;
     }
 
     /**
-     * Output directly to display interface
+     * Start animation sequence
+     *
+     * @param name Name of sequence ot be played
+     * @param loop True for looping animation. If set to false, at end of animation, IDLE will be played
      */
-    public void output(Entity sender, double x, double y, double direction) {
-        // temporarily reroute functions trough external class
-        double adjusted = progress;
-        switch (state) {
-            case ATTACKUP:
-                adjusted /= phase1;
-                break;
-            case ATTACKING:
-                adjusted /= phase2;
-                adjusted += 1;
-                break;
-            case ATTACKDOWN:
-                adjusted /= phase3;
-                adjusted += 2;
-                break;
-        }
-        CharView.parseCharacter(sender, x, y, direction, adjusted, state);
-        if (type.equals("Player")) {
-            Sequence sequence;
-            int index;
-            if (Main.game.getPlayer().hasState(EntityState.MOVING)) {
-                sequence = sprite.getSequence(Sequences.WALK, direction);
-                index = (int) (progress) % 8;
-            } else if (state == AnimationState.ATTACKUP ||
-                    state == AnimationState.ATTACKING ||
-                    state == AnimationState.ATTACKDOWN) {
-                sequence = sprite.getSequence(Sequences.ATTACK, direction);
-                index = (int) (adjusted * 5);
-            } else {
-                sequence = sprite.getSequence(Sequences.IDLE, direction);
-                index = (int) (progress) % 10;
-            }
-            Frame current = sequence.get(index);
-            Main.game.getGc().drawImage(current.get(),
-                    QuickView.toCanvasX(x) - current.getOX(),
-                    QuickView.toCanvasY(y) - current.getOY());
-        } else if (sender instanceof Creature) {
-            Creature current = (Creature) sender;
-            Sequence sequence;
-            int index;
-            if (current.hasState(EntityState.CASTUP) ||
-                    current.hasState(EntityState.CASTING) ||
-                    current.hasState(EntityState.CASTDOWN)) {
-                sequence = sprite.getSequence(Sequences.ATTACK, direction);
-                index = (int) ((adjusted / 3) * sequence.length()) % sequence.length();
-            }
-            else if (current.getVelocity().getMagnitude() > 0) { // moving
-                sequence = sprite.getSequence(Sequences.WALK, direction);
-                index = (int) (progress) % sequence.length();
-            } else { // idle
-                sequence = sprite.getSequence(Sequences.IDLE, direction);
-                index = (int) (progress) % sequence.length();
-            }
-            Frame currentFrame = sequence.get(index);
-            Main.game.getGc().drawImage(currentFrame.get(),
-                    QuickView.toCanvasX(x) - currentFrame.getOX(),
-                    QuickView.toCanvasY(y) - currentFrame.getOY());
-        }
-    }
-
-    public void advance(double time) {
-        progress += time * framerate;
-        // decide if state change is needed
-
-        switch (state) {
-            // TODO: these times should be based on the actual length of the sequence of frames
-            case ATTACKUP:
-                // if enough time has passed, change to next state
-                if (progress >= phase1) {
-                    progress = 0;
-                    state = AnimationState.ATTACKING;
-                }
-                break;
-            case ATTACKING:
-                if (progress >= phase2) {
-                    progress = 0;
-                    state = AnimationState.ATTACKDOWN;
-                }
-                break;
-            case ATTACKDOWN:
-                // if enough time has passed, change back to idle
-                if (progress >= phase3) {
-                    progress = 0;
-                    state = AnimationState.IDLE;
-                }
-                break;
-            case DEFEND:
-                break;
-            // TODO: other cases
-        }
-    }
-
-    public void setState(AnimationState state) {
-        this.state = state;
+    public void play(Sequences name, boolean loop) {
+        state = name;
+        looping = loop;
         progress = 0;
+        currentIndex = 0;
+        updateSequence();
+        updateFrame();
     }
 
-    public AnimationState getState() {
+    public void reset() {
+        state = Sequences.IDLE;
+        looping = true;
+        progress = 0;
+        currentIndex = 0;
+        updateSequence();
+        updateFrame();
+    }
+
+    public Sequences getState() {
         return state;
     }
 
-    // TODO: a method that returns the length of animation and special cue points to ability callers
-    // for instance, attack has three sections - init (uncancelable, interruptable); resolution; wind down (cancelable)
-
-    // note: might actually not be necessary, abilities can just get the state and decide if resolution has occurred
-
-    /**
-     * Get the length of animation sequence
-     *
-     * @param animation target sequence name
-     * @return length of sequence in seconds
-     */
-    public double getLength(String animation) {
-        return 0.0;
+    public boolean ended() {
+        return currentIndex >= currentSequence.length() - 1;
     }
 
-    /**
-     * Get the moment in time where resolution occurs
-     *
-     * @param animation target sequence name
-     * @param index     ID of cue point, if more than one
-     * @return moment of resolution since beginning of sequence
-     */
-    public double getCue(String animation, int index) {
-        return 0.0;
-    }
-
-    public double getCue(String animation) {
-        return 0.0;
-    }
 }

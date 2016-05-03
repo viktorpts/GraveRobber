@@ -13,7 +13,7 @@ public class Defend extends Ability {
     private double currentHealth;
 
     public Defend(Creature owner, double health, double rechargeRate) {
-        super(owner, 0); // raising the shield has no cooldown, it's health is what matters
+        super(owner, 0, 0.0); // raising the shield has no cooldown, it's health is what matters; instant resolution
         this.health = health;
         currentHealth = health;
         this.rechargeRate = rechargeRate;
@@ -22,7 +22,12 @@ public class Defend extends Ability {
     @Override
     public void use() {
         state = AbilityState.ACTIVE;
-        owner.changeAnimation(Abilities.DEFEND.getName());
+        //owner.changeAnimation(Abilities.DEFEND.getName());
+    }
+
+    @Override
+    public void resolve() {
+        // do nothing, this is a toggled ability
     }
 
     @Override

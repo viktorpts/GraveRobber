@@ -7,6 +7,7 @@ import Abilities.MeleeAttack;
 import Abilities.Defend;
 import Enumerations.EntityState;
 import Enumerations.UserOrders;
+import Factories.AnimationFactory;
 import Game.ControlState;
 import Renderer.Animation;
 import Renderer.QuickView;
@@ -39,12 +40,12 @@ public class Player extends Creature {
                   int startAttackPower,
                   int startArmorValue,
                   double x, double y) {
-        super(new Animation(15, "Player"),
+        super(AnimationFactory.getAnimation("Player"),
                 x, y, 0.0,
                 startHealthPoints, startAttackPower, startArmorValue,
                 new HashMap<Abilities, Ability>(),
                 0.25, Physics.maxMoveSpeed, Physics.maxAcceleration);
-        addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, startAttackPower, 1.0));
+        addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 1.0));
         addAbility(Abilities.DASH, new Dash(this, 5, 12));
         addAbility(Abilities.DEFEND, new Defend(this, 25, 2));
 

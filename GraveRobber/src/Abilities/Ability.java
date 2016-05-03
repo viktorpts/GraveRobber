@@ -2,6 +2,7 @@ package Abilities;
 
 import Enumerations.AbilityState;
 import Enumerations.EntityState;
+import Enumerations.Sequences;
 import Interfaces.IAbility;
 import Models.Creature;
 
@@ -14,17 +15,30 @@ abstract public class Ability implements IAbility {
 
     double remaining; // time to next use, seconds
     double cooldown; // time between uses, seconds
+    double elapsedTime;
+    double resolution; // point of resolution, 0 for instant
+    Sequences animation = null; // associated animation, if left null nothing will be played
     AbilityState state; // state
     protected final Creature owner; // reference to creature
 
     /**
      * Bare bones constructor
-     * @param owner Reference to Creature
+     *
+     * @param owner    Reference to Creature
      * @param cooldown Time between uses, in seconds
      */
-    public Ability (Creature owner, double cooldown) {
+    public Ability(Creature owner, double cooldown, double resolution) {
         this.owner = owner; // passed by reference, we don't want a copy
         this.cooldown = cooldown;
+        this.resolution = resolution;
+        reset();
+    }
+
+    public Ability(Creature owner, Sequences animation, double cooldown, double resolution) {
+        this.owner = owner; // passed by reference, we don't want a copy
+        this.animation = animation;
+        this.cooldown = cooldown;
+        this.resolution = resolution;
         reset();
     }
 
@@ -58,15 +72,23 @@ abstract public class Ability implements IAbility {
     /**
      * Some abilities do not have casting time or resolution point - those wont need an implementation of update(), so
      * we have to make sure they are cooled down in the general case
+     *
      * @param time Seconds since last update
      */
     @Override
     public void update(double time) {
         if (isCooling()) cool(time);
-        if ((state == AbilityState.INIT ||state == AbilityState.RESOLVE) &&
-                !vrfyState()) { // make sure owner is not interrupted
-            // if ability was initiated, put it in cool down mode, cancel further resolution
-            state = AbilityState.COOLING;
+        if (state == AbilityState.INIT) {
+            elapsedTime += time;
+            if (!vrfyState()) {
+                state = AbilityState.COOLING; // make sure owner is not interrupted
+                return;
+            }
+            if (elapsedTime >= resolution) {
+                resolve();
+                elapsedTime = 0;
+                state = AbilityState.COOLING;
+            }
         }
     }
 
@@ -74,12 +96,13 @@ abstract public class Ability implements IAbility {
     public void cool(double time) {
         if (isReady()) return;
         remaining -= time;
-        if (remaining <=0) reset();
+        if (remaining <= 0) reset();
     }
 
     @Override
     public void reset() {
         remaining = 0;
+        elapsedTime = 0;
         state = AbilityState.READY;
     }
 
@@ -99,6 +122,7 @@ abstract public class Ability implements IAbility {
      * Check if entity has not cancelled the ability, for instance, by getting staggered or destroyed. This check MUST
      * occur in all abilities that have casting time and resolution point - if entity state has changed and ability is
      * not ready, set it to cooling, so further updates are cancelled.
+     *
      * @return Result of check, true when still committed
      */
     boolean vrfyState() {
