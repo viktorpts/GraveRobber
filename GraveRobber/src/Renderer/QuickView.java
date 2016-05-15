@@ -441,7 +441,7 @@ public class QuickView {
         return result;
     }
 
-    static public void renderBlock(int x, int y, int type) {
+    static public void renderBlock(Image texture, int x, int y, int type) {
         GraphicsContext gc = Main.game.getGc();
         /**
          * Type:
@@ -452,15 +452,18 @@ public class QuickView {
         switch (type) {
             case 0:
                 gc.setFill(Color.BLACK);
+                gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
                 break;
             case 1:
-                gc.setFill(Color.WHITE);
+                gc.save();
+                gc.setGlobalAlpha(0.75);
+                gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y - 1.5), gridSize, gridSize * 3);
+                gc.restore();
                 break;
             case 2:
-                gc.setFill(Color.DARKORANGE);
+                gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
                 break;
         }
-        gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
     }
 
     // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter

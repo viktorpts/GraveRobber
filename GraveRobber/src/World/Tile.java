@@ -29,6 +29,7 @@ public class Tile {
 	private int x, y;
 	private TileType tileType;
 	private Image img;
+    private boolean transparent = false;
 
 	public Tile(int x, int y, TileType tileType) {
 
@@ -36,16 +37,16 @@ public class Tile {
 		this.y = y;
 		this.id = ++nextID;
 		this.tileType = tileType;
-		//this.img = setImageTile(tileType); // removed to prevent exception error on missing files
+		this.img = setImageTile(tileType); // removed to prevent exception error on missing files
 	}
 
     // TODO: fix paths
 	public Image setImageTile(TileType tileType){
 		Image img;
 		if (tileType == TileType.WALL){
-			img = new Image("\\wall.jpg");
+			img = new Image("wall.jpg");
 		}else{
-			img = new Image("\\floor.jpg");
+			img = new Image("floor.jpg");
 		}
 		return img;
 	}
@@ -83,6 +84,6 @@ public class Tile {
 	}
 
     public void render() {
-        QuickView.renderBlock(x-1, y-1, tileType == TileType.WALL ? 1 : 2);
+        QuickView.renderBlock(this.img, x-1, y-1, tileType == TileType.WALL ? 1 : 2);
     }
 }
