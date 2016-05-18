@@ -27,7 +27,8 @@ public class Aggression extends Behaviour {
 
     /**
      * If the player is within the range of our weapon, we try to swing at them. Called every update.
-     * @param time Seconds since last udate
+     *
+     * @param time Seconds since last update
      * @return True when triggered, keeps returning true as long as player is within range, allows other AI to process
      * as soon as the player walks away, even if attack is still resolving - ability state and animation priority will
      * take care of us not moving/doing anything else before we're done attacking first. This actually allows for lower
@@ -37,14 +38,30 @@ public class Aggression extends Behaviour {
     @Override
     public boolean think(double time) {
         if (Main.game.getPlayer().getState().contains(EntityState.DEAD)) return false; // don't bother if he's down
-        if (Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude() <= range) {
-            // face player
-            owner.turnTo(Game.Main.game.getPlayer().getX(), Game.Main.game.getPlayer().getY());
-            // attempt attack (wont do anything if creature has no primary attack, or if it's processing/cooling down)
-            owner.useAbility(Abilities.ATTACKPRIMARY);
+
+        if (state == AIState.PROCESSING) {
+            elapsedTime += time;
+            if (elapsedTime >= 0.3) { // short pause before attacking, otherwise enemies are too snappy
+                reset();
+                state = AIState.THINKING;
+                if (Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude() <= range) {
+                    act();
+                }
+            }
+            return true;
+        } else if (Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude() <= range) {
+            state = AIState.PROCESSING;
+            reset();
             return true;
         }
         return false;
+    }
+
+    private void act() {
+        // face player
+        owner.turnTo(Game.Main.game.getPlayer().getX(), Game.Main.game.getPlayer().getY());
+        // attempt attack (wont do anything if creature has no primary attack, or if it's processing/cooling down)
+        owner.useAbility(Abilities.ATTACKPRIMARY);
     }
 
 }

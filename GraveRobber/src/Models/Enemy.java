@@ -6,6 +6,7 @@ import AI.Roam;
 import Enumerations.AIState;
 import Enumerations.Abilities;
 import Enumerations.EntityState;
+import Enumerations.Sequences;
 import Renderer.Animation;
 import World.Coord;
 import Abilities.Ability;
@@ -52,6 +53,7 @@ public class Enemy extends Creature {
         // using stream is overkill, since each creature wont have more than a handful of behaviours to cycle trough and
         // having the option to break the loop is better, considering each individual brain might have complex logic
         if (!hasState(EntityState.IDLE)) return;
+        if (hasState(EntityState.DAMAGED)) return;
         for (Behaviour behaviour : brain) {
             if (behaviour.update(time)) break; // break the loop as soon as one brain makes a decision
         }

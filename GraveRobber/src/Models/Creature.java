@@ -404,6 +404,7 @@ abstract public class Creature extends Entity implements IMovable {
                 immuneTime = 0.3; // Enemies have a much shorter invinciframe
             }
             getState().add(EntityState.DAMAGED); // prevent instances from resolving more than once
+            stop();
 
             healthPoints -= (int) damage;
 
