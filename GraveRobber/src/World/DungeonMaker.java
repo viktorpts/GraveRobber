@@ -100,19 +100,17 @@ public class DungeonMaker {
             if (leftEnd && rightEnd) {
                 break;
             }
+            if (levelMatrix[11][i] == 2 && !leftEnd)
+                leftEnd = true;
+            if (levelMatrix[13][i] == 2 && !rightEnd)
+                rightEnd = true;
+            // Walls
+            if (levelMatrix[10][i] == 0) levelMatrix[10][i] = 1;
+            if (levelMatrix[14][i] == 0) levelMatrix[14][i] = 1;
+            // Floor
+            levelMatrix[11][i] = 2;
             levelMatrix[12][i] = 2;
-            if (!leftEnd) {
-                if (levelMatrix[10][i] == 0) levelMatrix[10][i] = 1;
-                if ((levelMatrix[11][i] == 2))
-                    leftEnd = true;
-                levelMatrix[11][i] = 2;
-            }
-            if (!rightEnd) {
-                if (levelMatrix[14][i] == 0) levelMatrix[14][i] = 1;
-                if (levelMatrix[13][i] == 2)
-                    rightEnd = true;
-                levelMatrix[13][i] = 2;
-            }
+            levelMatrix[13][i] = 2;
         }
 
         for (int i = 0; i < 13; i++) {
