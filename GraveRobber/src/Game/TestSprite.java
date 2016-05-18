@@ -20,7 +20,7 @@ public class TestSprite extends Application {
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
     static Sprite sprite;
-    static String testPath = "./resources/warrior.ini";
+    static String testPath = "./resources/rat.ini";
     static int index[] = {0};
 
     public static void main(String[] args) {
@@ -35,8 +35,8 @@ public class TestSprite extends Application {
         Scene scene = new Scene(root, horizontalRes, verticalRes, Color.BLACK);
         Canvas canvas = new Canvas(horizontalRes, verticalRes); // Main canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
-        gc.setStroke(Color.WHITE);
+        gc.setFill(Color.RED);
+        gc.setStroke(Color.RED);
         root.getChildren().addAll(canvas);
 
         // Initialize sprite for testing
@@ -133,7 +133,10 @@ public class TestSprite extends Application {
                 }
 
                 // Output
-                gc.clearRect(0, 0, horizontalRes, verticalRes);
+                gc.save();
+                gc.setFill(Color.AZURE);
+                gc.fillRect(0, 0, horizontalRes, verticalRes);
+                gc.restore();
                 String debug = String.format("Time: %.2f%n", elapsed[0]);
                 debug += String.format("Sequence: %d %s%n", currentSequence[0], current);
                 gc.fillText(debug, 10, 20);

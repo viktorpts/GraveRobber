@@ -16,14 +16,12 @@ public class ChargeAttack extends Ability {
 
     double damage;
     double range;
-    double elapsedTime;
 
     // TODO: set cool down from constructor
-    public ChargeAttack(Creature owner, double resolution, double damage, double range) {
-        super(owner, 1.0, resolution);
+    public ChargeAttack(Creature owner, double resolution, double damage, double range, double cooldown) {
+        super(owner, cooldown, resolution);
         this.damage = damage;
         this.range = range;
-        elapsedTime = 0;
     }
 
     /**
@@ -36,8 +34,12 @@ public class ChargeAttack extends Ability {
         elapsedTime = 0;
         state = AbilityState.INIT;
         owner.stop();
-        //owner.changeAnimation(Abilities.ATTACKPRIMARY.getName());
+        owner.changeAnimation(Sequences.ATTACK, false);
         owner.setState(EnumSet.of(EntityState.CASTUP));
+        // Charge forward
+        Coord vector = new Coord(10, 0.0);
+        vector.setDirection(owner.getDirection());
+        owner.accelerate(vector, 1.0);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class ChargeAttack extends Ability {
                         return false; // don't damage allies
                     if (entity.hasState(EntityState.DEAD))
                         return false; // don't hit dead creatures
-                    if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
+                    if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range + owner.getRadius() + entity.getRadius())
                         return false; // only damage those in range
                     if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 6)
                         return false; // only damage those within sweep angle
@@ -62,7 +64,8 @@ public class ChargeAttack extends Ability {
                     current.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos());
                 });
         //owner.getState().remove(EntityState.CASTUP);
-        reset();
+        //reset();
+        // Charge attacks do not reset, or else hilarity ensues
     }
 
     /**

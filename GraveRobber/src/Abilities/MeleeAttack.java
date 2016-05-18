@@ -49,7 +49,7 @@ public class MeleeAttack extends Ability {
                         return false; // don't damage allies
                     if (entity.hasState(EntityState.DEAD))
                         return false; // don't hit dead creatures
-                    if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
+                    if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range + owner.getRadius() + entity.getRadius())
                         return false; // only damage those in range
                     if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 4)
                         return false; // only damage those within sweep angle

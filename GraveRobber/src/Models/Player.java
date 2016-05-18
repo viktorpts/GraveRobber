@@ -44,8 +44,8 @@ public class Player extends Creature {
                 x, y, 0.0,
                 startHealthPoints, startAttackPower, startArmorValue,
                 new HashMap<Abilities, Ability>(),
-                0.25, Physics.maxMoveSpeed, Physics.maxAcceleration);
-        addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 1.0));
+                0.40, Physics.maxMoveSpeed, Physics.maxAcceleration);
+        addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 0.7));
         addAbility(Abilities.DASH, new Dash(this, 5, 12));
         addAbility(Abilities.DEFEND, new Defend(this, 25, 2));
 

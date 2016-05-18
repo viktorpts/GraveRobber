@@ -8,7 +8,7 @@ import java.util.HashMap;
 public enum EnemyTypes {
     GIANT_RAT(50, 5, 0,
             new HashMap<Abilities, Ability>(),
-            0.15, 3, 10),
+            0.25, 3, 10),
     SLIME(150, 15, 0,
             new HashMap<Abilities, Ability>(),
             0.25, 3.5, 7),
@@ -17,7 +17,7 @@ public enum EnemyTypes {
             0.25, 4, 8),
     SKELETON(100, 15, 5,
             new HashMap<Abilities, Ability>(),
-            0.25, 3, 5);
+            0.35, 3, 5);
 
     private int healthPoints;
     private int attackPoints;

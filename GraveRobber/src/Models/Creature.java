@@ -393,7 +393,7 @@ abstract public class Creature extends Entity implements IMovable {
                 Defend shield = (Defend) abilities.get(Abilities.DEFEND);
                 // redirect damage to shield
                 if (shield.isActive() && shield.getHealth() > 0 &&
-                        Coord.innerAngle(getPos(), source, getDirection()) < Math.PI / 4) {
+                        Coord.innerAngle(getPos(), source, getDirection()) < Math.PI / 2) {
                     damage = shield.takeDamage(damage);
                     if (damage > 0) stagger();
                 } else {
@@ -401,7 +401,7 @@ abstract public class Creature extends Entity implements IMovable {
                 }
                 immuneTime = 0.5;
             } else {
-                immuneTime = 0.1; // Enemies have a much shorter invinciframe
+                immuneTime = 0.3; // Enemies have a much shorter invinciframe
             }
             getState().add(EntityState.DAMAGED); // prevent instances from resolving more than once
 
