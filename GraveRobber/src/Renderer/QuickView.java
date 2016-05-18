@@ -32,6 +32,7 @@ public class QuickView {
     static public double cameraHeight = 120;
     static public double cameraX = 79;
     static public double cameraY = 59;
+
     // Camera controls
     static public void adjustRes(int size) {
         gridSize = size;
@@ -352,14 +353,14 @@ public class QuickView {
                         toCanvasY(y - range),
                         range * 2 * gridSize,
                         range * 2 * gridSize,
-                        Math.toDegrees(- dir - Math.PI / 8),
+                        Math.toDegrees(-dir - Math.PI / 8),
                         45 * progress,
                         ArcType.OPEN);
                 gc.strokeArc(toCanvasX(x - range * 0.85),
                         toCanvasY(y - range * 0.85),
                         range * 1.7 * gridSize,
                         range * 1.7 * gridSize,
-                        Math.toDegrees(- dir - Math.PI / 8),
+                        Math.toDegrees(-dir - Math.PI / 8),
                         45 * progress,
                         ArcType.OPEN);
             } else {
@@ -368,15 +369,15 @@ public class QuickView {
                         toCanvasY(y - range),
                         range * 2 * gridSize,
                         range * 2 * gridSize,
-                        Math.toDegrees(- dir + Math.PI / 8),
-                        - 45 * progress,
+                        Math.toDegrees(-dir + Math.PI / 8),
+                        -45 * progress,
                         ArcType.OPEN);
                 gc.strokeArc(toCanvasX(x - range * 0.85),
                         toCanvasY(y - range * 0.85),
                         range * 1.7 * gridSize,
                         range * 1.7 * gridSize,
-                        Math.toDegrees(- dir + Math.PI / 8),
-                        - 45 * progress,
+                        Math.toDegrees(-dir + Math.PI / 8),
+                        -45 * progress,
                         ArcType.OPEN);
             }
         } else { // recover
@@ -441,7 +442,7 @@ public class QuickView {
         return result;
     }
 
-    static public void renderBlock(Image texture, int x, int y, int type) {
+    static public void renderBlock(Image texture, int x, int y, int type, boolean transparent) {
         GraphicsContext gc = Main.game.getGc();
         /**
          * Type:
@@ -456,7 +457,12 @@ public class QuickView {
                 break;
             case 1:
                 gc.save();
-                gc.setGlobalAlpha(0.75);
+                if (transparent) {
+                    double alpha = Math.sqrt(Math.pow(Math.abs(toCanvasY(y) - Main.verticalRes / 2) / (Main.verticalRes / 2), 2) +
+                            Math.pow(Math.abs(toCanvasX(x) - Main.horizontalRes / 2) / (Main.horizontalRes / 2), 2));
+                    gc.setGlobalAlpha(alpha + 0.1);
+                }
+
                 gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y - 1.5), gridSize, gridSize * 3);
                 gc.restore();
                 break;
@@ -466,5 +472,5 @@ public class QuickView {
         }
     }
 
-    // TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
+// TODO add method for rendering bitmaps using javafx.Image -> WritableImage -> PixelWriter
 }

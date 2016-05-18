@@ -3,12 +3,13 @@ package Models;
 import Enumerations.AnimationState;
 import Enumerations.EntityState;
 import Enumerations.Sequences;
+import Interfaces.IRenderable;
 import Renderer.Animation;
 import World.Coord;
 
 import java.util.EnumSet;
 
-abstract public class Entity {
+abstract public class Entity implements IRenderable {
 
     private static int lastID = 0; // all entities know the last assigned ID
     private int ID; // ID

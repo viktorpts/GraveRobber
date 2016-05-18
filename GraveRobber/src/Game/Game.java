@@ -3,6 +3,8 @@ package Game;
 import Enumerations.Abilities;
 import Enumerations.EntityState;
 import Enumerations.GameState;
+import Enumerations.TileType;
+import Interfaces.IRenderable;
 import Models.Creature;
 import Models.Entity;
 import Models.Player;
@@ -127,26 +129,41 @@ public class Game {
      * propagate the call to everyone.
      */
     public void render() {
-        // Level tiles first, so they appear bellow everything else
+        // Construct list of renerable objects
+        ArrayList<IRenderable> objects = new ArrayList<>();
+
+        // Level tiles
         level.getGeometry().stream()
                 .filter(tile -> tile.getX() > getPlayer().getX() - Physics.activeRange &&
                         tile.getX() < getPlayer().getX() + Physics.activeRange &&
                         tile.getY() > getPlayer().getY() - Physics.activeRange &&
                         tile.getY() < getPlayer().getY() + Physics.activeRange)
-                .forEach(Tile::render);
-        // Now entities. Note dead creatures still render according to their creation index, so there might be some
-        // unwanted overlap
+                .forEach(tile -> objects.add(tile));
+        // Entities
         level.getEntities().stream()
                 .filter(entity -> entity.getX() > getPlayer().getX() - Physics.activeRange &&
                         entity.getX() < getPlayer().getX() + Physics.activeRange &&
                         entity.getY() > getPlayer().getY() - Physics.activeRange &&
                         entity.getY() < getPlayer().getY() + Physics.activeRange)
-                .sorted((e1, e2) -> Double.compare(e1.getY(), e2.getY()))
-                .sorted((e1, e2) -> {
-                    if (e1.hasState(EntityState.DEAD)) return -1;
+                .forEach(entity -> objects.add(entity));
+
+        // Output
+        objects.stream()
+                .sorted((o1, o2) -> Double.compare(o1.getY(), o2.getY()))
+                .sorted((o1, o2) -> { // Dead entities always appear under living entities
+                    if (o1 instanceof Entity && o2 instanceof Entity) {
+                        if (((Entity)o1).hasState(EntityState.DEAD) && !((Entity)o2).hasState(EntityState.DEAD)) return -1;
+                        else if (!((Entity)o1).hasState(EntityState.DEAD) && ((Entity)o2).hasState(EntityState.DEAD)) return 1;
+                        else return 0;
+                    }
                     else return 0;
                 })
-                .forEach(Entity::render);
+                .sorted((o1, o2) -> { // Floor tiles at the bottom
+                    if (o1 instanceof Tile && ((Tile)o1).getTileType() == TileType.FLOOR) return -1;
+                    else if (o2 instanceof Tile && ((Tile)o2).getTileType() == TileType.FLOOR) return 1;
+                    else return 0;
+                })
+                .forEach(IRenderable::render);
     }
 
     public ControlState getControlState() {

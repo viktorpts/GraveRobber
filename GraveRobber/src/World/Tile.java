@@ -3,26 +3,11 @@ package World;
 import Enumerations.TileType;
 import java.util.List;
 
+import Interfaces.IRenderable;
 import Renderer.QuickView;
 import javafx.scene.image.Image;
 
-public class Tile {
-	/**
-	 * Да се създаде клас, който представя квадратно поле с размер 1х1метър от игралната карта. Класа трябва да
-	 * съхранява следната информация:
-	 * - Пореден номер на полето (без повтаряне)
-	 * - Координати на полето
-	 * - Плътност (дали може да се преминава през него): solid (плътно), transparent(свободно преминаване, пода на
-	 * играланта карта), clip (блокира преминаване на създания, не блокира ефекти)
-	 * - Как изглежда полето (име на Sprite или път към изображение на харддиска)
-	 * - Допълнителна информация за изобразяването на полето, ако е нужна
-	 * <p>
-	 * При подадена информация, обектът трябва да може да изпълнява следните функции:
-	 * - Да променя своята плътност и/или външен вид
-	 * <p>
-	 * <p>
-	 * Всички полета се съхраняват в масив, който да може да се обхожда и сортира чрез Stream API
-	 */
+public class Tile implements IRenderable {
 
 	private int id;
 	private static int nextID = 0;
@@ -65,17 +50,21 @@ public class Tile {
 		this.tileType = tileType;
 	}
 
+    public void overlay() {
+        transparent = true;
+    }
+
 
 	//Getters
 	public int getId() {
 		return id;
 	}
 
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 
@@ -83,7 +72,11 @@ public class Tile {
 		return tileType;
 	}
 
+    public boolean isTransparent() {
+        return transparent;
+    }
+
     public void render() {
-        QuickView.renderBlock(this.img, x-1, y-1, tileType == TileType.WALL ? 1 : 2);
+        QuickView.renderBlock(this.img, x-1, y-1, tileType == TileType.WALL ? 1 : 2, transparent);
     }
 }

@@ -58,8 +58,8 @@ public class TestLevel  extends Application {
                     // Render dungeon
                     map.getLevelTiles().stream().forEach(tile -> {
                         QuickView.setBlock(gc,
-                                tile.getX(),
-                                tile.getY(),
+                                (int)tile.getX(),
+                                (int)tile.getY(),
                                 tile.getTileType() == TileType.WALL ? 1 : 2);
                     });
                 }

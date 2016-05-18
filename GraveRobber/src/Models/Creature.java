@@ -387,7 +387,7 @@ abstract public class Creature extends Entity implements IMovable {
             } // don't do anything if entity is not affected
         }
         // TODO: stagger enemies if damaged more than 30% in 2 seconds
-        if (damage > 0) { // prevent negative damage from healing
+        if (damage > 0 && healthPoints > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
             if (this instanceof Player) {
                 Defend shield = (Defend) abilities.get(Abilities.DEFEND);
@@ -408,6 +408,7 @@ abstract public class Creature extends Entity implements IMovable {
             healthPoints -= (int) damage;
 
             if (healthPoints <= 0) {
+                stop();
                 stopAbilities();
                 cancelAnimation();
                 changeAnimation(Sequences.DIE, false);

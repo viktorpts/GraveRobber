@@ -99,7 +99,15 @@ public class DungeonMaker {
         for (int i = 0; i < levelMatrix.length; i++) {
             for (int j = 0; j < levelMatrix[i].length; j++) {
                 if (levelMatrix[i][j] == 0) continue;
-                levelTiles.add(new Tile(i, j, levelMatrix[i][j] == 1 ? TileType.WALL : TileType.FLOOR));
+                Tile current = new Tile(i, j, levelMatrix[i][j] == 1 ? TileType.WALL : TileType.FLOOR);
+                if (current.getTileType() == TileType.WALL) {
+                    if (j > 0 && levelMatrix[i][j-1] == 2) {
+                        current.overlay();
+                    } else if (j > 1 && levelMatrix[i][j-2] == 2) {
+                        current.overlay();
+                    }
+                }
+                levelTiles.add(current);
             }
         }
 
