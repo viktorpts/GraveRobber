@@ -1,6 +1,7 @@
 package Renderer;
 
 import Enumerations.GameState;
+import Enumerations.TileType;
 import Game.Main;
 import World.Dungeon;
 import javafx.application.Platform;
@@ -442,7 +443,7 @@ public class QuickView {
         return result;
     }
 
-    static public void renderBlock(Image texture, int x, int y, int type, boolean transparent) {
+    static public void renderBlock(Image texture, int x, int y, TileType type, boolean transparent) {
         GraphicsContext gc = Main.game.getGc();
         /**
          * Type:
@@ -451,23 +452,28 @@ public class QuickView {
          * 2 - grey (floor)
          */
         switch (type) {
-            case 0:
-                gc.setFill(Color.BLACK);
-                gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
-                break;
-            case 1:
+            case WALL:
                 gc.save();
                 if (transparent) {
                     double alpha = Math.sqrt(Math.pow(Math.abs(toCanvasY(y) - Main.verticalRes / 2) / (Main.verticalRes / 2), 2) +
                             Math.pow(Math.abs(toCanvasX(x) - Main.horizontalRes / 2) / (Main.horizontalRes / 2), 2));
                     gc.setGlobalAlpha(alpha + 0.1);
                 }
-
                 gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y - 1.5), gridSize, gridSize * 3);
                 gc.restore();
                 break;
-            case 2:
+            case FLOOR:
                 gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
+                break;
+            case DOOR:
+                gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y - 1.5), gridSize, gridSize * 3);
+                break;
+            case OPEN:
+                gc.drawImage(texture, toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
+                break;
+            default:
+                gc.setFill(Color.BLACK);
+                gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
                 break;
         }
     }

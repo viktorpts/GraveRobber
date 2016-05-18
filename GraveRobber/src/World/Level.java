@@ -9,6 +9,8 @@ import Models.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Contains the level geometry (grid), a tileset and a list of entity instances. One per game! Methods are self-
@@ -21,6 +23,7 @@ public class Level {
     ArrayList<Tile> geometry;
 
     public static byte CURRENT_LEVEL = 1;
+    public static int enemyCount;
 
     // TODO: add level geometry and populate with entities
     public Level() {
@@ -43,7 +46,7 @@ public class Level {
 
     private void generateGeometry() {
         DungeonMaker generator = new DungeonMaker();
-        geometry = generator.processTiles();
+        geometry = generator.getLevelTiles();
     }
 
     public Player getPlayer() {
@@ -61,11 +64,14 @@ public class Level {
     // Pick starting position inside the maze and place player there
     private void setStart() {
         Random rnd = new Random();
+        List<Tile> validTiles = geometry.stream()
+                .filter(tile -> tile.getTileType() == TileType.FLOOR && tile.getY() > 1)
+                .collect(Collectors.toList());
         while (true) {
-            int tile = rnd.nextInt(geometry.size());
-            if (geometry.get(tile).getTileType() == TileType.FLOOR) {
-                player.setX(geometry.get(tile).getX());
-                player.setY(geometry.get(tile).getY());
+            int tile = rnd.nextInt(validTiles.size());
+            if (validTiles.get(tile).getTileType() == TileType.FLOOR) {
+                player.setX(validTiles.get(tile).getX());
+                player.setY(validTiles.get(tile).getY());
                 break;
             }
         }
@@ -75,12 +81,14 @@ public class Level {
         // Add 7 Skeletons and 13 Rats
         Random rnd = new Random();
         // Get just the floor tiles
-        ArrayList<Tile> floor = new ArrayList<>();
-        geometry.stream().filter(tile -> tile.getTileType() == TileType.FLOOR).forEach(tile -> floor.add(tile));
+        List<Tile> validTiles = geometry.stream()
+                .filter(tile -> tile.getTileType() == TileType.FLOOR && tile.getY() > 1)
+                .collect(Collectors.toList());
         for (int i = 0; i < 7; i++) {
-            Tile current = floor.get(rnd.nextInt(floor.size())); // Pick random tile
+            Tile current = validTiles.get(rnd.nextInt(validTiles.size())); // Pick random tile
             entities.add(CreatureFactory.createEnemy(EnemyTypes.SKELETON, current.getX(), current.getY(), rnd.nextDouble() * Math.PI * 2));
-            floor.remove(current); // Remove tile from list
+            validTiles.remove(current); // Remove tile from list
+            enemyCount++;
         }
         /*
         for (int i = 0; i < 13; i++) {
@@ -89,5 +97,9 @@ public class Level {
             floor.remove(current); // Remove tile from list
         }
         //*/
+    }
+
+    public void spawnBoss() {
+        geometry.stream().filter(tile -> tile.getTileType() == TileType.DOOR).forEach(Tile::toggle);
     }
 }

@@ -13,7 +13,6 @@ public class DungeonMaker {
     private ArrayList<Tile> levelTiles;
 
     public DungeonMaker() {
-        this.maze = new ArrayList<Dungeon>();
         dungeonGenerate();
         processTiles();
     }
@@ -95,15 +94,52 @@ public class DungeonMaker {
             }
         }
 
+        // This code adds a hardcoded room outside the level with a corridor leading into it from the center
+        boolean leftEnd = false, rightEnd = false;
+        for (int i = 0; i < mazeHeight; i++) { // start from the top of the level
+            if (leftEnd && rightEnd) {
+                break;
+            }
+            levelMatrix[12][i] = 2;
+            if (!leftEnd) {
+                if (levelMatrix[10][i] == 0) levelMatrix[10][i] = 1;
+                if ((levelMatrix[11][i] == 2))
+                    leftEnd = true;
+                levelMatrix[11][i] = 2;
+            }
+            if (!rightEnd) {
+                if (levelMatrix[14][i] == 0) levelMatrix[14][i] = 1;
+                if (levelMatrix[13][i] == 2)
+                    rightEnd = true;
+                levelMatrix[13][i] = 2;
+            }
+        }
+
+        for (int i = 0; i < 13; i++) {
+            for (int j = 0; j < 16; j++) {
+                Tile current;
+                if (i == 0 || i == 12 || j == 0 || (j == 15 && (i < 5 || i > 7)))
+                    current = new Tile(i + 6, j - 17, TileType.WALL);
+                else
+                    current = new Tile(i + 6, j - 17, TileType.FLOOR);
+                levelTiles.add(current);
+            }
+        }
+        levelTiles.add(new Tile(10, -1, TileType.WALL));
+        levelTiles.add(new Tile(11, -1, TileType.DOOR));
+        levelTiles.add(new Tile(12, -1, TileType.DOOR));
+        levelTiles.add(new Tile(13, -1, TileType.DOOR));
+        levelTiles.add(new Tile(14, -1, TileType.WALL));
+
         // Convert matrix to usable tiles
         for (int i = 0; i < levelMatrix.length; i++) {
             for (int j = 0; j < levelMatrix[i].length; j++) {
                 if (levelMatrix[i][j] == 0) continue;
                 Tile current = new Tile(i, j, levelMatrix[i][j] == 1 ? TileType.WALL : TileType.FLOOR);
                 if (current.getTileType() == TileType.WALL) {
-                    if (j > 0 && levelMatrix[i][j-1] == 2) {
+                    if (j > 0 && levelMatrix[i][j - 1] == 2) {
                         current.overlay();
-                    } else if (j > 1 && levelMatrix[i][j-2] == 2) {
+                    } else if (j > 1 && levelMatrix[i][j - 2] == 2) {
                         current.overlay();
                     }
                 }

@@ -255,7 +255,7 @@ abstract public class Creature extends Entity implements IMovable {
 
         // Walls
         Main.game.getLevel().getGeometry().stream()
-                .filter(tile -> tile.getTileType() == TileType.WALL) //just the walls
+                .filter(tile -> tile.getTileType() == TileType.WALL || tile.getTileType() == TileType.DOOR) //just the walls
                 .filter(tile -> Math.abs(tile.getX() - getX()) < Physics.activeRange && Math.abs(tile.getY() - getY()) < Physics.activeRange)
                 .forEach(this::vrfyBounds);
 
@@ -413,6 +413,12 @@ abstract public class Creature extends Entity implements IMovable {
                 cancelAnimation();
                 changeAnimation(Sequences.DIE, false);
                 setState(EnumSet.of(EntityState.DIE));
+
+                // Placeholder end level condition
+                if (this instanceof Enemy) {
+                    Main.game.getLevel().enemyCount--;
+                    if (Main.game.getLevel().enemyCount == 0) Main.game.getLevel().spawnBoss();
+                }
             }
         }
     }
