@@ -19,6 +19,7 @@ import java.util.HashMap;
  */
 abstract public class Creature extends Entity implements IMovable {
     // Stats
+    private int maxHealth;
     private int healthPoints;
     private int attackPower;
     private int armorValue;
@@ -38,6 +39,7 @@ abstract public class Creature extends Entity implements IMovable {
                     double radius, double maxSpeed,
                     double maxAcceleration) {
         super(animation, x, y, direction, radius);
+        maxHealth = healthPoints;
         this.healthPoints = healthPoints;
         this.attackPower = attackPower;
         this.armorValue = armorValue;
@@ -50,6 +52,10 @@ abstract public class Creature extends Entity implements IMovable {
     //region Properties
     public int getHealthPoints() {
         return healthPoints;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     public void setHealthPoints(int value) {
@@ -90,14 +96,14 @@ abstract public class Creature extends Entity implements IMovable {
         }
     }
 
-    /**
-     * Unconditional teleport to target location, disregarding physics and timing!
-     */
     @Override
     public void stop() {
         velocity = new Coord(0, 0);
     }
 
+    /**
+     * Unconditional teleport to target location, disregarding physics and timing!
+     */
     @Override
     public void place(Coord newPosition) {
         super.setPos(newPosition);
@@ -225,16 +231,24 @@ abstract public class Creature extends Entity implements IMovable {
      */
     @Override
     public void update(double time) {
+        // TODO Find a better place for these animations
+        if (hasState(EntityState.DIE)) {
+            if (getAnimation().ended()) setState(EnumSet.of(EntityState.DEAD));
+        } else if (hasState(EntityState.DAMAGED)) {
+            if (getAnimationState() == Sequences.IDLE ||
+                    getAnimationState() == Sequences.WALK) {
+                changeAnimation(Sequences.GETHIT, false);
+            }
+        } else if (getAnimationState() == Sequences.WALK && velocity.getMagnitude() == 0) getAnimation().reset();
+        else if (velocity.getMagnitude() > 0 && canMove() && getAnimationState() != Sequences.WALK)
+            changeAnimation(Sequences.WALK, true);
+
         // Keep track of damage instances
         if (immuneTime > 0) immuneTime -= time;
         if (getState().contains(EntityState.DAMAGED) && immuneTime <= 0) {
             getState().remove(EntityState.DAMAGED);
             getState().remove(EntityState.STAGGERED);
             immuneTime = 0;
-        }
-        // Process behaviour
-        if (this instanceof Enemy) {
-            ((Enemy) this).processBehaviour(time);
         }
 
         // If the object is moving, update vector with friction and project new position, based on time and velocity
@@ -246,33 +260,16 @@ abstract public class Creature extends Entity implements IMovable {
 
         // Detect collisions
         // Creatures
-        Main.game.getLevel().getEntities().stream()
-                .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't collide with corpses
-                .filter(entity -> Math.abs(entity.getX() - getX()) < Physics.activeRange / 2 && Math.abs(entity.getY() - getY()) < Physics.activeRange / 2)
-                .filter(entity -> entity instanceof Creature) // get just the creatures
-                .filter(entity -> !entity.equals(this)) // can't collide with self
-                .forEach(entity -> ((Creature) entity).hitscan(this)); // resolution currently included in detection, can be filtered further
-
+        Main.game.getLevel().getValidCreatures(this)
+                .forEach(creature -> creature.hitscan(this)); // resolution currently included in detection, can be filtered further
         // Walls
-        Main.game.getLevel().getGeometry().stream()
-                .filter(tile -> tile.getTileType() == TileType.WALL || tile.getTileType() == TileType.DOOR) //just the walls
-                .filter(tile -> Math.abs(tile.getX() - getX()) < Physics.activeRange && Math.abs(tile.getY() - getY()) < Physics.activeRange)
+        Main.game.getLevel().getValidTiles(this)
                 .forEach(this::vrfyBounds);
 
         // Update used abilities (they cool themselves down, if needed)
         abilities.entrySet().stream().forEach(entry -> entry.getValue().update(time));
         resetState(); // make sure we have something here
 
-        // TODO Find a better place for these animations
-        if (hasState(EntityState.DIE)) {
-            if (getAnimation().ended()) setState(EnumSet.of(EntityState.DEAD));
-        } else if (hasState(EntityState.DAMAGED)) {
-            if (getAnimationState() == Sequences.IDLE ||
-                    getAnimationState() == Sequences.WALK) {
-                changeAnimation(Sequences.GETHIT, false);
-            }
-        } else if (getAnimationState() == Sequences.WALK && velocity.getMagnitude() == 0) getAnimation().reset();
-        else if (velocity.getMagnitude() > 0 && canMove() && getAnimationState() != Sequences.WALK) changeAnimation(Sequences.WALK, true);
         animate(time);
     }
 

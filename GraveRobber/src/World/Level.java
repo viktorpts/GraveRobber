@@ -1,16 +1,18 @@
 package World;
 
 import Enumerations.EnemyTypes;
+import Enumerations.EntityState;
 import Enumerations.TileType;
 import Factories.CreatureFactory;
+import Models.Creature;
 import Models.Entity;
 import Models.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Contains the level geometry (grid), a tileset and a list of entity instances. One per game! Methods are self-
@@ -57,8 +59,25 @@ public class Level {
         return entities;
     }
 
+    public Stream<Creature> getValidCreatures(Creature collider) {
+        return entities.stream()
+                .filter(entity -> entity instanceof Creature) // get just the creatures
+                .filter(entity -> !entity.hasState(EntityState.DEAD)) // don't collide with corpses
+                .filter(entity -> Math.abs(entity.getX() - collider.getX()) < Physics.activeRange / 2 &&
+                        Math.abs(entity.getY() - collider.getY()) < Physics.activeRange / 2)
+                .filter(entity -> !entity.equals(collider)) // can't collide with self
+                .map(e -> (Creature) e);
+    }
+
     public ArrayList<Tile> getGeometry() {
         return geometry;
+    }
+
+    public Stream<Tile> getValidTiles(Creature collider) {
+        return geometry.stream()
+                .filter(tile -> tile.getTileType() == TileType.WALL || tile.getTileType() == TileType.DOOR) //just the walls
+                .filter(tile -> Math.abs(tile.getX() - collider.getX()) < Physics.activeRange &&
+                        Math.abs(tile.getY() - collider.getY()) < Physics.activeRange);
     }
 
     // Pick starting position inside the maze and place player there

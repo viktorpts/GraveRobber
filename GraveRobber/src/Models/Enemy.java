@@ -10,6 +10,7 @@ import Enumerations.Sequences;
 import Renderer.Animation;
 import World.Coord;
 import Abilities.Ability;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,6 +32,7 @@ public class Enemy extends Creature {
 
     /**
      * Add a new behaviour to the Enemy. Note the list sorted by priority each time.
+     *
      * @param newBrain A unique Behaviour. This can't be shared, since it contains a reference to it's owner! OR, it can
      *                 be shared, or even point to another Enemy, for hilarious results.
      */
@@ -47,6 +49,7 @@ public class Enemy extends Creature {
     /**
      * Consult each Behaviour and act accordingly. Once an action is taken, the rest of the possible actions are
      * ignored, hence sorting them by priority earlier.
+     *
      * @param time Seconds since last update
      */
     void processBehaviour(double time) {
@@ -57,6 +60,14 @@ public class Enemy extends Creature {
         for (Behaviour behaviour : brain) {
             if (behaviour.update(time)) break; // break the loop as soon as one brain makes a decision
         }
+    }
+
+    @Override
+    public void update(double time) {
+        super.update(time);
+
+        // Process behaviour
+        processBehaviour(time);
     }
 
     // TODO: add methods to initialize loot table

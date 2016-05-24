@@ -20,7 +20,7 @@ public class TestSprite extends Application {
     final static public double horizontalRes = 800;
     final static public double verticalRes = 600;
     static Sprite sprite;
-    static String testPath = "./resources/rat.ini";
+    static String testPath = "./resources/healthpotion.ini";
     static int index[] = {0};
 
     public static void main(String[] args) {
