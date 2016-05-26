@@ -1,15 +1,12 @@
 package Models;
 
-import Enumerations.Abilities;
-import Abilities.Ability;
-import Abilities.Dash;
-import Abilities.MeleeAttack;
-import Abilities.Defend;
-import Enumerations.EntityState;
-import Enumerations.UserOrders;
+import Abilities.*;
+import Enumerations.*;
 import Factories.AnimationFactory;
+import Factories.LootFactory;
 import Game.ControlState;
-import Renderer.Animation;
+import Game.Main;
+import Renderer.DebugView;
 import Renderer.QuickView;
 import World.Coord;
 import World.Physics;
@@ -43,20 +40,42 @@ public class Player extends Creature {
         super(AnimationFactory.getAnimation("Player"),
                 x, y, 0.0,
                 startHealthPoints, startAttackPower, startArmorValue,
-                new HashMap<Abilities, Ability>(),
+                new HashMap<AbilityTypes, Ability>(),
                 0.40, Physics.maxMoveSpeed, Physics.maxAcceleration);
-        addAbility(Abilities.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 0.7));
-        addAbility(Abilities.DASH, new Dash(this, 5, 12));
-        addAbility(Abilities.DEFEND, new Defend(this, 25, 2));
+        addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 0.7));
+        addAbility(AbilityTypes.DASH, new Dash(this, 5, 12));
+        addAbility(AbilityTypes.DEFEND, new Defend(this, 25, 2));
+        addAbility(AbilityTypes.HEAL, new DrinkHealth(this, 5));
 
         currentInput = new ControlState();
         movementOrder = UserOrders.EMPTY;
         abilityOrder = UserOrders.EMPTY;
         timeSinceLastMove = 0;
         timeSinceLastCast = 0;
+
+        inventory = new Inventory();
+
+        // Health potion starting ammount
+        int startingPotions = 1;
+        inventory.pickUp(LootFactory.getConsumable(Items.POTIONHEALTH, 0, 0, startingPotions));
     }
 
     // TODO: Inventory management
+
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public void update(double time) {
+        super.update(time);
+
+        // TODO: Item pick up
+        Main.game.getLevel().getItems(this)
+                .filter(item -> Coord.subtract(this.getPos(), item.getPos()).getMagnitude() < this.getRadius())
+                .forEach(item -> inventory.pickUp(item));
+    }
 
     public ControlState getControlState() {
         return currentInput;
@@ -100,6 +119,7 @@ public class Player extends Creature {
     //endregion ==============================
 
     public void handleInput(double elapsed) {
+        if (hasState(EntityState.DEAD) || hasState(EntityState.DIE)) return;
         timeSinceLastCast += elapsed;
         timeSinceLastMove += elapsed;
         // Don't let the player move if he's stunned
@@ -122,8 +142,8 @@ public class Player extends Creature {
             timeSinceLastCast = 0;
             abilityOrder = UserOrders.DEFEND;
         } else {
-            if (abilities.get(Abilities.DEFEND).isActive())
-                unUseAbility(Abilities.DEFEND);
+            if (abilities.get(AbilityTypes.DEFEND).isActive())
+                unUseAbility(AbilityTypes.DEFEND);
         }
 
         // Keyboard
@@ -131,6 +151,11 @@ public class Player extends Creature {
             timeSinceLastCast = 0;
             abilityOrder = UserOrders.DASH;
         }
+        if (currentInput.pressed(KeyCode.DIGIT1)) { // Heal
+            timeSinceLastCast = 0;
+            abilityOrder = UserOrders.HEAL;
+        }
+
         // Movement
         double modifier = Physics.playerAcceleration + Physics.friction; // we add friction so we can have a net positive
         boolean previous = movementOrder != UserOrders.EMPTY; // We need this to prevent resetting time every tick
@@ -212,15 +237,17 @@ public class Player extends Creature {
     private boolean processAbilities(double elapsed) {
         switch (abilityOrder) {
             case ATTACK:
-                return useAbility(Abilities.ATTACKPRIMARY);
+                return useAbility(AbilityTypes.ATTACKPRIMARY);
             case DASH:
                 if (hasState(EntityState.CASTDOWN)) { // allow movement to cancel animation
                     getState().remove(EntityState.CASTDOWN);
                     processMovement(elapsed);
                 }
-                return useAbility(Abilities.DASH);
+                return useAbility(AbilityTypes.DASH);
             case DEFEND:
-                return useAbility(Abilities.DEFEND);
+                return useAbility(AbilityTypes.DEFEND);
+            case HEAL:
+                return useAbility(AbilityTypes.HEAL);
         }
         return true;
     }

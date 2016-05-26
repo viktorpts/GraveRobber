@@ -1,18 +1,18 @@
 package Models;
 
 import AI.Behaviour;
-import AI.Gank;
-import AI.Roam;
 import Enumerations.AIState;
-import Enumerations.Abilities;
+import Enumerations.AbilityTypes;
 import Enumerations.EntityState;
-import Enumerations.Sequences;
+import Enumerations.Items;
+import Factories.LootFactory;
+import Game.Main;
 import Renderer.Animation;
-import World.Coord;
 import Abilities.Ability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Dedicated class that has a few extra things compared to it's inanimate parent, mainly AI.
@@ -24,7 +24,7 @@ public class Enemy extends Creature {
     public Enemy(Animation animation, double x,
                  double y, double direction,
                  int healthPoints, int attackPower,
-                 int armorValue, HashMap<Abilities, Ability> abilities, double radius,
+                 int armorValue, HashMap<AbilityTypes, Ability> abilities, double radius,
                  double maxSpeed, double maxAcceleration) {
         super(animation, x, y, direction, healthPoints, attackPower, armorValue, abilities, radius, maxSpeed, maxAcceleration);
         this.brain = new ArrayList<>();
@@ -68,6 +68,17 @@ public class Enemy extends Creature {
 
         // Process behaviour
         processBehaviour(time);
+    }
+
+    @Override
+    protected void die() {
+        super.die();
+
+        // 10% chance to drop health potion
+        Random rnd = new Random();
+        if (rnd.nextDouble() > 0.90) Main.game.getLevel().getEntities().add(
+                LootFactory.getConsumable(Items.POTIONHEALTH, getX(), getY(), 1)
+        );
     }
 
     // TODO: add methods to initialize loot table

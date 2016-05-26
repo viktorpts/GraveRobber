@@ -114,8 +114,12 @@ abstract public class Ability implements IAbility {
         return state == AbilityState.ACTIVE;
     }
 
+    public double getRemaining() {
+        return remaining;
+    }
+
     public double getCooldown() {
-        return cooldown - remaining;
+        return cooldown;
     }
 
     /**

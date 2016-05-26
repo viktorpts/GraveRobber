@@ -1,9 +1,8 @@
 package Game;
 
-import Enumerations.Abilities;
+import Enumerations.AbilityTypes;
 import Enumerations.EntityState;
 import Enumerations.GameState;
-import Abilities.Defend;
 import Factories.AnimationFactory;
 import Renderer.DebugView;
 import Renderer.UserInterface;
@@ -60,23 +59,60 @@ public class Main extends Application {
         root.getChildren().addAll(canvas, debugCanvas);
 
         // Initialize Game
-        AnimationFactory.init(); // WE NEED THIS BEFORE CREATURES ARE MADE
+        AnimationFactory.init(); // WE NEED THIS BEFORE ENTITIES ARE MADE
         game = new Game(gc, System.nanoTime());
         QuickView.adjustRes(50); // set zoom level
 
         //Load cursor image
         UserInterface.loadMouseImage();
 
+        hookEventListeners(scene);
+
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
+                if (game.getGameState() != GameState.MENU) {
+                    // Update game state and render
+                    game.passTime(currentNanoTime);
+                    game.handleInput();
+                    game.update();
+                    game.render();
+                    if (game.getPlayer().hasState(EntityState.DEAD)) {
+                        UserInterface.drawDeadScreen();
+                    } else {
+                        UserInterface.drawUI(game.getPlayer());
+                    }
+                } else { // Visualise start menu
+                    UserInterface.drawMenu();
+                }
+                // Debug info
+                DebugView.renderAll();
+            }
+        }.start();
+
+        // Render stage
+        primaryStage.setResizable(false);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.setTitle("Test Window");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void hookEventListeners(Scene scene) {
         // Event handler for keyboard input
         scene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                 if (game.getGameState() == GameState.LIVE) game.setGameState(GameState.MENU);
                 else if (game.getGameState() == GameState.MENU) game.setGameState(GameState.LIVE);
+            } else if (ke.getCode() == KeyCode.CONTROL) {
+                game.setShowEnemyHealth(true);
             } else
                 game.getPlayer().addKey(ke.getCode());
         });
         scene.setOnKeyReleased(ke -> {
-            game.getPlayer().removeKey(ke.getCode());
+            if (ke.getCode() == KeyCode.CONTROL) {
+                game.setShowEnemyHealth(false);
+            } else
+                game.getPlayer().removeKey(ke.getCode());
         });
 
         // Event handler for mouse position and input
@@ -94,85 +130,6 @@ public class Main extends Application {
             if (!event.isPrimaryButtonDown()) game.getPlayer().setMouseLeft(false);
             if (!event.isSecondaryButtonDown()) game.getPlayer().setMouseRight(false);
         });
-
-        new AnimationTimer() {
-            public void handle(long currentNanoTime) {
-                if (game.getGameState() != GameState.MENU) {
-                    // Update state
-                    game.passTime(currentNanoTime);
-                    game.handleInput();
-                    game.update();
-
-                    // Output
-                    gc.clearRect(0, 0, horizontalRes, verticalRes); // clear the screen before drawing new frame
-                    QuickView.moveCamera(game.getLevel().getPlayer().getX(), // focus camera on player
-                            game.getLevel().getPlayer().getY());
-                    game.render();
-
-                    // Health bar
-                    gc.save();
-                    gc.setFill(Color.RED);
-                    gc.setStroke(Color.RED);
-                    gc.setLineWidth(2);
-                    gc.strokeRect(10, 10, 220, 20);
-                    gc.fillRect(12, 12, 216 * game.getPlayer().getHealthPoints() / 100, 16);
-                    gc.restore();
-
-                    // Shield endurance bar
-                    gc.save();
-                    gc.setFill(Color.LIGHTBLUE);
-                    gc.setStroke(Color.LIGHTBLUE);
-                    gc.setLineWidth(2);
-                    gc.strokeRect(10, 35, 220, 10);
-                    gc.fillRect(12, 37, 216 * ((Defend) game.getPlayer().getAbility(Abilities.DEFEND)).getHealth() / 25, 6);
-                    gc.restore();
-
-                    if (game.getPlayer().hasState(EntityState.DEAD)) {
-                        gc.save();
-                        gc.setFill(Color.RED);
-                        gc.setStroke(Color.BLACK);
-                        gc.setLineWidth(1);
-                        gc.setFont(Font.font("Times New Roman", FontWeight.EXTRA_BOLD, 72));
-                        gc.setTextAlign(TextAlignment.CENTER);
-                        gc.strokeText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
-                        gc.fillText("WASTED", horizontalRes / 2, verticalRes / 2 - QuickView.gridSize);
-                        gc.restore();
-                    } else {
-                        QuickView.renderArrow(game.getPlayer().getMouseX(),
-                                game.getPlayer().getMouseY(),
-                                game.getPlayer().getDirection());
-                    }
-                } else {
-                    //Visualise start menu
-                    UserInterface.renderMenuBackground();
-                    UserInterface.renderTitle(180,300);
-                    UserInterface.renderStartButton(300, 350);
-                    UserInterface.renderExitButton(300, 400);
-                    UserInterface.renderMenuCursor(game.getPlayer().getMouseX(), game.getPlayer().getMouseY());
-                }
-                /**
-                 * Debug info
-                 */
-                DebugView.clear();
-                DebugView.showPlayerInfo(); // Player position and movement
-                DebugView.showControlInfo(); // Input state
-                DebugView.showEntityData();
-                DebugView.showInfo(); // Custom data from other objects
-                /**
-                 * End of Debug info
-                 */
-            }
-        }
-
-                .
-
-                        start();
-
-        // Render stage
-        primaryStage.setResizable(false);
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.setTitle("Test Window");
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
+
 }

@@ -1,6 +1,5 @@
 package Game;
 
-import Enumerations.Abilities;
 import Enumerations.EntityState;
 import Enumerations.GameState;
 import Enumerations.TileType;
@@ -9,16 +8,13 @@ import Models.Creature;
 import Models.Entity;
 import Models.Player;
 import Renderer.QuickView;
-import World.Coord;
+import Renderer.UserInterface;
 import World.Level;
 import World.Physics;
 import World.Tile;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.stream.Stream;
 
 /**
  * This object will contain all instances required for a complete game to be initialized, updated and displayed:
@@ -38,6 +34,7 @@ public class Game {
     private long timeLast;      // System time in nanoseconds when last update occurred
     private double elapsed;     // Time elapsed since last update in seconds
     private GameState gameState;
+    private boolean showEnemyHealth = false;
 
     public Game(GraphicsContext gc, long timeStart) {
         this.gc = gc;
@@ -46,6 +43,10 @@ public class Game {
         gameState = GameState.MENU;
         makeLevel();
         controlState = level.getPlayer().getControlState();
+    }
+
+    public void setShowEnemyHealth(boolean showEnemyHealth) {
+        this.showEnemyHealth = showEnemyHealth;
     }
 
     /**
@@ -131,6 +132,10 @@ public class Game {
      * propagate the call to everyone.
      */
     public void render() {
+        // Prepare screen
+        gc.clearRect(0, 0, Main.horizontalRes, Main.verticalRes); // clear the screen before drawing new frame
+        QuickView.moveCamera(getPlayer().getX(), getPlayer().getY()); // focus camera on player
+
         // Construct list of renderable objects
         ArrayList<IRenderable> objects = new ArrayList<>();
 
@@ -171,6 +176,11 @@ public class Game {
                     return 0;
                 })
                 .forEach(IRenderable::render);
+
+        // Enemy health bars
+        if (showEnemyHealth) {
+            level.getValidCreatures(getPlayer()).forEach(creature -> UserInterface.drawHealthBar(creature, 64));
+        }
     }
 
     public ControlState getControlState() {

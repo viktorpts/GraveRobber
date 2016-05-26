@@ -1,8 +1,6 @@
 package Abilities;
 
-import Enumerations.Abilities;
 import Enumerations.AbilityState;
-import Enumerations.AnimationState;
 import Enumerations.EntityState;
 import Models.Creature;
 

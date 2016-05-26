@@ -63,4 +63,12 @@ public class DebugView {
         Main.debugc.setStroke(Color.GREENYELLOW);
         clear();
     }
+
+    public static void renderAll() {
+        clear();
+        showPlayerInfo(); // Player position and movement
+        showControlInfo(); // Input state
+        showEntityData();
+        showInfo(); // Custom data from other objects
+    }
 }

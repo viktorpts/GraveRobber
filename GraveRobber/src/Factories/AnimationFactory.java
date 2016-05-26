@@ -17,6 +17,7 @@ public class AnimationFactory {
         sprites.put("Player", new Sprite("./resources/warrior.ini"));
         sprites.put("GIANT_RAT", new Sprite("./resources/rat.ini"));
         sprites.put("SKELETON", new Sprite("./resources/skeleton.ini"));
+        sprites.put("HealthPotion", new Sprite("./resources/healthpotion.ini"));
     }
 
     public static Animation getAnimation(String name) {

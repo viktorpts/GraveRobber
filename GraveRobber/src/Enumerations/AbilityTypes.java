@@ -1,13 +1,14 @@
 package Enumerations;
 
-public enum Abilities {
+public enum AbilityTypes {
     ATTACKPRIMARY ("Primary Attack"),
     DASH ("Dash"),
-    DEFEND ("Defend");
+    DEFEND ("Defend"),
+    HEAL ("Heal");
 
     private String name;
 
-    private Abilities(String name) {
+    private AbilityTypes(String name) {
         this.name = name;
     }
 

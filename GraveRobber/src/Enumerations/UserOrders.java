@@ -12,5 +12,6 @@ public enum UserOrders {
     MOVE_SOUTHEAST,
     ATTACK,
     DASH,
-    DEFEND
+    DEFEND,
+    HEAL
 }

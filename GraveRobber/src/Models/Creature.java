@@ -23,7 +23,7 @@ abstract public class Creature extends Entity implements IMovable {
     private int healthPoints;
     private int attackPower;
     private int armorValue;
-    HashMap<Abilities, Ability> abilities;
+    HashMap<AbilityTypes, Ability> abilities;
     double immuneTime = 0; // time to next damage instance
 
     // Physical characteristics
@@ -35,7 +35,7 @@ abstract public class Creature extends Entity implements IMovable {
                     double x, double y,
                     double direction, int healthPoints,
                     int attackPower, int armorValue,
-                    HashMap<Abilities, Ability> abilities,
+                    HashMap<AbilityTypes, Ability> abilities,
                     double radius, double maxSpeed,
                     double maxAcceleration) {
         super(animation, x, y, direction, radius);
@@ -50,6 +50,7 @@ abstract public class Creature extends Entity implements IMovable {
     }
 
     //region Properties
+
     public int getHealthPoints() {
         return healthPoints;
     }
@@ -78,11 +79,6 @@ abstract public class Creature extends Entity implements IMovable {
         this.armorValue = value;
     }
 
-    public double getCooldown(Abilities ability) {
-        if (abilities.containsKey(ability))
-            return abilities.get(ability).getCooldown();
-        else return 0.0;
-    }
     //endregion ==============================
 
     //region Movement
@@ -165,7 +161,7 @@ abstract public class Creature extends Entity implements IMovable {
         double penetration = dist.getMagnitude() - (getRadius() + target.getRadius());
         if (penetration < 0.0) {
             // collision; resolve via projection (entities placed apart, no vector modification)
-            Main.debugInfo += String.format("%ncollision");
+            //Main.debugInfo += String.format("%ncollision");
             dist.setMagnitude(penetration / 2); // separation vector
             getPos().doSubtract(dist);
             dist.scale(-1); // push target entity in opposite direction
@@ -274,7 +270,7 @@ abstract public class Creature extends Entity implements IMovable {
     }
 
     //region Abilities
-    public Ability getAbility(Abilities ability) {
+    public Ability getAbility(AbilityTypes ability) {
         if (abilities.containsKey(ability))
             return abilities.get(ability);
         else return null;
@@ -287,7 +283,7 @@ abstract public class Creature extends Entity implements IMovable {
      * @param ability An instance of the ability. Do not attach the same reference to two different creatures, since
      *                cooldown and effects are linked back to the creature
      */
-    public void addAbility(Abilities name, Ability ability) {
+    public void addAbility(AbilityTypes name, Ability ability) {
         abilities.put(name, ability);
     }
 
@@ -299,7 +295,7 @@ abstract public class Creature extends Entity implements IMovable {
      * @param ability Name of ability to be activated
      * @return True if ability was activated successfully
      */
-    public boolean useAbility(Abilities ability) {
+    public boolean useAbility(AbilityTypes ability) {
         if (!isReady()) return false;
         if (abilities.containsKey(ability)) {
             if (!abilities.get(ability).isReady()) return false;
@@ -313,7 +309,7 @@ abstract public class Creature extends Entity implements IMovable {
         return false;
     }
 
-    public void unUseAbility(Abilities ability) {
+    public void unUseAbility(AbilityTypes ability) {
         if (abilities.containsKey(ability)) {
             cancelAnimation();
             resetState();
@@ -387,7 +383,7 @@ abstract public class Creature extends Entity implements IMovable {
         if (damage > 0 && healthPoints > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
             if (this instanceof Player) {
-                Defend shield = (Defend) abilities.get(Abilities.DEFEND);
+                Defend shield = (Defend) abilities.get(AbilityTypes.DEFEND);
                 // redirect damage to shield
                 if (shield.isActive() && shield.getHealth() > 0 &&
                         Coord.innerAngle(getPos(), source, getDirection()) < Math.PI / 2) {
@@ -406,19 +402,29 @@ abstract public class Creature extends Entity implements IMovable {
             healthPoints -= (int) damage;
 
             if (healthPoints <= 0) {
-                stop();
-                stopAbilities();
-                cancelAnimation();
-                changeAnimation(Sequences.DIE, false);
-                setState(EnumSet.of(EntityState.DIE));
-
-                // Placeholder end level condition
-                if (this instanceof Enemy) {
-                    Main.game.getLevel().enemyCount--;
-                    if (Main.game.getLevel().enemyCount == 0) Main.game.getLevel().spawnBoss();
-                }
+                die();
             }
         }
+    }
+
+    protected void die() {
+        stop();
+        stopAbilities();
+        cancelAnimation();
+        changeAnimation(Sequences.DIE, false);
+        setState(EnumSet.of(EntityState.DIE));
+
+        // Placeholder end level condition
+        if (this instanceof Enemy) {
+            Main.game.getLevel().enemyCount--;
+            if (Main.game.getLevel().enemyCount == 0) Main.game.getLevel().spawnBoss();
+        }
+    }
+
+    public void modifyHealth(double change) {
+        healthPoints += change;
+        if (healthPoints > maxHealth) healthPoints = maxHealth;
+        else if (healthPoints <= 0) die();
     }
     //endregion ==============================
 

@@ -1,12 +1,10 @@
 package World;
 
-import Enumerations.EnemyTypes;
-import Enumerations.EntityState;
-import Enumerations.TileType;
+import Enumerations.*;
+import Factories.AnimationFactory;
 import Factories.CreatureFactory;
-import Models.Creature;
-import Models.Entity;
-import Models.Player;
+import Factories.LootFactory;
+import Models.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +39,7 @@ public class Level {
         entities = new ArrayList<>();
         generateGeometry();
         spawnEnemies();
+        spawnItems();
         this.player = player;
         setStart();
         entities.add(this.player);
@@ -67,6 +66,14 @@ public class Level {
                         Math.abs(entity.getY() - collider.getY()) < Physics.activeRange / 2)
                 .filter(entity -> !entity.equals(collider)) // can't collide with self
                 .map(e -> (Creature) e);
+    }
+
+    public Stream<Loot> getItems(Creature collider) {
+        return entities.stream()
+                .filter(entity -> entity instanceof Loot)
+                .filter(entity -> Math.abs(entity.getX() - collider.getX()) < Physics.activeRange / 2 &&
+                        Math.abs(entity.getY() - collider.getY()) < Physics.activeRange / 2)
+                .map(entity -> (Loot) entity);
     }
 
     public ArrayList<Tile> getGeometry() {
@@ -115,13 +122,25 @@ public class Level {
                 .collect(Collectors.toList());
         for (int i = 0; i < 2; i++) {
             Tile current = validTiles.get(rnd.nextInt(validTiles.size())); // Pick random tile
-            entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,current.getX()-0.3, current.getY()+0.4, rnd.nextDouble() * Math.PI * 2));
-            entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,current.getX()+0.3, current.getY()+0.4, rnd.nextDouble() * Math.PI * 2));
-            entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT,current.getX(), current.getY()-0.2, rnd.nextDouble() * Math.PI * 2));
+            entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT, current.getX() - 0.3, current.getY() + 0.4, rnd.nextDouble() * Math.PI * 2));
+            entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT, current.getX() + 0.3, current.getY() + 0.4, rnd.nextDouble() * Math.PI * 2));
+            entities.add(CreatureFactory.createEnemy(EnemyTypes.GIANT_RAT, current.getX(), current.getY() - 0.2, rnd.nextDouble() * Math.PI * 2));
             validTiles.remove(current); // Remove tile from list
-            enemyCount++;
+            enemyCount += 3;
         }
         //*/
+    }
+
+    private void spawnItems() {
+        Random rnd = new Random();
+        // Get just the floor tiles
+        List<Tile> validTiles = geometry.stream()
+                .filter(tile -> tile.getTileType() == TileType.FLOOR && tile.getY() > 1)
+                .collect(Collectors.toList());
+        for (int i = 0; i < 2; i++) {
+            Tile current = validTiles.get(rnd.nextInt(validTiles.size())); // Pick random tile
+            entities.add(LootFactory.getConsumable(Items.POTIONHEALTH, current.getX(), current.getY(), 1));
+        }
     }
 
     public void spawnBoss() {
