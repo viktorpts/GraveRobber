@@ -18,6 +18,7 @@ import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.stream.Stream;
 
 /**
  * This object will contain all instances required for a complete game to be initialized, updated and displayed:
@@ -89,6 +90,7 @@ public class Game {
 
     /**
      * Calculate length of previous frame in seconds and store it internally for all other time dependent functions.
+     *
      * @param timeNew Current processor time in nanoseconds. We convert that to seconds and forward to all entities for
      *                convenience
      */
@@ -129,7 +131,7 @@ public class Game {
      * propagate the call to everyone.
      */
     public void render() {
-        // Construct list of renerable objects
+        // Construct list of renderable objects
         ArrayList<IRenderable> objects = new ArrayList<>();
 
         // Level tiles
@@ -151,17 +153,22 @@ public class Game {
         objects.stream()
                 .sorted((o1, o2) -> Double.compare(o1.getY(), o2.getY()))
                 .sorted((o1, o2) -> { // Dead entities always appear under living entities
-                    if (o1 instanceof Entity && o2 instanceof Entity) {
-                        if (((Entity)o1).hasState(EntityState.DEAD) && !((Entity)o2).hasState(EntityState.DEAD)) return -1;
-                        else if (!((Entity)o1).hasState(EntityState.DEAD) && ((Entity)o2).hasState(EntityState.DEAD)) return 1;
-                        else return 0;
-                    }
-                    else return 0;
+                    boolean o1dead = false, o2dead = false;
+                    if (o1 instanceof Entity && ((Entity) o1).hasState(EntityState.DEAD)) o1dead = true;
+                    if (o2 instanceof Entity && ((Entity) o2).hasState(EntityState.DEAD)) o2dead = true;
+                    if (o1dead && o2dead) return 0;
+                    if (o1dead) return -1;
+                    if (o2dead) return 1;
+                    return 0;
                 })
                 .sorted((o1, o2) -> { // Floor tiles at the bottom
-                    if (o1 instanceof Tile && ((Tile)o1).getTileType() == TileType.FLOOR) return -1;
-                    else if (o2 instanceof Tile && ((Tile)o2).getTileType() == TileType.FLOOR) return 1;
-                    else return 0;
+                    boolean o1floor = false, o2floor = false;
+                    if (o1 instanceof Tile && ((Tile) o1).getTileType() == TileType.FLOOR) o1floor = true;
+                    if (o2 instanceof Tile && ((Tile) o2).getTileType() == TileType.FLOOR) o2floor = true;
+                    if (o1floor && o2floor) return 0;
+                    if (o1floor) return -1;
+                    if (o2floor) return 1;
+                    return 0;
                 })
                 .forEach(IRenderable::render);
     }
