@@ -5,5 +5,6 @@ public enum Sequences {
     WALK,
     ATTACK,
     GETHIT,
-    DIE
+    DIE,
+    DEFEND
 }

@@ -55,8 +55,8 @@ public class Animation {
             updateFrame();
         }
         // Debug info
-        Main.debugInfo += String.format("Progress: %.2f%n", progress);
-        Main.debugInfo += String.format("Index: %d", currentIndex);
+        //Main.debugInfo += String.format("Progress: %.2f%n", progress);
+        //Main.debugInfo += String.format("Index: %d", currentIndex);
     }
 
     public void render(double x, double y) {

@@ -335,7 +335,8 @@ abstract public class Creature extends Entity implements IMovable {
     public void stagger() {
         stopAbilities();
         cancelAnimation();
-        setState(EnumSet.of(EntityState.STAGGERED));
+        getState().add(EntityState.STAGGERED);
+        //setState(EnumSet.of(EntityState.STAGGERED));
     }
 
     /**
@@ -364,7 +365,7 @@ abstract public class Creature extends Entity implements IMovable {
      * @param type   Type of source (weapon, world, spell, etc.)
      * @param source Location of damage source
      */
-    public void resolveDamage(double damage, DamageType type, Coord source) {
+    protected void resolveDamage(double damage, DamageType type, Coord source) {
         // TODO: armor calculation
         // Knockback effect, if hit with a weapon from a known source (so we knock back away from source)
         if ((type == DamageType.WEAPONMELEE || type == DamageType.WEAPONRANGED) && source != null) {
@@ -382,28 +383,14 @@ abstract public class Creature extends Entity implements IMovable {
         // TODO: stagger enemies if damaged more than 30% in 2 seconds
         if (damage > 0 && healthPoints > 0) { // prevent negative damage from healing
             if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
-            if (this instanceof Player) {
-                Defend shield = (Defend) abilities.get(AbilityTypes.DEFEND);
-                // redirect damage to shield
-                if (shield.isActive() && shield.getHealth() > 0 &&
-                        Coord.innerAngle(getPos(), source, getDirection()) < Math.PI / 2) {
-                    damage = shield.takeDamage(damage);
-                    if (damage > 0) stagger();
-                } else {
-                    stagger(); // player always gets staggered
-                }
-                immuneTime = 0.5;
-            } else {
-                immuneTime = 0.3; // Enemies have a much shorter invinciframe
-            }
+            immuneTime = 0.3; // Enemies have a much shorter invinciframe
             getState().add(EntityState.DAMAGED); // prevent instances from resolving more than once
             stop();
 
             healthPoints -= (int) damage;
-
-            if (healthPoints <= 0) {
-                die();
-            }
+        }
+        if (healthPoints <= 0) {
+            die();
         }
     }
 
@@ -413,12 +400,6 @@ abstract public class Creature extends Entity implements IMovable {
         cancelAnimation();
         changeAnimation(Sequences.DIE, false);
         setState(EnumSet.of(EntityState.DIE));
-
-        // Placeholder end level condition
-        if (this instanceof Enemy) {
-            Main.game.getLevel().enemyCount--;
-            if (Main.game.getLevel().enemyCount == 0) Main.game.getLevel().spawnBoss();
-        }
     }
 
     public void modifyHealth(double change) {

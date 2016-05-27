@@ -7,6 +7,7 @@ import Models.Enemy;
 import World.Coord;
 
 import java.util.EnumSet;
+import java.util.stream.Stream;
 
 /**
  * Note that attacks don't actually have a cooldown, since another attack cannot be initiated before the first one has
@@ -16,12 +17,13 @@ public class MeleeAttack extends Ability {
 
     double damage;
     double range;
+    double width;
 
-    // TODO: set cool down from constructor
-    public MeleeAttack(Creature owner, double resolution, double damage, double range) {
-        super(owner, 1.0, resolution);
+    public MeleeAttack(Creature owner, double resolution, double damage, double range, double cooldown) {
+        super(owner, cooldown, resolution);
         this.damage = damage;
         this.range = range;
+        this.width = Math.PI / 4; // this is half the sweep, to simplify calculations
     }
 
     /**
@@ -35,107 +37,32 @@ public class MeleeAttack extends Ability {
         state = AbilityState.INIT;
         owner.stop();
         owner.changeAnimation(Sequences.ATTACK, false);
-        owner.setState(EnumSet.of(EntityState.CASTUP)); // TODO unify busy/casting state
+        owner.setState(EnumSet.of(EntityState.CASTUP));
     }
 
     @Override
     public void resolve() {
-        Main.game.getLevel().getEntities().stream()
+        getValidTargets().forEach(entity -> entity.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos()));
+        reset();
+    }
+
+    protected Stream<Creature> getValidTargets() {
+        return Main.game.getLevel().getEntities().stream()
                 .filter(entity -> {
                     boolean result = true;
                     if (!(entity instanceof Creature) || entity == owner)
                         return false; // only damage creatures and not self
                     if (owner instanceof Enemy && entity instanceof Enemy)
                         return false; // don't damage allies
-                    if (entity.hasState(EntityState.DEAD))
+                    if (entity.hasState(EntityState.DEAD) || entity.hasState(EntityState.DIE))
                         return false; // don't hit dead creatures
-                    if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range + owner.getRadius() + entity.getRadius())
+                    if (Coord.dist(entity, owner) > range)
                         return false; // only damage those in range
-                    if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 4)
+                    if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > width)
                         return false; // only damage those within sweep angle
                     return true; // if everything's been fine, process target
                 })
-                .forEach(entity -> {
-                    Creature current = (Creature) entity;
-                    current.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos());
-                });
-        //owner.getState().remove(EntityState.CASTUP);
-        reset();
+                .map(entity -> (Creature) entity);
     }
-
-    /**
-     * Process attack. Called on every frame, we keep track of what the owner is doing, and it their animation has
-     * changed to the next phase, we update our status. If animation is cancelled (staggered, destroyed, chained), we
-     * also cancel the ability and put it in cooldown.
-     *
-     * @param time Seconds since last update
-     */
-    /*
-    @Override
-    public void update(double time) {
-        if (isReady()) return; // do nothing if ability is ready (not cooling, not in use)
-        if (isCooling()) {
-            cool(time);
-            return;
-        }
-        if ((state == AbilityState.INIT || state == AbilityState.RESOLVE) &&
-                !vrfyState()) {
-            // entity state has changed from external source, cancel attack
-            state = AbilityState.COOLING;
-            return;
-        }
-        elapsedTime += time;
-        switch (state) {
-            case INIT: // attack wind up, can't be cancelled, can be interrupted by staggering effects
-                if (owner.getAnimationState() == AnimationState.ATTACKING) {
-                    // animation state has advanced, resolve damage
-                    state = AbilityState.RESOLVE; // move to next state
-                    // cycle states of owner
-                    owner.getState().remove(EntityState.CASTUP);
-                    owner.getState().add(EntityState.CASTING);
-                }
-                break;
-            case RESOLVE: // apply effect continuously
-                // damage instances have a cool down, so no danger of resolving more than once
-                if (owner.getAnimationState() == AnimationState.ATTACKDOWN) {
-                    // animation state has advanced, wind down
-                    state = AbilityState.RECOVER; // move to next state
-                    owner.getState().remove(EntityState.CASTING);
-                    owner.getState().add(EntityState.CASTDOWN);
-                } else {
-                    // TODO: best to replace this with an event for all entities to register and decide what to do
-                    // TODO: events are a great idea! we can stream everything just once and register the whole queue
-                    Main.game.getLevel().getEntities().stream()
-                            .filter(entity -> {
-                                boolean result = true;
-                                if (!(entity instanceof Creature) || entity == owner)
-                                    return false; // only damage creatures and not self
-                                if (owner instanceof Enemy && entity instanceof Enemy)
-                                    return false; // don't damage allies
-                                if (entity.hasState(EntityState.DEAD))
-                                    return false; // don't hit dead creatures
-                                if (Coord.subtract(entity.getPos(), owner.getPos()).getMagnitude() > range)
-                                    return false; // only damage those in range
-                                if (Coord.innerAngle(owner.getPos(), entity.getPos(), owner.getDirection()) > Math.PI / 4)
-                                    return false; // only damage those within sweep angle
-                                return true; // if everything's been fine, process target
-                            })
-                            .forEach(entity -> {
-                                Creature current = (Creature) entity;
-                                current.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos());
-                            });
-                }
-                break;
-            case RECOVER: // attack wind down, can be cancelled by other abilities (chaining attacks, dodging, etc.)
-                if (owner.getAnimationState() != AnimationState.ATTACKDOWN) {
-                    // animation state has advanced, go back to ready
-                    reset(); // if attack was successful, reset cooldown
-                    owner.getState().remove(EntityState.CASTDOWN);
-                    owner.resetState(); // TODO: since we update Entity state at end of each frame, this is likely redundant
-                }
-                break;
-        }
-    }
-    */
 
 }

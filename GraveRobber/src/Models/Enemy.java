@@ -79,6 +79,12 @@ public class Enemy extends Creature {
         if (rnd.nextDouble() > 0.90) Main.game.getLevel().getEntities().add(
                 LootFactory.getConsumable(Items.POTIONHEALTH, getX(), getY(), 1)
         );
+
+        // Placeholder end level condition
+        if (this instanceof Enemy) {
+            Main.game.getLevel().enemyCount--;
+            if (Main.game.getLevel().enemyCount == 0) Main.game.getLevel().spawnBoss();
+        }
     }
 
     // TODO: add methods to initialize loot table

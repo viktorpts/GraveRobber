@@ -39,17 +39,17 @@ public class CreatureFactory implements IEnemyProducible, IPlayerProducible {
         thisEnemy.addBrain(new Roam(thisEnemy, 0.3)); // all enemies roam randomly
         switch (type) {
             case SKELETON: // skeletons are fearsome
-                thisEnemy.addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(thisEnemy, 0.75, type.getAttackPoints(), 0.4));
+                thisEnemy.addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(thisEnemy, 0.75, type.getAttackPoints(), 0.6, 1.0));
                 thisEnemy.addBrain(new Gank(thisEnemy, 5));
-                thisEnemy.addBrain(new Aggression(thisEnemy, 0.75));
+                thisEnemy.addBrain(new Aggression(thisEnemy, 0.4));
                 break;
             case GIANT_RAT: // rats are fast but feeble
-                thisEnemy.addAbility(AbilityTypes.ATTACKPRIMARY, new ChargeAttack(thisEnemy, 0.3, type.getAttackPoints(), 0.2, 2.0));
+                thisEnemy.addAbility(AbilityTypes.ATTACKPRIMARY, new ChargeAttack(thisEnemy, 0.3, type.getAttackPoints(), 0.3, 2.0));
                 thisEnemy.addBrain(new Gank(thisEnemy, 3));
-                thisEnemy.addBrain(new Aggression(thisEnemy, 1.0));
+                thisEnemy.addBrain(new Aggression(thisEnemy, 1.5));
                 break;
             default:
-                thisEnemy.addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(thisEnemy, 0.75, type.getAttackPoints(), 0.4));
+                thisEnemy.addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(thisEnemy, 0.75, type.getAttackPoints(), 0.6, 1.0));
                 thisEnemy.addBrain(new Gank(thisEnemy, 3));
                 break;
         }

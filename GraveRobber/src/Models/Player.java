@@ -42,7 +42,7 @@ public class Player extends Creature {
                 startHealthPoints, startAttackPower, startArmorValue,
                 new HashMap<AbilityTypes, Ability>(),
                 0.40, Physics.maxMoveSpeed, Physics.maxAcceleration);
-        addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 0.7));
+        addAbility(AbilityTypes.ATTACKPRIMARY, new MeleeAttack(this, 0.35, startAttackPower, 0.7, 1.0));
         addAbility(AbilityTypes.DASH, new Dash(this, 5, 12));
         addAbility(AbilityTypes.DEFEND, new Defend(this, 25, 2));
         addAbility(AbilityTypes.HEAL, new DrinkHealth(this, 5));
@@ -81,6 +81,7 @@ public class Player extends Creature {
         return currentInput;
     }
 
+    //========================================
     //region Keyboard Properties
     public void addKey(KeyCode kc) {
         currentInput.addKey(kc);
@@ -91,6 +92,7 @@ public class Player extends Creature {
     }
     //endregion ==============================
 
+    //========================================
     //region Mouse Properties
     public void setMouseLeft(boolean mouseLeft) {
         currentInput.setMouseLeft(mouseLeft);
@@ -177,6 +179,7 @@ public class Player extends Creature {
         processOrders(elapsed); // Carry out
     }
 
+    //========================================
     //region User Orders
 
     /**
@@ -258,6 +261,33 @@ public class Player extends Creature {
         double dir = Math.atan2(offsetY, offsetX);
         setDirection(dir);
     }
+    //endregion ==============================
+
+    //========================================
+    //region External effects
+
+    @Override
+    protected void resolveDamage(double damage, DamageType type, Coord source) {
+        if (getState().contains(EntityState.DAMAGED)) return; // prevent instances from resolving more than once
+
+        // redirect damage to shield
+        Defend shield = (Defend) abilities.get(AbilityTypes.DEFEND);
+        if (shield.isActive() && shield.getHealth() > 0 &&
+                Coord.innerAngle(getPos(), source, getDirection()) < Math.PI / 2) {
+            damage = shield.takeDamage(damage);
+            getState().add(EntityState.DAMAGED); // prevent instances from resolving more than once
+            immuneTime = 0.5;
+            stop();
+            changeAnimation(Sequences.DEFEND, false);
+        }
+        if (damage > 0) {
+            getState().remove(EntityState.DAMAGED);
+            stagger(); // player always gets staggered
+            super.resolveDamage(damage, type, source);
+            immuneTime = 0.5;
+        }
+    }
+
     //endregion ==============================
 
 }

@@ -41,12 +41,12 @@ public class Aggression extends Behaviour {
             if (elapsedTime >= 0.3) { // short pause before attacking, otherwise enemies are too snappy
                 reset();
                 state = AIState.THINKING;
-                if (Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude() <= range) {
+                if (Coord.dist(Game.Main.game.getPlayer(), owner) <= range) {
                     act();
                 }
             }
             return true;
-        } else if (Coord.subtract(Game.Main.game.getPlayer().getPos(), owner.getPos()).getMagnitude() <= range) {
+        } else if (Coord.dist(Game.Main.game.getPlayer(), owner) <= range) {
             state = AIState.PROCESSING;
             reset();
             return true;

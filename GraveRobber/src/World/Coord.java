@@ -125,4 +125,8 @@ public class Coord {
         if (inner > Math.PI) inner -= 2 * Math.PI;
         return Math.abs(inner);
     }
+
+    public static double dist(Models.Entity e1, Models.Entity e2) {
+        return subtract(e1.getPos(), e2.getPos()).getMagnitude() - (e1.getRadius() + e2.getRadius());
+    }
 }

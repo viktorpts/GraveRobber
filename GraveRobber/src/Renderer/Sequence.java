@@ -53,6 +53,7 @@ public class Sequence {
         else if (name.equals("attack")) return Sequences.ATTACK;
         else if (name.equals("gethit")) return Sequences.GETHIT;
         else if (name.equals("die")) return Sequences.DIE;
+        else if (name.equals("defend")) return Sequences.DEFEND;
         return Sequences.IDLE;
     }
 
