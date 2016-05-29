@@ -10,6 +10,7 @@ import Models.Player;
 import Renderer.QuickView;
 import Renderer.UserInterface;
 import World.Level;
+import World.LevelMaker;
 import World.Physics;
 import World.Tile;
 import javafx.scene.canvas.GraphicsContext;
@@ -54,9 +55,12 @@ public class Game {
      * by the Level itself, after the maze is generated
      */
     public void makeLevel() {
-        level = new Level(new Player(100, 10, 2, 10, 10));
+        level = new Level(new Player(100, 10, 2, 10, 10), 1);
     }
     // TODO: this object can be streamed to a file for a complete game state save and load function
+    public void nextLevel() {
+        level.nextLevel();
+    }
 
     // Shorthands for the most commonly used objects
     public GraphicsContext getGc() {

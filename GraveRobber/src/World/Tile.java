@@ -27,7 +27,6 @@ public class Tile implements IRenderable {
 
     // TODO: fix paths
     public Image setImageTile(TileType tileType) {
-        Image img;
         if (tileType == TileType.WALL) {
             img = new Image("wall.jpg");
         } else if (tileType == TileType.DOOR) {

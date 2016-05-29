@@ -91,7 +91,7 @@ public class QuickView {
                 gc.setFill(Color.DARKORANGE);
                 break;
         }
-        gc.fillRect(toCanvasX(x + 0.5), toCanvasY(y + 0.5), gridSize, gridSize);
+        gc.fillRect(toCanvasX(x - 1.0) + 1, toCanvasY(y - 1.0) + 1, gridSize - 2, gridSize - 2);
     }
 
     static public void renderDungeon(GraphicsContext gc, ArrayList<Dungeon> list, boolean finalize) {

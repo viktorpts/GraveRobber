@@ -13,11 +13,21 @@ public class Dungeon {
 	private Dungeon leftChild;
 	private Dungeon rightChild;
 	private Dungeon hallway;
+    private Dungeon dungeon; // Room to display
 
+    /**
+     * Constructor
+     */
+    public Dungeon(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
 
-	/**
-	 * Properties
-	 */
+    //========================================
+	//region Properties
+
 	public Dungeon getDungeon() {
 		return dungeon;
 	}
@@ -89,21 +99,7 @@ public class Dungeon {
 		this.y = y;
 	}
 
-
-	/**
-	 * Room to display
-	 */
-	private Dungeon dungeon;
-
-	/**
-	 * Constructor
-	 */
-	public Dungeon(int x, int y, int width, int height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-	}
+    //endregion ==============================
 
 	/**
 	 * Attempts to split the room in two, if not already split and if MIN_SIZE has not been reached
