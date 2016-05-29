@@ -31,7 +31,7 @@ public class ChargeAttack extends MeleeAttack {
 
     @Override
     public void resolve() {
-        getValidTargets().forEach(entity -> entity.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos()));
+        getValidTargets().forEach(entity -> entity.takeDamage(owner.getAttackPower(), DamageType.WEAPONMELEE, owner.getPos()));
         // Charge attacks do not reset, or else hilarity ensues
     }
 

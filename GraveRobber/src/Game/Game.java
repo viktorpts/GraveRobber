@@ -110,6 +110,12 @@ public class Game {
      * altogether. Filters are in place to only update entities a certain distance from where the camera is looking.
      */
     public void update() {
+        if (gameState == GameState.lOADNEXT) {
+            gameState = GameState.LIVE;
+            level.nextLevel();
+            return;
+        }
+
         ArrayList<Entity> markedForDeletion = new ArrayList<>(); // prevent ConcurrentModificationException
         // Limit to Creature instances that are within a predetermined range (one screen width in each direction from the camera)
         level.getEntities().stream().filter(entity -> entity instanceof Creature)

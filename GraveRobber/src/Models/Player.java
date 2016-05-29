@@ -74,7 +74,11 @@ public class Player extends Creature {
         // TODO: Item pick up
         Main.game.getLevel().getItems(this)
                 .filter(item -> Coord.subtract(this.getPos(), item.getPos()).getMagnitude() < this.getRadius())
-                .forEach(item -> inventory.pickUp(item));
+                .forEach(item -> {
+                    if (item.getType() == Items.ENDKEY)
+                        Main.game.setGameState(GameState.lOADNEXT);
+                    inventory.pickUp(item);
+                });
     }
 
     public ControlState getControlState() {

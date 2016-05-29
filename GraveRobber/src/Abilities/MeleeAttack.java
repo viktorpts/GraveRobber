@@ -42,7 +42,7 @@ public class MeleeAttack extends Ability {
 
     @Override
     public void resolve() {
-        getValidTargets().forEach(entity -> entity.takeDamage(damage, DamageType.WEAPONMELEE, owner.getPos()));
+        getValidTargets().forEach(entity -> entity.takeDamage(owner.getAttackPower(), DamageType.WEAPONMELEE, owner.getPos()));
         reset();
     }
 

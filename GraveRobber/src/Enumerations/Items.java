@@ -1,7 +1,8 @@
 package Enumerations;
 
 public enum Items {
-    POTIONHEALTH(3, "HealthPotion", 100, 0);
+    POTIONHEALTH(3, "HealthPotion", 100, 0),
+    ENDKEY(100, "EndKey", 0, 0);
 
     private int maxStack;
     private String spriteName;
